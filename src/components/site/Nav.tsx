@@ -20,13 +20,20 @@ export function Nav() {
         </nav>
         <div className="flex items-center gap-4">
           <a
-            href="#about"
+            href="/#about"
             className="hidden sm:inline text-xs font-mono uppercase tracking-widest text-silver/80 hover:text-primary transition-colors"
           >
             About Us
           </a>
+          <Link
+            to="/blog"
+            className="hidden sm:inline text-xs font-mono uppercase tracking-widest text-silver/80 hover:text-primary transition-colors"
+            activeProps={{ className: "text-primary" }}
+          >
+            Blog
+          </Link>
           <a
-            href="#custom"
+            href="/#custom"
             className="text-xs font-mono uppercase tracking-widest px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             Order Custom
