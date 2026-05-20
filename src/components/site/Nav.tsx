@@ -27,8 +27,8 @@ export function Nav() {
           </a>
           <Link
             to="/blog"
-            className="hidden sm:inline text-xs font-mono uppercase tracking-widest text-silver/80 hover:text-primary transition-colors"
-            activeProps={{ className: "text-primary" }}
+            className="hidden sm:inline text-xs font-mono uppercase tracking-widest px-4 py-2 border border-silver/60 text-silver hover:bg-silver hover:text-background transition-colors"
+            activeProps={{ className: "bg-silver text-background" }}
           >
             Blog
           </Link>
