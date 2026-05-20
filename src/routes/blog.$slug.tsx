@@ -78,7 +78,7 @@ function PostPage() {
             {post.excerpt}
           </p>
           <div className="space-y-6 text-silver/80 text-lg leading-relaxed">
-            {post.body.map((para, i) => (
+            {post.body.map((para: string, i: number) => (
               <p key={i}>{para}</p>
             ))}
           </div>
