@@ -16,7 +16,7 @@ export function Nav() {
           <a href="#craft" className="hover:text-primary transition-colors">Craft</a>
           <a href="#shop" className="hover:text-primary transition-colors">Shop</a>
           <a href="#custom" className="hover:text-primary transition-colors">Custom</a>
-          <a href="#newsletter" className="hover:text-primary transition-colors">News</a>
+          <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Journal</Link>
         </nav>
         <a
           href="#custom"
