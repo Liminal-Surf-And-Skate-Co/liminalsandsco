@@ -6,6 +6,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-2">
           <img src={logo} alt="Liminal" className="h-16 w-auto mb-4" />
+          <p className="font-display text-2xl text-primary mb-3">Oh Yeah Not Bad!</p>
           <p className="text-silver/60 text-sm max-w-xs leading-relaxed">
             Hand-shaped surf and skate from a one-bench workshop. Made
             between the wave and the concrete.

@@ -6,7 +6,7 @@ export function Hero() {
       <div className="max-w-7xl mx-auto px-6 pt-20 pb-32 grid lg:grid-cols-12 gap-8 items-center">
         <div className="lg:col-span-7 relative z-10">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-8">
-            Est. 2026 · Hand-shaped · Small batch
+            Oh Yeah Not Bad! · Est. 2026 · Hand-shaped
           </p>
           <h1 className="font-display font-black text-6xl sm:text-7xl lg:text-[8.5rem] leading-[0.85] tracking-tighter mb-8">
             BETWEEN<br />
@@ -50,8 +50,8 @@ export function Hero() {
         <div className="flex animate-marquee whitespace-nowrap py-4">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex items-center gap-12 px-6 font-display text-2xl text-silver/40">
+              <span>OH YEAH NOT BAD!</span><span className="text-primary">✦</span>
               <span>HAND SHAPED</span><span className="text-primary">✦</span>
-              <span>SMALL BATCH</span><span className="text-primary">✦</span>
               <span>SURF · SKATE · WEAR</span><span className="text-primary">✦</span>
               <span>MADE TO RIDE</span><span className="text-primary">✦</span>
               <span>NO TWO ALIKE</span><span className="text-primary">✦</span>
