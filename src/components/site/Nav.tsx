@@ -12,6 +12,7 @@ export function Nav() {
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-mono uppercase tracking-widest text-silver/80">
+          <a href="#about" className="hover:text-primary transition-colors">About</a>
           <a href="#craft" className="hover:text-primary transition-colors">Craft</a>
           <a href="#shop" className="hover:text-primary transition-colors">Shop</a>
           <a href="#custom" className="hover:text-primary transition-colors">Custom</a>
