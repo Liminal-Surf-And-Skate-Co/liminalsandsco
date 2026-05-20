@@ -8,7 +8,7 @@ export function Footer() {
           <img src={logo} alt="Liminal" className="h-16 w-auto mb-4" />
           <p className="font-display text-2xl text-primary mb-3">Oh Yeah Not Bad!</p>
           <p className="text-silver/60 text-sm max-w-xs leading-relaxed">
-            Hand-shaped surf and skate from a one-bench workshop. Made
+            Hand-crafted surf and skate from a one-bench workshop. Made
             between the wave and the concrete.
           </p>
         </div>
