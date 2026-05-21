@@ -19,13 +19,6 @@ export function Nav() {
         </nav>
         <div className="flex items-center gap-4">
           <Link
-            to="/about"
-            className="hidden sm:inline text-xs font-mono uppercase tracking-widest px-4 py-2 border border-silver/60 bg-black text-silver hover:bg-silver hover:text-background transition-colors"
-            activeProps={{ className: "bg-silver text-background" }}
-          >
-            About Us
-          </Link>
-          <Link
             to="/blog"
             className="hidden sm:inline text-xs font-mono uppercase tracking-widest px-4 py-2 border border-silver/60 text-silver hover:bg-silver hover:text-background transition-colors"
             activeProps={{ className: "bg-silver text-background" }}
