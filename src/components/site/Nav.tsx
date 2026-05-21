@@ -16,7 +16,6 @@ export function Nav() {
           <a href="#craft" className="hover:text-primary transition-colors">Craft</a>
           <a href="#shop" className="hover:text-primary transition-colors">Shop</a>
           <a href="#custom" className="hover:text-primary transition-colors">Custom</a>
-          <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Journal</Link>
         </nav>
         <div className="flex items-center gap-4">
           <Link
@@ -32,13 +31,6 @@ export function Nav() {
             activeProps={{ className: "bg-silver text-background" }}
           >
             Blog
-          </Link>
-          <Link
-            to="/shop"
-            className="hidden sm:inline text-xs font-mono uppercase tracking-widest px-4 py-2 border border-silver/60 text-silver hover:bg-silver hover:text-background transition-colors"
-            activeProps={{ className: "bg-silver text-background" }}
-          >
-            Shop
           </Link>
           <a
             href="/#custom"
