@@ -13,9 +13,9 @@ export function Nav() {
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-mono uppercase tracking-widest text-silver/80">
           <Link to="/about" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>About</Link>
-          <a href="#craft" className="hover:text-primary transition-colors">Craft</a>
-          <a href="#shop" className="hover:text-primary transition-colors">Shop</a>
-          <a href="#custom" className="hover:text-primary transition-colors">Custom</a>
+          <a href="/#craft" className="hover:text-primary transition-colors">Community</a>
+          <Link to="/shop" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Shop</Link>
+          <a href="/#custom" className="hover:text-primary transition-colors">Custom</a>
           <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Journal</Link>
         </nav>
         <div className="flex items-center gap-4">
