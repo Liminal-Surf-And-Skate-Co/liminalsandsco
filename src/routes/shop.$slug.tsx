@@ -94,7 +94,7 @@ function ProductPage() {
             <p className="text-silver/90 leading-relaxed mb-8">{product.description}</p>
 
             <ul className="border-y border-border/60 divide-y divide-border/60 mb-10">
-              {product.details.map((d) => (
+              {product.details.map((d: string) => (
                 <li key={d} className="py-3 font-mono text-xs uppercase tracking-widest text-silver/80">
                   — {d}
                 </li>
