@@ -2,11 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Heart, Search, SlidersHorizontal, X } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Slider } from "@/components/ui/slider";
 import { allProducts, categories, type Category } from "@/lib/products";
+import { useWishlist } from "@/hooks/use-wishlist";
+import { useCart } from "@/hooks/use-cart";
 
 const PRICE_MIN = 0;
 const PRICE_MAX = Math.max(...allProducts.map((p) => p.price));
@@ -19,14 +21,16 @@ const shopSearchSchema = z.object({
   max: fallback(z.number().min(0), PRICE_MAX).default(PRICE_MAX),
 });
 
+type ShopSearch = z.infer<typeof shopSearchSchema>;
+
 export const Route = createFileRoute("/shop")({
   validateSearch: zodValidator(shopSearchSchema),
   head: () => ({
     meta: [
       { title: "Shop — Liminal Surf & Skate Co" },
-      { name: "description", content: "Skateboards, surfboards, merchandise, jewellery, and hand-crafted pieces from Liminal." },
+      { name: "description", content: "Surfboards, skateboards, merchandise, footwear, accessories, jewellery, and hand-crafted pieces from Liminal." },
       { property: "og:title", content: "Shop — Liminal Surf & Skate Co" },
-      { property: "og:description", content: "Skateboards, surfboards, merchandise, jewellery, and hand-crafted pieces from Liminal." },
+      { property: "og:description", content: "Everything we make, in one place." },
     ],
   }),
   component: ShopPage,
@@ -38,16 +42,18 @@ function ShopPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/shop" });
   const [open, setOpen] = useState(true);
+  const { has: wishHas, toggle: wishToggle } = useWishlist();
+  const { add: cartAdd } = useCart();
 
-  const activeCats = search.cats.filter((c): c is Category =>
+  const activeCats = (search.cats as string[]).filter((c): c is Category =>
     (categories as string[]).includes(c),
   );
 
-  const update = (patch: Partial<typeof search>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true });
+  const update = (patch: Partial<ShopSearch>) =>
+    navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }), replace: true });
 
   const toggleCat = (c: Category) => {
-    const next = activeCats.includes(c) ? activeCats.filter((x) => x !== c) : [...activeCats, c];
+    const next = activeCats.includes(c) ? activeCats.filter((x: Category) => x !== c) : [...activeCats, c];
     update({ cats: next });
   };
 
@@ -93,9 +99,19 @@ function ShopPage() {
         <section className="py-20 border-b border-border/40">
           <div className="max-w-7xl mx-auto px-6">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">The Shop</p>
-            <h1 className="font-display font-black text-5xl lg:text-7xl leading-none">
+            <h1 className="font-display font-black text-5xl lg:text-7xl leading-none mb-8">
               Everything we make,<br />in one place.
             </h1>
+            {/* Prominent hero search */}
+            <div className="relative max-w-xl">
+              <Search className="h-4 w-4 absolute left-4 top-1/2 -translate-y-1/2 text-silver/50" />
+              <input
+                value={search.q}
+                onChange={(e) => update({ q: e.target.value })}
+                placeholder="Search products — wheels, wetsuit, hoodie…"
+                className="w-full pl-11 pr-4 py-3 bg-card border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 focus:outline-none focus:border-primary"
+              />
+            </div>
           </div>
         </section>
 
@@ -216,30 +232,51 @@ function ShopPage() {
                   <section key={cat}>
                     <h2 className="font-display font-black text-2xl lg:text-3xl mb-6">{cat}</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {items.map((p) => (
-                        <Link
-                          key={p.slug}
-                          to="/shop/$slug"
-                          params={{ slug: p.slug }}
-                          className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden"
-                        >
-                          <div className="aspect-square overflow-hidden bg-background">
-                            <img
-                              src={p.img}
-                              alt={p.title}
-                              loading="lazy"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
-                          </div>
-                          <div className="p-5 flex items-end justify-between">
-                            <div>
-                              <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{p.tag}</p>
-                              <h3 className="font-display font-bold text-lg">{p.title}</h3>
+                      {items.map((p) => {
+                        const saved = wishHas(p.slug);
+                        return (
+                          <div
+                            key={p.slug}
+                            className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative"
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                wishToggle(p.slug);
+                              }}
+                              aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+                              className="absolute top-3 right-3 z-10 h-9 w-9 flex items-center justify-center bg-background/80 backdrop-blur border border-border/60 hover:border-primary"
+                            >
+                              <Heart className={`h-4 w-4 ${saved ? "fill-primary text-primary" : "text-silver"}`} />
+                            </button>
+                            <Link to="/shop/$slug" params={{ slug: p.slug }} className="block">
+                              <div className="aspect-square overflow-hidden bg-background">
+                                <img
+                                  src={p.img}
+                                  alt={p.title}
+                                  loading="lazy"
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                              </div>
+                              <div className="p-5 flex items-end justify-between">
+                                <div>
+                                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{p.tag}</p>
+                                  <h3 className="font-display font-bold text-lg">{p.title}</h3>
+                                </div>
+                                <span className="text-silver text-sm font-mono">${p.price}</span>
+                              </div>
+                            </Link>
+                            <div className="px-5 pb-5">
+                              <button
+                                onClick={() => cartAdd(p.slug)}
+                                className="w-full font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                              >
+                                Add to cart
+                              </button>
                             </div>
-                            <span className="text-silver text-sm font-mono">${p.price}</span>
                           </div>
-                        </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </section>
                 ))}

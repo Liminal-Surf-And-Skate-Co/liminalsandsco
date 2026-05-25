@@ -9,21 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as CommunityRouteImport } from './routes/community'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -50,16 +74,24 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/blog': typeof BlogRouteWithChildren
+  '/cart': typeof CartRoute
+  '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
+  '/wishlist': typeof WishlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/blog': typeof BlogRouteWithChildren
+  '/cart': typeof CartRoute
+  '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
+  '/wishlist': typeof WishlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
@@ -67,22 +99,50 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/blog': typeof BlogRouteWithChildren
+  '/cart': typeof CartRoute
+  '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
+  '/wishlist': typeof WishlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/blog' | '/shop' | '/blog/$slug' | '/shop/$slug'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/account'
+    | '/blog'
+    | '/cart'
+    | '/community'
+    | '/shop'
+    | '/wishlist'
+    | '/blog/$slug'
+    | '/shop/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/blog' | '/shop' | '/blog/$slug' | '/shop/$slug'
+  to:
+    | '/'
+    | '/about'
+    | '/account'
+    | '/blog'
+    | '/cart'
+    | '/community'
+    | '/shop'
+    | '/wishlist'
+    | '/blog/$slug'
+    | '/shop/$slug'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/account'
     | '/blog'
+    | '/cart'
+    | '/community'
     | '/shop'
+    | '/wishlist'
     | '/blog/$slug'
     | '/shop/$slug'
   fileRoutesById: FileRoutesById
@@ -90,12 +150,23 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
   BlogRoute: typeof BlogRouteWithChildren
+  CartRoute: typeof CartRoute
+  CommunityRoute: typeof CommunityRoute
   ShopRoute: typeof ShopRouteWithChildren
+  WishlistRoute: typeof WishlistRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -103,11 +174,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog': {
       id: '/blog'
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -164,19 +256,13 @@ const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
   BlogRoute: BlogRouteWithChildren,
+  CartRoute: CartRoute,
+  CommunityRoute: CommunityRoute,
   ShopRoute: ShopRouteWithChildren,
+  WishlistRoute: WishlistRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

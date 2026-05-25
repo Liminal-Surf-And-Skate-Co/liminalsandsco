@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart, ShoppingCart } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { getProductBySlug } from "@/lib/products";
+import { useWishlist } from "@/hooks/use-wishlist";
+import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/shop/$slug")({
   loader: ({ params }) => {
@@ -51,6 +53,9 @@ function ProductPage() {
   const [sent, setSent] = useState(false);
   const [mode, setMode] = useState<"inquiry" | "custom">("inquiry");
   const [message, setMessage] = useState("");
+  const { has: wishHas, toggle: wishToggle } = useWishlist();
+  const { add: cartAdd } = useCart();
+  const saved = wishHas(product.slug);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,13 +98,32 @@ function ProductPage() {
 
             <p className="text-silver/90 leading-relaxed mb-8">{product.description}</p>
 
-            <ul className="border-y border-border/60 divide-y divide-border/60 mb-10">
+            <ul className="border-y border-border/60 divide-y divide-border/60 mb-8">
               {product.details.map((d: string) => (
                 <li key={d} className="py-3 font-mono text-xs uppercase tracking-widest text-silver/80">
                   — {d}
                 </li>
               ))}
             </ul>
+
+            {/* Cart + Wishlist actions */}
+            <div className="flex gap-3 mb-10">
+              <button
+                onClick={() => cartAdd(product.slug)}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest py-3 hover:opacity-90 transition-opacity"
+              >
+                <ShoppingCart className="h-4 w-4" /> Add to cart
+              </button>
+              <button
+                onClick={() => wishToggle(product.slug)}
+                aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+                className={`h-12 w-12 flex items-center justify-center border transition-colors ${
+                  saved ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-silver hover:border-primary"
+                }`}
+              >
+                <Heart className={`h-5 w-5 ${saved ? "fill-primary" : ""}`} />
+              </button>
+            </div>
 
             <div className="border border-border/60 bg-card p-6">
               <div className="flex gap-2 mb-5">
