@@ -1,14 +1,10 @@
-import hero from "@/assets/hero-deck.jpg";
-import apparel from "@/assets/apparel.jpg";
-import accessories from "@/assets/accessories.jpg";
-import surfboard from "@/assets/craft-surfboard.jpg";
+import { Link } from "@tanstack/react-router";
+import { allProducts } from "@/lib/products";
 
-const products = [
-  { img: hero, title: "Maple Cruisers", price: "From $180", tag: "Decks" },
-  { img: surfboard, title: "Shaped Surfboards", price: "From $720", tag: "Surf" },
-  { img: apparel, title: "Heavyweight Hoodies", price: "$85", tag: "Wear" },
-  { img: accessories, title: "Wheels & Stickers", price: "From $12", tag: "Bits" },
-];
+const featuredSlugs = ["maple-cruisers", "shaped-shortboards", "heavyweight-hoodies", "salt-sunglasses"];
+const products = featuredSlugs
+  .map((s) => allProducts.find((p) => p.slug === s))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
 export function Shop() {
   return (
@@ -23,19 +19,20 @@ export function Shop() {
               Shop the<br />latest run.
             </h2>
           </div>
-          <a
-            href="#newsletter"
+          <Link
+            to="/shop"
             className="font-mono text-xs uppercase tracking-widest text-silver/70 hover:text-primary border-b border-silver/30 pb-1"
           >
             View all →
-          </a>
+          </Link>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((p) => (
-            <a
-              key={p.title}
-              href="#newsletter"
+            <Link
+              key={p.slug}
+              to="/shop/$slug"
+              params={{ slug: p.slug }}
               className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden"
             >
               <div className="aspect-square overflow-hidden bg-background">
@@ -53,9 +50,9 @@ export function Shop() {
                   </p>
                   <h3 className="font-display font-bold text-lg">{p.title}</h3>
                 </div>
-                <span className="text-silver text-sm font-mono">{p.price}</span>
+                <span className="text-silver text-sm font-mono">${p.price}</span>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

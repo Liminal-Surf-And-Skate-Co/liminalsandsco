@@ -18,10 +18,11 @@ export function Nav() {
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-mono uppercase tracking-widest text-silver/80">
+          <Link to="/" className="hover:text-primary transition-colors" activeOptions={{ exact: true }} activeProps={{ className: "text-primary" }}>Home</Link>
           <Link to="/about" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>About</Link>
           <Link to="/community" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Community</Link>
           <Link to="/shop" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Shop</Link>
-          <a href="/#custom" className="hover:text-primary transition-colors">Custom</a>
+          <Link to="/support" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Support</Link>
           <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Blog</Link>
         </nav>
         <div className="flex items-center gap-2">
