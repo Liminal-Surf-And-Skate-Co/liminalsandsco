@@ -20,8 +20,7 @@ export function About() {
           </p>
           <h2 className="font-display font-black text-5xl lg:text-7xl leading-[0.9] tracking-tighter mb-8">
             ONE BENCH.<br />
-            <span className="text-stroke">TWO WORLDS.</span><br />
-            ONE STOKE.
+            <span className="text-stroke">TWO WORLDS.</span>
           </h2>
           <div className="space-y-5 text-silver/80 text-lg leading-relaxed max-w-xl">
             <p>
@@ -36,6 +35,19 @@ export function About() {
               and a "oh yeah, not bad" when it finally rolls right.
             </p>
           </div>
+          <dl className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-border/40 pt-8 max-w-xl">
+            {[
+              ["7-day", "Shape & cure"],
+              ["100%", "Hand-finished"],
+              ["1 of 1", "Custom graphics"],
+              ["∞", "Soul per board"],
+            ].map(([k, v]) => (
+              <div key={v}>
+                <dt className="font-display text-3xl text-primary">{k}</dt>
+                <dd className="font-mono text-[10px] uppercase tracking-widest text-silver/60 mt-1">{v}</dd>
+              </div>
+            ))}
+          </dl>
           <div className="mt-10 grid grid-cols-3 gap-6 max-w-md">
             <Stat k="2026" v="Founded" />
             <Stat k="100%" v="Hand-made" />
