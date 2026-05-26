@@ -221,6 +221,92 @@ export function CommunityPage() {
           </div>
         </section>
 
+        {/* Video Submission Portal — Clip of the Month */}
+        <section className="py-20 border-b border-border/40">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-baseline justify-between mb-3 flex-wrap gap-2">
+              <h2 className="font-display font-black text-3xl lg:text-4xl flex items-center gap-3">
+                <Trophy className="h-7 w-7 text-primary" /> Clip of the Month
+              </h2>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">Winner takes the pot</p>
+            </div>
+            <p className="text-silver/70 mb-8 max-w-2xl text-sm">
+              Drop your best skate line or surf wave. Community votes. Winner gets a free shop deck, tee, and a brick of wax. New round every month.
+            </p>
+            <div className="grid lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7">
+                {submitted ? (
+                  <div className="border border-primary bg-card p-10 text-center">
+                    <Trophy className="h-10 w-10 text-primary mx-auto mb-4" />
+                    <p className="font-display text-2xl text-primary mb-2">Clip in the bag.</p>
+                    <p className="text-silver/70 font-mono text-sm">We'll review it within 48 hours. Voting opens on the 1st.</p>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
+                    className="bg-card/60 border border-border p-6 space-y-4"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Video className="h-4 w-4 text-primary" />
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-primary">Submit your clip</span>
+                    </div>
+                    <div>
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">Your name / handle</label>
+                      <input required className="w-full bg-input/60 border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary" />
+                    </div>
+                    <div>
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">Email</label>
+                      <input type="email" required className="w-full bg-input/60 border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary" />
+                    </div>
+                    <div>
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">Discipline</label>
+                      <select className="w-full bg-input/60 border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary">
+                        <option>Skate</option>
+                        <option>Surf</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">Clip link (YouTube / Vimeo / IG)</label>
+                      <input type="url" required placeholder="https://" className="w-full bg-input/60 border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary" />
+                    </div>
+                    <div>
+                      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">Where was it shot?</label>
+                      <input className="w-full bg-input/60 border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:border-primary" />
+                    </div>
+                    <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-gradient-purple text-primary-foreground py-4 font-mono text-xs uppercase tracking-widest shadow-glow hover:translate-y-[-2px] transition-transform">
+                      <Upload className="h-4 w-4" /> Submit Clip
+                    </button>
+                  </form>
+                )}
+              </div>
+              <div className="lg:col-span-5 space-y-4">
+                <div className="border border-border/60 bg-card p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">The Prize</p>
+                  <h3 className="font-display font-bold text-xl mb-2">Free shop deck + tee + wax</h3>
+                  <p className="text-sm text-silver/80">Winner picks any in-stock deck or surfboard blank, a Liminal tee, and a brick of wax. Featured on the Daily Swell.</p>
+                </div>
+                <div className="border border-border/60 bg-card p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">How voting works</p>
+                  <ul className="space-y-2 text-sm text-silver/80">
+                    <li>1. Submit your clip before the 28th.</li>
+                    <li>2. Top 6 go live on Discord on the 1st.</li>
+                    <li>3. Community votes for 7 days.</li>
+                    <li>4. Winner announced + shipped the prize.</li>
+                  </ul>
+                </div>
+                <a
+                  href={DISCORD_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="block border border-dashed border-primary/60 bg-card p-4 text-center font-mono text-[10px] uppercase tracking-widest text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  Watch this month's entries on Discord
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Discord CTA */}
         <section className="py-24">
           <div className="max-w-3xl mx-auto px-6 text-center">
