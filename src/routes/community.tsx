@@ -112,9 +112,9 @@ export function CommunityPage() {
             <div className="grid lg:grid-cols-12 gap-6">
               <div className="lg:col-span-8 relative border border-border/60 bg-card aspect-[16/10] overflow-hidden">
                 <div className="absolute inset-0 opacity-30"
-                  style={{ backgroundImage: "linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                  style={{ backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
                 <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                  <path d="M0,45 C20,30 40,60 60,40 S90,55 100,42 L100,0 L0,0 Z" fill="hsl(var(--primary) / 0.08)" stroke="hsl(var(--primary) / 0.4)" strokeWidth="0.3" vectorEffect="non-scaling-stroke" />
+                  <path d="M0,45 C20,30 40,60 60,40 S90,55 100,42 L100,0 L0,0 Z" fill="oklch(0.7 0.18 290 / 0.08)" stroke="oklch(0.7 0.18 290 / 0.4)" strokeWidth="0.3" vectorEffect="non-scaling-stroke" />
                 </svg>
                 {mapPins.map((p) => (
                   <button
