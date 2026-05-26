@@ -1,9 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, MapPin, MessageCircle, Users, Waves } from "lucide-react";
+import { useState } from "react";
+import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 
 const DISCORD_URL = "https://discord.gg/your-invite-here";
+
+type Pin = { id: string; name: string; kind: "Surf" | "Skate"; x: number; y: number; tip: string };
+const mapPins: Pin[] = [
+  { id: "np", name: "North Point Reef", kind: "Surf", x: 22, y: 30, tip: "Mid-tide pushing in. SW swell lights it up." },
+  { id: "hw", name: "Harbour Wall", kind: "Surf", x: 58, y: 22, tip: "Sheltered on a NE wind. Mellow lefts." },
+  { id: "rb", name: "Riverside Bowls", kind: "Skate", x: 38, y: 62, tip: "Smooth concrete, deep end gets dusty." },
+  { id: "sy", name: "School Yard Banks", kind: "Skate", x: 72, y: 70, tip: "Lights til 10pm. Locals after 6." },
+  { id: "ll", name: "Lighthouse Lefts", kind: "Surf", x: 82, y: 48, tip: "Hidden gem on bigger swells. Walk-in." },
+  { id: "dt", name: "Downtown Ledges", kind: "Skate", x: 14, y: 80, tip: "Smooth marble, no bust til midnight." },
+];
 
 export const Route = createFileRoute("/community")({
   head: () => ({
