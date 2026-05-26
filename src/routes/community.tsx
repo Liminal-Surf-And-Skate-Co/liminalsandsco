@@ -49,6 +49,8 @@ const rides = [
 ];
 
 export function CommunityPage() {
+  const [activePin, setActivePin] = useState<Pin | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
