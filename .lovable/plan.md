@@ -1,79 +1,74 @@
-# Implementation Plan
+# Build Plan — Liminal Surf & Skate Co
 
-## 1. Nav bar
-- Rename "Journal" → "Blog" in `src/components/site/Nav.tsx`.
-- "Community" already routes to `/#craft` — change to dedicated `/community` page (new route).
-- Add a small **Account** icon (right side, next to "Order Custom") linking to `/account` (login/signup placeholder page).
-- Add a **Cart** icon with item-count badge (next to Account).
-- Add a **Wishlist** (heart) icon next to Cart.
-
-## 2. Shop page (`src/routes/shop.tsx`)
-**Categories** — split & add:
-- Surfboards (own category)
-- Skateboards (own category)
-- Merchandise (hoodies, tees, hats, pants)
-- Footwear (skate shoes, slides, sandals) — NEW
-- Accessories (sunglasses, beanies, backpacks, wet bags, beach towels) — NEW
-- Jewellery
-- Hand Crafted
-
-Update `src/lib/products.ts` with new category enum + seed products for Footwear and Accessories; reclassify existing surf/skate items.
-
-**Features**
-- Search bar already exists in sidebar — also surface a prominent search at top of shop hero.
-- Wishlist: heart icon on each product card; click toggles. Persist in `localStorage` via small `useWishlist` hook (`src/hooks/use-wishlist.ts`). Heart icon in nav shows count and links to `/wishlist` page (new route showing saved items).
-- Cart: "Add to cart" button on product cards + product detail page. `useCart` hook (`src/hooks/use-cart.ts`) with localStorage. Nav cart icon shows badge with item count. New `/cart` route with line items + "Proceed to inquiry" CTA (no real checkout).
-
-## 3. Product detail page (`src/routes/shop.$slug.tsx`)
-- Add Wishlist + Add-to-cart buttons.
-- Wire inquiry/custom order form to a **server function** that:
-  - Validates with Zod (name, email, message, selected product slug).
-  - Calls Lovable Emails (`send-transactional-email`) to notify shop owner + send confirmation to customer.
-- Requires enabling **Lovable Cloud** + email domain setup + scaffolding transactional email infra. Two templates: `inquiry-notification` (to owner) and `inquiry-confirmation` (to customer).
-
-## 4. Blog page (`src/routes/blog.tsx`)
-- Add **search bar** filtering posts by title/tag.
-- Add **Media section** ("Daily Swell" / Log / Videos) below post list — grid of video/photo cards (placeholder content for now).
-
-## 5. Community page (NEW `src/routes/community.tsx`)
-Standalone page with sections:
-- Hero
-- Local Spot Checks & Reports (wave/weather/skatepark cards — placeholder)
-- Events Calendar (upcoming events list)
-- Discord link CTA (prominent button — need Discord invite URL from you)
-- Ride Share / Skate Buddy Finder (bulletin board — static placeholder cards)
-- Discussion forum link (Discord)
-
-Keep the existing `Craft` section on the home page unchanged.
-
-## 6. About page (`src/routes/about.tsx`)
-Keep home-page About section identical. Expand the standalone About page with new sections appended after current content:
-- Origin Story ("Your Why")
-- The Core Crew (founder/staff bios — placeholder photos)
-- The Team (sponsored skaters/surfers — rider profile cards)
-- Brand Values & Beliefs (sustainability, inclusivity)
-- Gritty photography layout, casual tone
-
-## 7. Account / Login (NEW `src/routes/account.tsx`)
-- Simple login/signup form (email + password) using Lovable Cloud auth.
-- Requires enabling Lovable Cloud.
-- Profile page shell for order tracking & loyalty rewards (placeholder — no orders backend yet).
-
-## 8. Backend / infrastructure needed
-- **Enable Lovable Cloud** (auth + email).
-- **Set up email domain** (you'll need to add DNS records).
-- **Scaffold transactional email** (for inquiry form).
-- Create `inquiries` table (id, product_slug, name, email, message, type, created_at) with RLS (insert allowed for anon, select admin-only).
+This is a large scope. To keep it shippable I'm splitting it into 5 phases. Each phase is independently usable. I'll need to enable **Lovable Cloud** (database, auth, file storage, email, server functions) at the start of Phase 1.
 
 ---
 
-## Questions before I build
+## Phase 1 — Foundation (Cloud + Admin + Site Settings)
 
-1. **Discord invite URL** — what's the link?
-2. **Notification email** — what email address should receive product inquiries?
-3. **Wishlist & Cart persistence** — localStorage only (guest), or tied to logged-in account? (localStorage is simpler; account-tied requires Cloud + a table.)
-4. **Account/login** — do you want it functional now (real signup via Lovable Cloud) or a placeholder page for later?
-5. **Media on blog** — placeholder cards for now, or do you have real video links/thumbnails to use?
-6. **Crew/Team on About** — placeholder names/photos for now, or do you have real bios + images?
+**Enable Lovable Cloud** — required for everything below.
 
-Once you answer these (especially 1–4, since they gate backend setup), I'll implement.
+- **Admin role system**: `user_roles` table + `has_role()` security definer function. First account you create gets promoted to admin manually (I'll tell you the one SQL snippet to run, or do it for you once you sign up).
+- **Login / signup** at `/account` (real auth, email+password).
+- **`/admin` dashboard** (admin-only, guarded route) with sections for: Site Settings, Products, Events, Reviews, Crew, Newsletters, Video Submissions.
+- **Site Settings table** (key/value): Discord invite URL, Instagram, YouTube, TikTok, Facebook, contact emails. Nav, footer, community page all read from this — no more hard-coded links.
+- **Footer**: add Instagram / YouTube / TikTok logo icons next to social links, pulled from settings.
+
+---
+
+## Phase 2 — Shop Overhaul (Mega-Nav + Filters + Product Detail)
+
+- **Mega-menu nav** with Skate / Clothing / Accessories / Surf / Other dropdowns (mobile = hamburger with accordions). Each sub-link routes to `/shop?dept=skate&type=decks` etc.
+- **Products schema** in DB (replaces `src/lib/products.ts`): dept, type, target_group (mens/womens/boys/girls), colour, size, technical fields (deck width/length/shape/wheelbase, wetsuit thickness, fin setup), tags (`new`, `sale`, `low_stock`), images[], stock_count, price, sale_price.
+- **Admin Products CRUD**: add/edit/delete products + image upload to storage.
+- **Shop sidebar**: dept, type, target group, colour, size, technical filters that appear only when relevant (e.g. Deck Width only when type=decks). Active filter chips with × + "Clear all". All URL-synced.
+- **Corner badges** on product cards: New / Sale (%) / Low Stock — auto-computed.
+- **Product detail page**:
+  - Left: image gallery (main + thumbnails).
+  - Right: title, price, size/thickness dropdown, qty selector, Add to Cart, Wishlist.
+  - Star rating summary.
+  - "You might also need" related-products row (rule-based: deck → trucks/wheels/bearings/grip; surfboard → fins/leash/wax/traction).
+  - Photo reviews section (logged-in users upload pic + text + rating; admin moderates).
+  - Inquiry button → opens the custom order form.
+
+---
+
+## Phase 3 — Community (Map + Spot Pins + Events + Video Submissions)
+
+- **Real Australia map** using Google Maps Platform connector (I'll connect it; uses Lovable-managed key on `*.lovable.app`). Centred on Australia, zoomable.
+- **Geolocation**: ask permission, centre on user's location, show "spots near me".
+- **Spot pins** (users can create when logged in): lat/lng, name, type (surf/skate), notes, tide tips, photos. Stored in DB + storage. Click pin = popup with details.
+- **Local Spot Checks**: list of nearest 5 surf + 5 skate spots from user's geolocation (Haversine sort on the spots table).
+- **Events Calendar**: month grid + list view toggle. Event cards (thumbnail, title, date/time, location, description). RSVP button (logged-in) + "Add to Google Calendar" link (generated calendar URL). Admin CRUD in `/admin/events`. Home page "Events" button links to `/community#events`.
+- **Video submissions**: logged-in users submit video URL (YouTube/Vimeo) + title + category (skate/surf). Community votes (one vote per user). Admin can feature/remove. "Clip of the Month" = top voted in current month.
+
+---
+
+## Phase 4 — Reviews + Search + Newsletter Archive + Crew
+
+- **Customer reviews carousel** above footer on home: 3–4 cards, name, 5-star, quote, "Verified Buyer — [product]" tag. "Leave a review" modal (logged-in). Admin moderation (approve/hide/feature).
+- **Global search** in header: searches products + blog posts + events. Predictive dropdown (debounced, max 5 results per category). Press enter → `/search?q=...` results page grouped by category.
+- **Newsletter archive**: new "News & Weekly Letters" tab on `/blog`. `newsletters` table (title, date, body, sent_at). Auto-dated grid. Subscriber list + Friday newsletter send from `/admin/newsletters` (composes + sends via Lovable Emails to all subscribers).
+- **Crew page rebuild** on `/about`: rename "Who's at the bench" → **"The Crew"**. Responsive 3–4 col grid, each card = photo, name, role, 1–2 sentence bio, Instagram icon link. Admin CRUD in `/admin/crew`.
+
+---
+
+## Phase 5 — Custom Orders → Email + Discord
+
+- **Custom order form** posts to a server function which:
+  1. Stores the inquiry in DB.
+  2. Sends transactional email with subject **"New Custom Product Inquiry"** to both `liminalsurfandskateco60467@gmail.com` and `contact@liminalsandsco.com` (requires verifying a sender domain — I'll walk you through that one-time DNS step).
+  3. POSTs to a Discord webhook URL (admin pastes it into Site Settings) so inquiries drop into your `#custom-orders` channel.
+- Inquiry form on product detail page deep-links here with the product pre-filled.
+
+---
+
+## What I need from you before I start
+
+1. **Discord invite URL** (public server invite link).
+2. **Discord webhook URL** for `#custom-orders` (Server Settings → Integrations → Webhooks → New Webhook → Copy URL). Can be added later in admin if you don't have it yet.
+3. **Instagram / YouTube / TikTok handle URLs** (for the footer).
+4. **Phase 1 sign-off**: confirm I should enable Lovable Cloud and start with Phase 1 (admin + settings + footer socials). Phases 2–5 follow once Phase 1 is live.
+5. **Custom domain verification later** — sending emails to your two Gmail/contact addresses requires verifying a sender domain (e.g. `notify.liminalsandsco.com`). OK to defer to Phase 5?
+
+Once you answer those (even just "go" + the social URLs) I'll start building Phase 1.
