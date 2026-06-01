@@ -14,6 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      newsletters: {
+        Row: {
+          body: string
+          created_at: string
+          excerpt: string | null
+          id: string
+          sent_at: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          sent_at?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          sent_at?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          colour: string | null
+          created_at: string
+          department: string
+          description: string
+          details: Json
+          featured: boolean
+          id: string
+          images: string[]
+          price: number
+          product_type: string | null
+          sale_price: number | null
+          sizes: string[]
+          slug: string
+          specs: Json
+          stock_count: number
+          tags: string[]
+          target_group: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          colour?: string | null
+          created_at?: string
+          department?: string
+          description?: string
+          details?: Json
+          featured?: boolean
+          id?: string
+          images?: string[]
+          price?: number
+          product_type?: string | null
+          sale_price?: number | null
+          sizes?: string[]
+          slug: string
+          specs?: Json
+          stock_count?: number
+          tags?: string[]
+          target_group?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          colour?: string | null
+          created_at?: string
+          department?: string
+          description?: string
+          details?: Json
+          featured?: boolean
+          id?: string
+          images?: string[]
+          price?: number
+          product_type?: string | null
+          sale_price?: number | null
+          sizes?: string[]
+          slug?: string
+          specs?: Json
+          stock_count?: number
+          tags?: string[]
+          target_group?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
