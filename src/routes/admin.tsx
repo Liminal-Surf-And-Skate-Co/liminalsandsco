@@ -1,10 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Shield } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings, useUpdateSetting, SETTING_KEYS, SETTING_LABELS } from "@/lib/site-settings";
+import { adminExists, claimFirstAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -39,28 +42,7 @@ function AdminPage() {
   if (!user) return null;
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Nav />
-        <main className="max-w-md mx-auto px-6 py-24 text-center">
-          <Shield className="h-10 w-10 text-primary mx-auto mb-4" />
-          <h1 className="font-display font-black text-3xl mb-3">Admin only</h1>
-          <p className="text-silver/70 text-sm mb-2">
-            Your account isn't an admin yet. Your user ID:
-          </p>
-          <code className="block bg-card border border-border/60 p-3 text-xs font-mono break-all mb-4">
-            {user.id}
-          </code>
-          <p className="text-silver/70 text-xs">
-            Ask the project owner to grant you admin in Lovable Cloud → SQL editor:
-          </p>
-          <code className="block bg-card border border-border/60 p-3 text-xs font-mono break-all mt-2 text-left">
-            insert into public.user_roles(user_id, role) values ('{user.id}', 'admin');
-          </code>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <NonAdminGate userId={user.id} />;
   }
 
   const save = async (key: string) => {
