@@ -1,8 +1,26 @@
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
+import { Lock, Instagram, Youtube, MessageCircle, Mail } from "lucide-react";
 import logo from "@/assets/liminal-logo.png";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export function Footer() {
+  const { data: settings } = useSiteSettings();
+  const socials = [
+    { key: "instagram_url", label: "Instagram", url: settings?.instagram_url, Icon: Instagram },
+    { key: "youtube_url", label: "YouTube", url: settings?.youtube_url, Icon: Youtube },
+    {
+      key: "tiktok_url",
+      label: "TikTok",
+      url: settings?.tiktok_url,
+      // lucide doesn't ship a TikTok icon; reuse a music-y glyph
+      Icon: MessageCircle,
+    },
+    { key: "discord_invite_url", label: "Discord", url: settings?.discord_invite_url, Icon: MessageCircle },
+  ].filter((s) => s.url);
+
+  const emailPrimary = settings?.contact_email_primary;
+  const emailSecondary = settings?.contact_email_secondary;
+
   return (
     <footer className="border-t border-border/40 mt-20">
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
@@ -14,8 +32,49 @@ export function Footer() {
             between the wave and the concrete.
           </p>
         </div>
-        <FooterCol title="Visit" links={["Workshop", "Stockists", "Events"]} />
-        <FooterCol title="Follow" links={["Instagram", "TikTok", "YouTube"]} />
+
+        <div>
+          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">Contact</h4>
+          <ul className="space-y-2 text-silver/70 text-sm">
+            {emailPrimary && (
+              <li>
+                <a href={`mailto:${emailPrimary}`} className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5" /> {emailPrimary}
+                </a>
+              </li>
+            )}
+            {emailSecondary && (
+              <li>
+                <a href={`mailto:${emailSecondary}`} className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5" /> {emailSecondary}
+                </a>
+              </li>
+            )}
+            <li><Link to="/support" className="hover:text-primary transition-colors">Support hub</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">Follow</h4>
+          {socials.length === 0 ? (
+            <p className="text-silver/40 text-xs font-mono">Links coming soon</p>
+          ) : (
+            <ul className="space-y-2 text-silver/70 text-sm">
+              {socials.map(({ key, label, url, Icon }) => (
+                <li key={key}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="hover:text-primary transition-colors inline-flex items-center gap-2"
+                  >
+                    <Icon className="h-3.5 w-3.5" /> {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="border-t border-border/40 bg-card/40">
@@ -47,22 +106,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterCol({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">
-        {title}
-      </h4>
-      <ul className="space-y-2 text-silver/70 text-sm">
-        {links.map((l) => (
-          <li key={l}>
-            <a href="#" className="hover:text-primary transition-colors">{l}</a>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
