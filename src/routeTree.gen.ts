@@ -21,6 +21,8 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -82,18 +84,30 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNewslettersRoute = AdminNewslettersRouteImport.update({
+  id: '/newsletters',
+  path: '/newsletters',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
@@ -101,13 +115,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
@@ -116,13 +132,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/community': typeof CommunityRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
@@ -139,6 +157,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/newsletters'
+    | '/admin/products'
     | '/blog/$slug'
     | '/shop/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +173,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/newsletters'
+    | '/admin/products'
     | '/blog/$slug'
     | '/shop/$slug'
   id:
@@ -167,6 +189,8 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/newsletters'
+    | '/admin/products'
     | '/blog/$slug'
     | '/shop/$slug'
   fileRoutesById: FileRoutesById
@@ -175,7 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   CartRoute: typeof CartRoute
   CommunityRoute: typeof CommunityRoute
@@ -270,8 +294,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/newsletters': {
+      id: '/admin/newsletters'
+      path: '/newsletters'
+      fullPath: '/admin/newsletters'
+      preLoaderRoute: typeof AdminNewslettersRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminNewslettersRoute: typeof AdminNewslettersRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminNewslettersRoute: AdminNewslettersRoute,
+  AdminProductsRoute: AdminProductsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
@@ -297,7 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   CartRoute: CartRoute,
   CommunityRoute: CommunityRoute,
