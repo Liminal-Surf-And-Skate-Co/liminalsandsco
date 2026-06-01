@@ -114,3 +114,63 @@ function AdminPage() {
     </div>
   );
 }
+
+function NonAdminGate({ userId }: { userId: string }) {
+  const queryClient = useQueryClient();
+  const adminExistsFn = useServerFn(adminExists);
+  const claimFn = useServerFn(claimFirstAdmin);
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin_exists"],
+    queryFn: () => adminExistsFn(),
+  });
+  const claim = useMutation({
+    mutationFn: () => claimFn(),
+    onSuccess: () => {
+      toast.success("You're now an admin. Refreshing…");
+      queryClient.invalidateQueries();
+      setTimeout(() => window.location.reload(), 600);
+    },
+    onError: (e: any) => toast.error(e.message || "Failed to claim admin"),
+  });
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Nav />
+      <main className="max-w-md mx-auto px-6 py-24 text-center">
+        <Shield className="h-10 w-10 text-primary mx-auto mb-4" />
+        <h1 className="font-display font-black text-3xl mb-3">Admin only</h1>
+
+        {isLoading ? (
+          <p className="text-silver/60 font-mono text-xs">Checking…</p>
+        ) : data?.exists ? (
+          <>
+            <p className="text-silver/70 text-sm mb-2">
+              Your account isn't an admin yet. Share your user ID with an existing admin:
+            </p>
+            <code className="block bg-card border border-border/60 p-3 text-xs font-mono break-all mb-4">
+              {userId}
+            </code>
+          </>
+        ) : (
+          <>
+            <p className="text-silver/70 text-sm mb-6">
+              No admins exist yet. Claim the first admin slot for this site.
+            </p>
+            <button
+              onClick={() => claim.mutate()}
+              disabled={claim.isPending}
+              className="bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-6 py-3 hover:opacity-90 disabled:opacity-40"
+            >
+              {claim.isPending ? "Claiming…" : "Make me admin"}
+            </button>
+          </>
+        )}
+
+        <Link to="/account" className="block mt-8 font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
+          ← Back to account
+        </Link>
+      </main>
+      <Footer />
+    </div>
+  );
+}
