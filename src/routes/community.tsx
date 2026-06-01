@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
+import { useSiteSettings } from "@/lib/site-settings";
 
-const DISCORD_URL = "https://discord.gg/your-invite-here";
+
 
 type Pin = { id: string; name: string; kind: "Surf" | "Skate"; x: number; y: number; tip: string };
 const mapPins: Pin[] = [
@@ -49,6 +50,8 @@ const rides = [
 ];
 
 export function CommunityPage() {
+  const { data: settings } = useSiteSettings();
+  const DISCORD_URL = settings?.discord_invite_url || "";
   const [activePin, setActivePin] = useState<Pin | null>(null);
   const [submitted, setSubmitted] = useState(false);
   return (
