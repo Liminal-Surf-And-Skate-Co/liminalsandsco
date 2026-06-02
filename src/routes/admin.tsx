@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield } from "lucide-react";
+import { Shield, Package, Mail, Settings as SettingsIcon } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -60,10 +60,28 @@ function AdminPage() {
       <main className="max-w-3xl mx-auto px-6 py-16">
         <div className="mb-10">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">Admin</p>
-          <h1 className="font-display font-black text-5xl">Site settings</h1>
+          <h1 className="font-display font-black text-5xl">Dashboard</h1>
           <p className="text-silver/70 text-sm mt-3">
-            Update social links, contact emails, and integration URLs. Saved instantly.
+            Manage products, newsletters, and site-wide settings.
           </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4 mb-12">
+          <Link to="/admin/products" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+            <Package className="h-6 w-6 text-primary mb-3" />
+            <h2 className="font-display font-bold text-xl mb-1">Products</h2>
+            <p className="font-mono text-xs text-silver/60">Create, edit, and stock the shop catalog.</p>
+          </Link>
+          <Link to="/admin/newsletters" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+            <Mail className="h-6 w-6 text-primary mb-3" />
+            <h2 className="font-display font-bold text-xl mb-1">Newsletters</h2>
+            <p className="font-mono text-xs text-silver/60">Compose weekly drops and archive past sends.</p>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <SettingsIcon className="h-4 w-4 text-primary" />
+          <h2 className="font-display font-bold text-2xl">Site settings</h2>
         </div>
 
         <div className="space-y-4">

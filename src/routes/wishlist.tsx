@@ -4,7 +4,7 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
-import { allProducts } from "@/lib/products";
+import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
 
 export const Route = createFileRoute("/wishlist")({
   head: () => ({
@@ -19,7 +19,8 @@ export const Route = createFileRoute("/wishlist")({
 function WishlistPage() {
   const { slugs, remove } = useWishlist();
   const { add } = useCart();
-  const items = allProducts.filter((p) => slugs.includes(p.slug));
+  const { data: products = [], isLoading } = useProducts();
+  const items = products.filter((p) => slugs.includes(p.slug));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -30,7 +31,9 @@ function WishlistPage() {
           <h1 className="font-display font-black text-4xl lg:text-5xl">Your Wishlist</h1>
         </div>
 
-        {items.length === 0 ? (
+        {isLoading ? (
+          <p className="font-mono text-xs text-silver/60">Loading…</p>
+        ) : items.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
             <p className="font-mono text-sm text-silver/70 mb-6">No saved pieces yet.</p>
             <Link to="/shop" className="font-mono text-xs uppercase tracking-widest text-primary hover:underline">
@@ -49,13 +52,13 @@ function WishlistPage() {
                   <X className="h-4 w-4" />
                 </button>
                 <Link to="/shop/$slug" params={{ slug: p.slug }} className="block aspect-square overflow-hidden bg-background">
-                  <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={productImage(p)} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </Link>
                 <div className="p-5">
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{p.tag}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{DEPARTMENT_LABELS[p.department]}</p>
                   <h3 className="font-display font-bold text-lg mb-3">{p.title}</h3>
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-silver text-sm font-mono">${p.price}</span>
+                    <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>
                     <button
                       onClick={() => add(p.slug)}
                       className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
