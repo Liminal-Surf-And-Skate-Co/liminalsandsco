@@ -20,17 +20,29 @@ import {
   type Product,
   type SortKey,
 } from "@/lib/products";
+import {
+  COLOURS, GENDERS, SIZES, DECK_SPEC_FIELDS, SURF_SPEC_FIELDS,
+} from "@/lib/shop-taxonomy";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
 
 const PRICE_MIN = 0;
 const PRICE_MAX = 2000;
 
+// CSV helpers for multi-select search params
+const csvSchema = fallback(z.string(), "").default("");
+const splitCsv = (s: string) => (s ? s.split(",").filter(Boolean) : []);
+const joinCsv = (a: string[]) => a.join(",");
+
 const shopSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
   sort: fallback(z.enum(["newest", "oldest", "price-asc", "price-desc"]), "newest").default("newest"),
   dept: fallback(z.enum(["skate", "surf", "clothing", "accessories", "other", "all"]), "all").default("all"),
   type: fallback(z.string(), "").default(""),
+  category: fallback(z.string(), "").default(""),
+  colour: csvSchema,        // CSV
+  gender: csvSchema,        // CSV
+  size: csvSchema,          // CSV
   min: fallback(z.number().min(0), PRICE_MIN).default(PRICE_MIN),
   max: fallback(z.number().min(0), PRICE_MAX).default(PRICE_MAX),
 });
@@ -61,10 +73,30 @@ function ShopPage() {
   const update = (patch: Partial<ShopSearch>) =>
     navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }), replace: true });
 
+  const selColours = splitCsv(search.colour);
+  const selGenders = splitCsv(search.gender);
+  const selSizes = splitCsv(search.size);
+
+  const toggle = (csv: string, value: string) => {
+    const set = new Set(splitCsv(csv));
+    set.has(value) ? set.delete(value) : set.add(value);
+    return joinCsv([...set]);
+  };
+
   const filtered = useMemo(() => {
     let list = (products ?? []).slice();
     if (search.dept !== "all") list = list.filter((p) => p.department === search.dept);
     if (search.type) list = list.filter((p) => (p.product_type ?? "") === search.type);
+    if (search.category) {
+      const cat = search.category.toLowerCase();
+      list = list.filter((p) =>
+        p.tags.map((t) => t.toLowerCase()).includes(cat) ||
+        (p.target_group ?? "").toLowerCase() === cat,
+      );
+    }
+    if (selColours.length) list = list.filter((p) => p.colour && selColours.includes(p.colour.toLowerCase()));
+    if (selGenders.length) list = list.filter((p) => p.target_group && selGenders.includes(p.target_group.toLowerCase()));
+    if (selSizes.length) list = list.filter((p) => p.sizes.some((s) => selSizes.includes(s)));
     if (search.q.trim()) {
       const q = search.q.toLowerCase();
       list = list.filter((p) =>
@@ -78,22 +110,36 @@ function ShopPage() {
       return price >= search.min && price <= search.max;
     });
     return sortProducts(list, search.sort);
-  }, [products, search.q, search.sort, search.min, search.max, search.dept, search.type]);
+  }, [products, search, selColours, selGenders, selSizes]);
 
   const reset = () =>
     navigate({
-      search: { q: "", sort: "newest", dept: "all", type: "", min: PRICE_MIN, max: PRICE_MAX },
+      search: { q: "", sort: "newest", dept: "all", type: "", category: "", colour: "", gender: "", size: "", min: PRICE_MIN, max: PRICE_MAX },
       replace: true,
     });
 
   const currentDeptLabel =
     search.dept === "all" ? "Everything we make" : DEPARTMENT_LABELS[search.dept as Department];
 
+  // Active filter badges
+  const badges: { key: string; label: string; clear: () => void }[] = [];
+  if (search.dept !== "all") badges.push({ key: "dept", label: DEPARTMENT_LABELS[search.dept as Department], clear: () => update({ dept: "all", type: "", category: "" }) });
+  if (search.type) badges.push({ key: "type", label: search.type, clear: () => update({ type: "" }) });
+  if (search.category) badges.push({ key: "category", label: search.category, clear: () => update({ category: "" }) });
+  selColours.forEach((c) => badges.push({ key: `c-${c}`, label: `Colour: ${c}`, clear: () => update({ colour: toggle(search.colour, c) }) }));
+  selGenders.forEach((g) => badges.push({ key: `g-${g}`, label: `Gender: ${g}`, clear: () => update({ gender: toggle(search.gender, g) }) }));
+  selSizes.forEach((s) => badges.push({ key: `s-${s}`, label: `Size: ${s}`, clear: () => update({ size: toggle(search.size, s) }) }));
+  if (search.min !== PRICE_MIN || search.max !== PRICE_MAX) badges.push({ key: "price", label: `$${search.min}–$${search.max}`, clear: () => update({ min: PRICE_MIN, max: PRICE_MAX }) });
+  if (search.q.trim()) badges.push({ key: "q", label: `“${search.q}”`, clear: () => update({ q: "" }) });
+
+  const showDeckSpecs = search.dept === "skate";
+  const showSurfSpecs = search.dept === "surf";
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       <main>
-        <section className="py-20 border-b border-border/40">
+        <section className="py-16 border-b border-border/40">
           <div className="max-w-7xl mx-auto px-6">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">
               {search.dept === "all" ? "The Shop" : `Shop · ${currentDeptLabel}`}
@@ -103,9 +149,9 @@ function ShopPage() {
             </h1>
 
             {/* Department pills */}
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="flex flex-wrap gap-2 mb-6">
               <button
-                onClick={() => update({ dept: "all", type: "" })}
+                onClick={() => update({ dept: "all", type: "", category: "" })}
                 className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
                   search.dept === "all"
                     ? "border-primary bg-primary text-primary-foreground"
@@ -117,7 +163,7 @@ function ShopPage() {
               {ALL_DEPARTMENTS.map((d) => (
                 <button
                   key={d}
-                  onClick={() => update({ dept: d, type: "" })}
+                  onClick={() => update({ dept: d, type: "", category: "" })}
                   className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
                     search.dept === d
                       ? "border-primary bg-primary text-primary-foreground"
@@ -152,18 +198,35 @@ function ShopPage() {
               >
                 {open ? <X className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
               </button>
-              {open && (
-                <button onClick={reset} className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
-                  Reset
+              {open && badges.length > 0 && (
+                <button onClick={reset} className="font-mono text-[10px] uppercase tracking-widest text-primary hover:opacity-70">
+                  Clear all
                 </button>
               )}
             </div>
 
             {open && (
-              <div className="space-y-6 border border-border/60 bg-card p-5">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70">Price</label>
+              <div className="space-y-6 border border-border/60 bg-card p-5 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                {/* Active filter badges */}
+                {badges.length > 0 && (
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">Active filters</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {badges.map((b) => (
+                        <button
+                          key={b.key}
+                          onClick={b.clear}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-primary/15 border border-primary/40 text-primary font-mono text-[10px] uppercase tracking-widest hover:bg-primary hover:text-primary-foreground"
+                        >
+                          {b.label} <X className="h-2.5 w-2.5" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <FilterGroup label="Price">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="font-mono text-[10px] text-silver">${search.min} – ${search.max}</span>
                   </div>
                   <Slider
@@ -173,16 +236,15 @@ function ShopPage() {
                     value={[search.min, search.max]}
                     onValueChange={(v) => update({ min: v[0], max: v[1] })}
                   />
-                </div>
+                </FilterGroup>
 
-                <div>
-                  <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">Sort by</label>
-                  <div className="grid gap-2">
+                <FilterGroup label="Sort by">
+                  <div className="grid gap-1.5">
                     {(Object.entries(SORT_LABELS) as [SortKey, string][]).map(([key, label]) => (
                       <button
                         key={key}
                         onClick={() => update({ sort: key })}
-                        className={`text-left text-xs font-mono uppercase tracking-widest px-3 py-2 border transition-colors ${
+                        className={`text-left text-[11px] font-mono uppercase tracking-widest px-2.5 py-1.5 border transition-colors ${
                           search.sort === key
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-border/60 text-silver hover:border-primary"
@@ -192,18 +254,103 @@ function ShopPage() {
                       </button>
                     ))}
                   </div>
-                </div>
+                </FilterGroup>
 
-                {search.dept !== "all" && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">
-                      Showing
-                    </label>
-                    <div className="px-3 py-2 border border-primary/60 text-primary font-mono text-xs uppercase tracking-widest">
-                      {DEPARTMENT_LABELS[search.dept as Department]}
-                      {search.type && ` · ${search.type}`}
-                    </div>
+                <FilterGroup label="Colour">
+                  <div className="flex flex-wrap gap-1.5">
+                    {COLOURS.map((c) => {
+                      const on = selColours.includes(c);
+                      return (
+                        <button
+                          key={c}
+                          onClick={() => update({ colour: toggle(search.colour, c) })}
+                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
+                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                          }`}
+                        >
+                          {c}
+                        </button>
+                      );
+                    })}
                   </div>
+                </FilterGroup>
+
+                <FilterGroup label="Gender">
+                  <div className="flex flex-wrap gap-1.5">
+                    {GENDERS.map((g) => {
+                      const on = selGenders.includes(g);
+                      return (
+                        <button
+                          key={g}
+                          onClick={() => update({ gender: toggle(search.gender, g) })}
+                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
+                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                          }`}
+                        >
+                          {g}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </FilterGroup>
+
+                <FilterGroup label="Size">
+                  <div className="flex flex-wrap gap-1.5">
+                    {SIZES.map((s) => {
+                      const on = selSizes.includes(s);
+                      return (
+                        <button
+                          key={s}
+                          onClick={() => update({ size: toggle(search.size, s) })}
+                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
+                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </FilterGroup>
+
+                {/* Department-aware spec filters via category param */}
+                {showDeckSpecs && (
+                  <FilterGroup label="Deck specs">
+                    <p className="font-mono text-[10px] text-silver/50 mb-2">
+                      Filter by spec keyword (matches product spec values).
+                    </p>
+                    <div className="space-y-1.5">
+                      {DECK_SPEC_FIELDS.map((f) => (
+                        <button
+                          key={f.key}
+                          onClick={() => update({ category: search.category === f.key ? "" : f.key })}
+                          className={`w-full text-left px-2 py-1 font-mono text-[10px] uppercase border ${
+                            search.category === f.key ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </FilterGroup>
+                )}
+
+                {showSurfSpecs && (
+                  <FilterGroup label="Surf specs">
+                    <div className="space-y-1.5">
+                      {SURF_SPEC_FIELDS.map((f) => (
+                        <button
+                          key={f.key}
+                          onClick={() => update({ category: search.category === f.key ? "" : f.key })}
+                          className={`w-full text-left px-2 py-1 font-mono text-[10px] uppercase border ${
+                            search.category === f.key ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </FilterGroup>
                 )}
               </div>
             )}
@@ -214,7 +361,27 @@ function ShopPage() {
               <p className="font-mono text-xs uppercase tracking-widest text-silver/70">
                 {isLoading ? "Loading…" : `${filtered.length} ${filtered.length === 1 ? "piece" : "pieces"}`}
               </p>
+              {badges.length > 0 && (
+                <button onClick={reset} className="md:hidden font-mono text-[10px] uppercase tracking-widest text-primary">
+                  Clear all
+                </button>
+              )}
             </div>
+
+            {/* Mobile active filter badges */}
+            {badges.length > 0 && (
+              <div className="md:hidden flex flex-wrap gap-1.5 mb-4">
+                {badges.map((b) => (
+                  <button
+                    key={b.key}
+                    onClick={b.clear}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-primary/15 border border-primary/40 text-primary font-mono text-[10px] uppercase tracking-widest"
+                  >
+                    {b.label} <X className="h-2.5 w-2.5" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {error ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
@@ -223,6 +390,11 @@ function ShopPage() {
             ) : !isLoading && filtered.length === 0 ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
                 Nothing matches those filters.
+                {badges.length > 0 && (
+                  <div className="mt-3">
+                    <button onClick={reset} className="text-primary underline-offset-4 hover:underline">Clear all filters</button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -241,6 +413,15 @@ function ShopPage() {
         </div>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">{label}</label>
+      {children}
     </div>
   );
 }
@@ -264,7 +445,6 @@ function ProductCard({
 
   return (
     <div className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative">
-      {/* Corner badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
         {oos && <Badge tone="muted">Out of stock</Badge>}
         {!oos && low && <Badge tone="warn">Only {product.stock_count} left</Badge>}

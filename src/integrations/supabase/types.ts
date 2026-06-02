@@ -17,27 +17,39 @@ export type Database = {
       newsletters: {
         Row: {
           body: string
+          cover_image: string | null
           created_at: string
           excerpt: string | null
           id: string
+          links: Json
+          published: boolean
+          scheduled_for: string | null
           sent_at: string
           subject: string
           updated_at: string
         }
         Insert: {
           body?: string
+          cover_image?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          links?: Json
+          published?: boolean
+          scheduled_for?: string | null
           sent_at?: string
           subject: string
           updated_at?: string
         }
         Update: {
           body?: string
+          cover_image?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          links?: Json
+          published?: boolean
+          scheduled_for?: string | null
           sent_at?: string
           subject?: string
           updated_at?: string
