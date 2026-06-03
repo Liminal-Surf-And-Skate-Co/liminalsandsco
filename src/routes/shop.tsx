@@ -83,20 +83,23 @@ function ShopPage() {
     return joinCsv([...set]);
   };
 
-  const filtered = useMemo(() => {
+  // Apply filters, optionally excluding one dimension so we can count
+  // how many products each option in that dimension would yield.
+  type Dim = "colour" | "gender" | "size" | "type" | "category" | "dept";
+  const applyFilters = (except?: Dim) => {
     let list = (products ?? []).slice();
-    if (search.dept !== "all") list = list.filter((p) => p.department === search.dept);
-    if (search.type) list = list.filter((p) => (p.product_type ?? "") === search.type);
-    if (search.category) {
+    if (except !== "dept" && search.dept !== "all") list = list.filter((p) => p.department === search.dept);
+    if (except !== "type" && search.type) list = list.filter((p) => (p.product_type ?? "") === search.type);
+    if (except !== "category" && search.category) {
       const cat = search.category.toLowerCase();
       list = list.filter((p) =>
         p.tags.map((t) => t.toLowerCase()).includes(cat) ||
         (p.target_group ?? "").toLowerCase() === cat,
       );
     }
-    if (selColours.length) list = list.filter((p) => p.colour && selColours.includes(p.colour.toLowerCase()));
-    if (selGenders.length) list = list.filter((p) => p.target_group && selGenders.includes(p.target_group.toLowerCase()));
-    if (selSizes.length) list = list.filter((p) => p.sizes.some((s) => selSizes.includes(s)));
+    if (except !== "colour" && selColours.length) list = list.filter((p) => p.colour && selColours.includes(p.colour.toLowerCase()));
+    if (except !== "gender" && selGenders.length) list = list.filter((p) => p.target_group && selGenders.includes(p.target_group.toLowerCase()));
+    if (except !== "size" && selSizes.length) list = list.filter((p) => p.sizes.some((s) => selSizes.includes(s)));
     if (search.q.trim()) {
       const q = search.q.toLowerCase();
       list = list.filter((p) =>
@@ -109,8 +112,45 @@ function ShopPage() {
       const price = effectivePrice(p);
       return price >= search.min && price <= search.max;
     });
-    return sortProducts(list, search.sort);
-  }, [products, search, selColours, selGenders, selSizes]);
+    return list;
+  };
+
+  const filtered = useMemo(() => sortProducts(applyFilters(), search.sort), [products, search, selColours, selGenders, selSizes]);
+
+  // Count helpers — base list ignores own dimension so counts reflect
+  // "what would match if I also picked this".
+  const colourCounts = useMemo(() => {
+    const base = applyFilters("colour");
+    const map = new Map<string, number>();
+    for (const c of COLOURS) map.set(c, 0);
+    for (const p of base) {
+      const c = (p.colour ?? "").toLowerCase();
+      if (map.has(c)) map.set(c, (map.get(c) ?? 0) + 1);
+    }
+    return map;
+  }, [products, search, selGenders, selSizes]);
+
+  const genderCounts = useMemo(() => {
+    const base = applyFilters("gender");
+    const map = new Map<string, number>();
+    for (const g of GENDERS) map.set(g, 0);
+    for (const p of base) {
+      const g = (p.target_group ?? "").toLowerCase();
+      if (map.has(g)) map.set(g, (map.get(g) ?? 0) + 1);
+    }
+    return map;
+  }, [products, search, selColours, selSizes]);
+
+  const sizeCounts = useMemo(() => {
+    const base = applyFilters("size");
+    const map = new Map<string, number>();
+    for (const s of SIZES) map.set(s, 0);
+    for (const p of base) {
+      for (const s of p.sizes) if (map.has(s)) map.set(s, (map.get(s) ?? 0) + 1);
+    }
+    return map;
+  }, [products, search, selColours, selGenders]);
+
 
   const reset = () =>
     navigate({
@@ -260,16 +300,18 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {COLOURS.map((c) => {
                       const on = selColours.includes(c);
+                      const n = colourCounts.get(c) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={c}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ colour: toggle(search.colour, c) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {c}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
@@ -279,16 +321,18 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {GENDERS.map((g) => {
                       const on = selGenders.includes(g);
+                      const n = genderCounts.get(g) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={g}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ gender: toggle(search.gender, g) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {g}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
@@ -298,20 +342,23 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {SIZES.map((s) => {
                       const on = selSizes.includes(s);
+                      const n = sizeCounts.get(s) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={s}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ size: toggle(search.size, s) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {s}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
                 </FilterGroup>
+
 
                 {/* Department-aware spec filters via category param */}
                 {showDeckSpecs && (
@@ -425,6 +472,39 @@ function FilterGroup({ label, children }: { label: string; children: React.React
     </div>
   );
 }
+
+function FilterChip({
+  children, active, disabled, count, onClick,
+}: {
+  children: React.ReactNode;
+  active: boolean;
+  disabled?: boolean;
+  count: number;
+  onClick: () => void;
+}) {
+  const base = "inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] uppercase border transition-colors";
+  const tone = active
+    ? "border-primary bg-primary text-primary-foreground"
+    : disabled
+      ? "border-border/40 text-silver/30 cursor-not-allowed line-through"
+      : "border-border/60 text-silver hover:border-primary";
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
+      title={disabled ? "No matching products" : undefined}
+      className={`${base} ${tone}`}
+    >
+      <span>{children}</span>
+      <span className={`text-[9px] ${active ? "text-primary-foreground/80" : disabled ? "text-silver/30" : "text-silver/50"}`}>
+        {count}
+      </span>
+    </button>
+  );
+}
+
 
 function ProductCard({
   product,

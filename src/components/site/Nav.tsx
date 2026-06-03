@@ -6,6 +6,7 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
 import { ALL_DEPARTMENTS, DEPARTMENT_LABELS, type Department } from "@/lib/products";
 import { MEGA_MENU } from "@/lib/shop-taxonomy";
+import { GlobalSearch } from "@/components/site/GlobalSearch";
 
 export function Nav() {
   const { count: wishCount } = useWishlist();
@@ -86,6 +87,17 @@ export function Nav() {
           </button>
         </div>
       </div>
+
+      {/* Secondary row: global search */}
+      <div className="border-t border-border/30 bg-background/60">
+        <div className="max-w-7xl mx-auto px-6 py-2 flex justify-end">
+          <div className="w-full md:max-w-sm">
+            <GlobalSearch />
+          </div>
+        </div>
+      </div>
+
+
 
       {/* Mobile menu */}
       {mobileOpen && (
