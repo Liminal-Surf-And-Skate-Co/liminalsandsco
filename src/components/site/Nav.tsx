@@ -6,6 +6,7 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
 import { ALL_DEPARTMENTS, DEPARTMENT_LABELS, type Department } from "@/lib/products";
 import { MEGA_MENU } from "@/lib/shop-taxonomy";
+import { GlobalSearch } from "@/components/site/GlobalSearch";
 
 export function Nav() {
   const { count: wishCount } = useWishlist();
