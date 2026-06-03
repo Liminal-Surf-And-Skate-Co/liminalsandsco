@@ -473,6 +473,39 @@ function FilterGroup({ label, children }: { label: string; children: React.React
   );
 }
 
+function FilterChip({
+  children, active, disabled, count, onClick,
+}: {
+  children: React.ReactNode;
+  active: boolean;
+  disabled?: boolean;
+  count: number;
+  onClick: () => void;
+}) {
+  const base = "inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] uppercase border transition-colors";
+  const tone = active
+    ? "border-primary bg-primary text-primary-foreground"
+    : disabled
+      ? "border-border/40 text-silver/30 cursor-not-allowed line-through"
+      : "border-border/60 text-silver hover:border-primary";
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
+      title={disabled ? "No matching products" : undefined}
+      className={`${base} ${tone}`}
+    >
+      <span>{children}</span>
+      <span className={`text-[9px] ${active ? "text-primary-foreground/80" : disabled ? "text-silver/30" : "text-silver/50"}`}>
+        {count}
+      </span>
+    </button>
+  );
+}
+
+
 function ProductCard({
   product,
   saved,
