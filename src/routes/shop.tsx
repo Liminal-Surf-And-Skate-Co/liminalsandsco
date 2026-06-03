@@ -300,16 +300,18 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {COLOURS.map((c) => {
                       const on = selColours.includes(c);
+                      const n = colourCounts.get(c) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={c}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ colour: toggle(search.colour, c) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {c}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
@@ -319,16 +321,18 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {GENDERS.map((g) => {
                       const on = selGenders.includes(g);
+                      const n = genderCounts.get(g) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={g}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ gender: toggle(search.gender, g) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {g}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
@@ -338,20 +342,23 @@ function ShopPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {SIZES.map((s) => {
                       const on = selSizes.includes(s);
+                      const n = sizeCounts.get(s) ?? 0;
+                      const disabled = n === 0 && !on;
                       return (
-                        <button
+                        <FilterChip
                           key={s}
+                          active={on}
+                          disabled={disabled}
+                          count={n}
                           onClick={() => update({ size: toggle(search.size, s) })}
-                          className={`px-2 py-1 font-mono text-[10px] uppercase border ${
-                            on ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
-                          }`}
                         >
                           {s}
-                        </button>
+                        </FilterChip>
                       );
                     })}
                   </div>
                 </FilterGroup>
+
 
                 {/* Department-aware spec filters via category param */}
                 {showDeckSpecs && (
