@@ -30,12 +30,7 @@ const spots = [
   { name: "School Yard Banks", kind: "Skate", status: "Dry", note: "Quiet after 6pm. Lights stay on til 10." },
 ];
 
-const events = [
-  { date: "Jun 14", title: "Beach Cleanup — North Point", detail: "9am meet at the car park. Gloves and bags provided." },
-  { date: "Jun 22", title: "Mini Ramp Jam", detail: "BYO board. Beers + BBQ from 4pm at the workshop." },
-  { date: "Jul 06", title: "Sunrise Paddle-Out", detail: "Long-boards welcome. Coffee after at the kiosk." },
-  { date: "Jul 19", title: "Shaping Workshop (Open Day)", detail: "Come watch a blank become a deck. Free entry." },
-];
+const events = COMMUNITY_EVENTS;
 
 const rides = [
   { user: "Maya R.", route: "City → North Point", when: "Sat 5:30am", seats: 2 },
