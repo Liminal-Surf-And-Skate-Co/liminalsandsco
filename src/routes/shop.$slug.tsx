@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeft, Heart, ShoppingCart, Star, Minus, Plus } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
+import { ProductBadges } from "@/components/site/ProductBadges";
+import { ProductReviews } from "@/components/site/ProductReviews";
+import { useProductReviews, averageRating } from "@/lib/reviews";
 import {
   useProduct,
   useProducts,
@@ -12,6 +15,7 @@ import {
   isLowStock,
   isOutOfStock,
   DEPARTMENT_LABELS,
+  type Product,
 } from "@/lib/products";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
