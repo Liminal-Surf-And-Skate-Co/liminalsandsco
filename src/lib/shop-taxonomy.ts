@@ -92,7 +92,7 @@ export const MEGA_MENU: Record<Department, { columns: MenuColumn[]; allLabel: st
       {
         title: "Mens",
         links: [
-          { label: "Shop All", target: "men" } as any,
+          { label: "Shop All", category: "men" },
           { label: "Tees", type: "tee", category: "men" },
           { label: "Sweatshirts", type: "sweatshirt", category: "men" },
           { label: "Hoodies", type: "hoodie", category: "men" },
