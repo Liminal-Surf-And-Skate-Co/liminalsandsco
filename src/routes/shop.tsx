@@ -6,6 +6,7 @@ import { Heart, Search, SlidersHorizontal, X } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Slider } from "@/components/ui/slider";
+import { ProductBadges } from "@/components/site/ProductBadges";
 import {
   useProducts,
   ALL_DEPARTMENTS,
@@ -14,7 +15,6 @@ import {
   sortProducts,
   productImage,
   effectivePrice,
-  isLowStock,
   isOutOfStock,
   type Department,
   type Product,
@@ -519,19 +519,10 @@ function ProductCard({
 }) {
   const onSale = product.sale_price !== null && product.sale_price < product.price;
   const oos = isOutOfStock(product);
-  const low = !oos && isLowStock(product);
-  const isNew = product.tags.includes("new");
-  const isLimited = product.tags.includes("limited");
 
   return (
     <div className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative">
-      <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-        {oos && <Badge tone="muted">Out of stock</Badge>}
-        {!oos && low && <Badge tone="warn">Only {product.stock_count} left</Badge>}
-        {onSale && <Badge tone="sale">Sale</Badge>}
-        {isNew && !onSale && <Badge tone="accent">New</Badge>}
-        {isLimited && <Badge tone="accent">Limited</Badge>}
-      </div>
+      <ProductBadges product={product} />
       <button
         onClick={(e) => { e.preventDefault(); onWish(); }}
         aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
@@ -578,19 +569,5 @@ function ProductCard({
         </button>
       </div>
     </div>
-  );
-}
-
-function Badge({ children, tone }: { children: React.ReactNode; tone: "muted" | "warn" | "sale" | "accent" }) {
-  const styles: Record<typeof tone, string> = {
-    muted: "bg-silver/20 text-silver border-silver/30",
-    warn: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-    sale: "bg-primary text-primary-foreground border-primary",
-    accent: "bg-primary/15 text-primary border-primary/40",
-  } as any;
-  return (
-    <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 border ${styles[tone]}`}>
-      {children}
-    </span>
   );
 }
