@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
+import { ProductBadges } from "@/components/site/ProductBadges";
 
 export function Shop() {
   const { data: all } = useProducts();
@@ -31,32 +32,45 @@ export function Shop() {
           <p className="text-silver/60 font-mono text-xs">No products yet — add some in the admin.</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {list.map((p) => (
-              <Link
-                key={p.slug}
-                to="/shop/$slug"
-                params={{ slug: p.slug }}
-                className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden"
-              >
-                <div className="aspect-square overflow-hidden bg-background">
-                  <img
-                    src={productImage(p)}
-                    alt={p.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-                <div className="p-5 flex items-end justify-between">
-                  <div>
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
-                      {DEPARTMENT_LABELS[p.department]}
-                    </p>
-                    <h3 className="font-display font-bold text-lg">{p.title}</h3>
+            {list.map((p) => {
+              const onSale = p.sale_price !== null && p.sale_price < p.price;
+              return (
+                <Link
+                  key={p.slug}
+                  to="/shop/$slug"
+                  params={{ slug: p.slug }}
+                  className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative"
+                >
+                  <ProductBadges product={p} />
+                  <div className="aspect-square overflow-hidden bg-background">
+                    <img
+                      src={productImage(p)}
+                      alt={p.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
                   </div>
-                  <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-5 flex items-end justify-between">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
+                        {DEPARTMENT_LABELS[p.department]}
+                      </p>
+                      <h3 className="font-display font-bold text-lg">{p.title}</h3>
+                    </div>
+                    <div className="text-right">
+                      {onSale ? (
+                        <>
+                          <span className="block text-silver/50 text-xs font-mono line-through">${p.price}</span>
+                          <span className="block text-primary text-sm font-mono">${effectivePrice(p)}</span>
+                        </>
+                      ) : (
+                        <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

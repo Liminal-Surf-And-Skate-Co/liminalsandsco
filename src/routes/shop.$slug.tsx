@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeft, Heart, ShoppingCart, Star, Minus, Plus } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
+import { ProductBadges } from "@/components/site/ProductBadges";
+import { ProductReviews } from "@/components/site/ProductReviews";
+import { useProductReviews, averageRating } from "@/lib/reviews";
 import {
   useProduct,
   useProducts,
@@ -12,6 +15,7 @@ import {
   isLowStock,
   isOutOfStock,
   DEPARTMENT_LABELS,
+  type Product,
 } from "@/lib/products";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
@@ -71,9 +75,9 @@ function ProductPage() {
   const price = effectivePrice(product);
   const needsSize = product.sizes && product.sizes.length > 0;
 
-  const related = (allProducts ?? [])
-    .filter((p) => p.id !== product.id && p.department === product.department)
-    .slice(0, 4);
+  const related = useMemo(() => recommendRelated(product, allProducts ?? []), [product, allProducts]);
+  const { data: reviews } = useProductReviews(product.id);
+  const { avg, count } = averageRating(reviews);
 
   const handleAddToCart = () => {
     if (needsSize && !size) {
@@ -131,14 +135,16 @@ function ProductPage() {
             </p>
             <h1 className="font-display font-black text-4xl lg:text-5xl leading-none mb-4">{product.title}</h1>
 
-            {/* Star ratings (placeholder until reviews shipped) */}
+            {/* Star ratings from real reviews */}
             <div className="flex items-center gap-2 mb-5">
               <div className="flex">
                 {[1,2,3,4,5].map((i) => (
-                  <Star key={i} className={`h-4 w-4 ${i <= 4 ? "fill-primary text-primary" : "text-silver/30"}`} />
+                  <Star key={i} className={`h-4 w-4 ${i <= Math.round(avg) ? "fill-primary text-primary" : "text-silver/30"}`} />
                 ))}
               </div>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-silver/60">4.0 · 12 reviews</span>
+              <a href="#reviews" className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
+                {count > 0 ? `${avg.toFixed(1)} · ${count} review${count === 1 ? "" : "s"}` : "No reviews yet"}
+              </a>
             </div>
 
             <div className="flex items-baseline gap-3 mb-2">
@@ -304,15 +310,19 @@ function ProductPage() {
         {/* Related */}
         {related.length > 0 && (
           <section className="mt-20 border-t border-border/40 pt-12">
-            <h2 className="font-display font-black text-2xl lg:text-3xl mb-6">You might also need</h2>
+            <h2 className="font-display font-black text-2xl lg:text-3xl mb-2">You might also need</h2>
+            <p className="font-mono text-[11px] uppercase tracking-widest text-silver/60 mb-6">
+              {relatedHeading(product)}
+            </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {related.map((r) => (
                 <Link
                   key={r.id}
                   to="/shop/$slug"
                   params={{ slug: r.slug }}
-                  className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden"
+                  className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative"
                 >
+                  <ProductBadges product={r} />
                   <div className="aspect-square overflow-hidden bg-background">
                     <img src={productImage(r)} alt={r.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
@@ -326,8 +336,45 @@ function ProductPage() {
             </div>
           </section>
         )}
+
+        <div id="reviews">
+          <ProductReviews productId={product.id} />
+        </div>
       </main>
       <Footer />
     </div>
   );
+}
+
+/** Department/type-aware recommendations: skate decks → trucks/wheels/bearings/grip;
+ *  surfboards → fins/leash/wax/traction; otherwise same department. */
+function recommendRelated(current: Product, all: Product[]): Product[] {
+  const others = all.filter((p) => p.id !== current.id);
+  const type = (current.product_type ?? "").toLowerCase();
+
+  let targetTypes: string[] = [];
+  if (current.department === "skate" && type.includes("deck")) {
+    targetTypes = ["trucks", "wheels", "bearings", "grip", "parts", "rails"];
+  } else if (current.department === "skate" && type.includes("complete")) {
+    targetTypes = ["wheels", "bearings", "grip", "stickers"];
+  } else if (current.department === "surf" && (type.includes("surfboard") || type.includes("shortboard") || type.includes("longboard") || type.includes("fish") || type.includes("softtop"))) {
+    targetTypes = ["fins", "leash", "surf-wax", "traction", "boardbag"];
+  } else if (current.department === "surf" && type.includes("wetsuit")) {
+    targetTypes = ["rashguard", "surf-wax", "boardbag"];
+  }
+
+  if (targetTypes.length > 0) {
+    const matched = others.filter(
+      (p) => p.department === current.department && targetTypes.includes((p.product_type ?? "").toLowerCase()),
+    );
+    if (matched.length > 0) return matched.slice(0, 4);
+  }
+  return others.filter((p) => p.department === current.department).slice(0, 4);
+}
+
+function relatedHeading(p: Product): string {
+  const t = (p.product_type ?? "").toLowerCase();
+  if (p.department === "skate" && t.includes("deck")) return "Trucks, wheels & bearings to finish the build";
+  if (p.department === "surf" && (t.includes("board") || t.includes("fish") || t.includes("softtop"))) return "Fins, leashes & wax for this board";
+  return "More from the same department";
 }
