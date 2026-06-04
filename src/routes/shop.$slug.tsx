@@ -75,9 +75,9 @@ function ProductPage() {
   const price = effectivePrice(product);
   const needsSize = product.sizes && product.sizes.length > 0;
 
-  const related = (allProducts ?? [])
-    .filter((p) => p.id !== product.id && p.department === product.department)
-    .slice(0, 4);
+  const related = useMemo(() => recommendRelated(product, allProducts ?? []), [product, allProducts]);
+  const { data: reviews } = useProductReviews(product.id);
+  const { avg, count } = averageRating(reviews);
 
   const handleAddToCart = () => {
     if (needsSize && !size) {
