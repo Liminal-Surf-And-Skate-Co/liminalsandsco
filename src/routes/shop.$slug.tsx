@@ -42,6 +42,14 @@ function ProductPage() {
   const { has: wishHas, toggle: wishToggle } = useWishlist();
   const { add: cartAdd } = useCart();
 
+  // All hooks must be called before any early returns (Rules of Hooks).
+  const related = useMemo(
+    () => (product ? recommendRelated(product, allProducts ?? []) : []),
+    [product, allProducts],
+  );
+  const { data: reviews } = useProductReviews(product?.id);
+  const { avg, count } = averageRating(reviews);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -74,10 +82,6 @@ function ProductPage() {
   const low = !oos && isLowStock(product);
   const price = effectivePrice(product);
   const needsSize = product.sizes && product.sizes.length > 0;
-
-  const related = useMemo(() => recommendRelated(product, allProducts ?? []), [product, allProducts]);
-  const { data: reviews } = useProductReviews(product.id);
-  const { avg, count } = averageRating(reviews);
 
   const handleAddToCart = () => {
     if (needsSize && !size) {
