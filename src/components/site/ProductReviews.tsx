@@ -41,7 +41,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -50,11 +50,13 @@ export function ProductReviews({ productId }: { productId: string }) {
     setErr(null);
     setUploading(true);
     try {
-      const urls: string[] = [];
+      const next: PhotoEntry[] = [];
       for (const f of Array.from(files).slice(0, 4 - photos.length)) {
-        urls.push(await uploadReviewPhoto(f));
+        const path = await uploadReviewPhoto(f);
+        const preview = (await signReviewPhoto(path)) ?? "";
+        next.push({ path, preview });
       }
-      setPhotos((p) => [...p, ...urls]);
+      setPhotos((p) => [...p, ...next]);
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
@@ -66,7 +68,13 @@ export function ProductReviews({ productId }: { productId: string }) {
     e.preventDefault();
     setErr(null);
     try {
-      await create.mutateAsync({ product_id: productId, rating, title: title || undefined, body, photos });
+      await create.mutateAsync({
+        product_id: productId,
+        rating,
+        title: title || undefined,
+        body,
+        photos: photos.map((p) => p.path),
+      });
       setTitle("");
       setBody("");
       setPhotos([]);
