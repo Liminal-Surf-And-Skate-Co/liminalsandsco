@@ -5,9 +5,12 @@ import {
   useProductReviews,
   useCreateReview,
   uploadReviewPhoto,
+  signReviewPhoto,
   averageRating,
   type Review,
 } from "@/lib/reviews";
+
+type PhotoEntry = { path: string; preview: string };
 
 function Stars({ value, onChange, size = 4 }: { value: number; onChange?: (v: number) => void; size?: number }) {
   const cls = `h-${size} w-${size}`;
@@ -38,7 +41,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<PhotoEntry[]>([]);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -47,11 +50,13 @@ export function ProductReviews({ productId }: { productId: string }) {
     setErr(null);
     setUploading(true);
     try {
-      const urls: string[] = [];
+      const next: PhotoEntry[] = [];
       for (const f of Array.from(files).slice(0, 4 - photos.length)) {
-        urls.push(await uploadReviewPhoto(f));
+        const path = await uploadReviewPhoto(f);
+        const preview = (await signReviewPhoto(path)) ?? "";
+        next.push({ path, preview });
       }
-      setPhotos((p) => [...p, ...urls]);
+      setPhotos((p) => [...p, ...next]);
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
@@ -63,7 +68,13 @@ export function ProductReviews({ productId }: { productId: string }) {
     e.preventDefault();
     setErr(null);
     try {
-      await create.mutateAsync({ product_id: productId, rating, title: title || undefined, body, photos });
+      await create.mutateAsync({
+        product_id: productId,
+        rating,
+        title: title || undefined,
+        body,
+        photos: photos.map((p) => p.path),
+      });
       setTitle("");
       setBody("");
       setPhotos([]);
@@ -134,9 +145,9 @@ export function ProductReviews({ productId }: { productId: string }) {
                   </label>
                   {photos.length > 0 && (
                     <div className="grid grid-cols-4 gap-2 mt-3">
-                      {photos.map((url, i) => (
-                        <div key={url} className="relative aspect-square">
-                          <img src={url} alt="" className="w-full h-full object-cover border border-border/60" />
+                      {photos.map((entry, i) => (
+                        <div key={entry.path} className="relative aspect-square">
+                          <img src={entry.preview} alt="" className="w-full h-full object-cover border border-border/60" />
                           <button
                             type="button"
                             onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}

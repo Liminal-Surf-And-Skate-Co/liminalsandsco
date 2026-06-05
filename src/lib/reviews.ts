@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 7; // 7 days
+
 export type Review = {
   id: string;
   product_id: string;
@@ -13,6 +15,31 @@ export type Review = {
   created_at: string;
 };
 
+/** Photos may have been stored as either storage paths or full URLs. Returns the storage path or null if it's already a usable URL we can't re-sign. */
+function extractPath(value: string): string | null {
+  if (!value) return null;
+  const match = value.match(/\/review-photos\/(.+?)(?:\?|$)/);
+  if (match) return decodeURIComponent(match[1]);
+  if (value.startsWith("http")) return null;
+  return value;
+}
+
+async function signPhotos(values: string[]): Promise<string[]> {
+  const out: string[] = [];
+  for (const v of values) {
+    const path = extractPath(v);
+    if (!path) {
+      out.push(v);
+      continue;
+    }
+    const { data, error } = await supabase.storage
+      .from("review-photos")
+      .createSignedUrl(path, SIGNED_URL_EXPIRY);
+    if (!error && data?.signedUrl) out.push(data.signedUrl);
+  }
+  return out;
+}
+
 export function useProductReviews(productId: string | undefined) {
   return useQuery({
     queryKey: ["product_reviews", productId],
@@ -24,10 +51,13 @@ export function useProductReviews(productId: string | undefined) {
         .eq("product_id", productId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []).map((row) => ({
+      const rows = (data ?? []).map((row) => ({
         ...row,
         photos: Array.isArray(row.photos) ? row.photos.filter(Boolean) : [],
       })) as Review[];
+      return Promise.all(
+        rows.map(async (r) => ({ ...r, photos: await signPhotos(r.photos) })),
+      );
     },
     staleTime: 30_000,
   });
@@ -57,7 +87,7 @@ export function useCreateReview() {
   });
 }
 
-/** Uploads a file to the review-photos bucket under <user_id>/<rand>.<ext> and returns its public URL. */
+/** Uploads a file to the (private) review-photos bucket; returns the storage path. URLs are signed on read. */
 export async function uploadReviewPhoto(file: File): Promise<string> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Please sign in to upload photos.");
@@ -68,8 +98,18 @@ export async function uploadReviewPhoto(file: File): Promise<string> {
     upsert: false,
   });
   if (error) throw new Error(error.message);
-  const { data } = supabase.storage.from("review-photos").getPublicUrl(path);
-  return data.publicUrl;
+  return path;
+}
+
+/** Used by the composer to preview a freshly-uploaded image before posting. */
+export async function signReviewPhoto(path: string): Promise<string | null> {
+  const real = extractPath(path);
+  if (!real) return path;
+  const { data, error } = await supabase.storage
+    .from("review-photos")
+    .createSignedUrl(real, SIGNED_URL_EXPIRY);
+  if (error) return null;
+  return data.signedUrl;
 }
 
 export function averageRating(reviews: Review[] | undefined): { avg: number; count: number } {
