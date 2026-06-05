@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useMatches, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
@@ -59,8 +59,14 @@ export const Route = createFileRoute("/shop")({
       { property: "og:description", content: "Everything we make, in one place." },
     ],
   }),
-  component: ShopPage,
+  component: ShopRouteShell,
 });
+
+function ShopRouteShell() {
+  const matches = useMatches();
+  const isProductDetail = matches.some((match) => match.routeId === "/shop/$slug");
+  return isProductDetail ? <Outlet /> : <ShopPage />;
+}
 
 function ShopPage() {
   const search = Route.useSearch();
