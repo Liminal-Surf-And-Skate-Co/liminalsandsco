@@ -145,9 +145,9 @@ export function ProductReviews({ productId }: { productId: string }) {
                   </label>
                   {photos.length > 0 && (
                     <div className="grid grid-cols-4 gap-2 mt-3">
-                      {photos.map((url, i) => (
-                        <div key={url} className="relative aspect-square">
-                          <img src={url} alt="" className="w-full h-full object-cover border border-border/60" />
+                      {photos.map((entry, i) => (
+                        <div key={entry.path} className="relative aspect-square">
+                          <img src={entry.preview} alt="" className="w-full h-full object-cover border border-border/60" />
                           <button
                             type="button"
                             onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}
