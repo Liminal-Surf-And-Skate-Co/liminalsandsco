@@ -5,9 +5,12 @@ import {
   useProductReviews,
   useCreateReview,
   uploadReviewPhoto,
+  signReviewPhoto,
   averageRating,
   type Review,
 } from "@/lib/reviews";
+
+type PhotoEntry = { path: string; preview: string };
 
 function Stars({ value, onChange, size = 4 }: { value: number; onChange?: (v: number) => void; size?: number }) {
   const cls = `h-${size} w-${size}`;
