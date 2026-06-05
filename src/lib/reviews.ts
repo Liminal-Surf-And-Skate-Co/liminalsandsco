@@ -24,7 +24,10 @@ export function useProductReviews(productId: string | undefined) {
         .eq("product_id", productId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Review[];
+      return (data ?? []).map((row) => ({
+        ...row,
+        photos: Array.isArray(row.photos) ? row.photos.filter(Boolean) : [],
+      })) as Review[];
     },
     staleTime: 30_000,
   });
@@ -71,6 +74,8 @@ export async function uploadReviewPhoto(file: File): Promise<string> {
 
 export function averageRating(reviews: Review[] | undefined): { avg: number; count: number } {
   if (!reviews || reviews.length === 0) return { avg: 0, count: 0 };
-  const sum = reviews.reduce((a, r) => a + r.rating, 0);
-  return { avg: sum / reviews.length, count: reviews.length };
+  const valid = reviews.filter((r) => Number.isFinite(r.rating));
+  if (valid.length === 0) return { avg: 0, count: 0 };
+  const sum = valid.reduce((a, r) => a + r.rating, 0);
+  return { avg: sum / valid.length, count: valid.length };
 }
