@@ -91,12 +91,12 @@ function CartPage() {
               <div className="text-right">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">Subtotal</p>
                 <p className="font-display font-black text-3xl mb-4">${subtotal}</p>
-                <button
-                  onClick={() => alert("Checkout is coming soon — for now, contact us via the product inquiry form.")}
-                  className="bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-8 py-3 hover:opacity-90 transition-opacity"
+                <Link
+                  to="/checkout"
+                  className="inline-block bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-8 py-3 hover:opacity-90 transition-opacity shadow-glow"
                 >
-                  Proceed to inquiry
-                </button>
+                  Proceed to checkout
+                </Link>
               </div>
             </div>
           </>
