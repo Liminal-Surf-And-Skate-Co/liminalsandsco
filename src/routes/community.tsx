@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves, Clock, ExternalLink, CalendarPlus } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useSiteSettings } from "@/lib/site-settings";
-import { COMMUNITY_EVENTS, SPOT_PINS, type SpotPin } from "@/lib/community-data";
-
+import { SPOT_PINS, type SpotPin } from "@/lib/community-data";
+import { useEvents, googleCalendarUrl, formatEventDate, EVENT_CATEGORY_LABELS } from "@/lib/events";
 
 
 type Pin = SpotPin;
