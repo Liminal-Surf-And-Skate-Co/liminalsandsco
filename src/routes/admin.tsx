@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Settings as SettingsIcon } from "lucide-react";
+import { Shield, Package, Mail, Calendar, Settings as SettingsIcon } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -76,6 +76,11 @@ function AdminPage() {
             <Mail className="h-6 w-6 text-primary mb-3" />
             <h2 className="font-display font-bold text-xl mb-1">Newsletters</h2>
             <p className="font-mono text-xs text-silver/60">Compose weekly drops and archive past sends.</p>
+          </Link>
+          <Link to="/admin/events" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+            <Calendar className="h-6 w-6 text-primary mb-3" />
+            <h2 className="font-display font-bold text-xl mb-1">Events</h2>
+            <p className="font-mono text-xs text-silver/60">Add, edit, and publish community events.</p>
           </Link>
         </div>
 

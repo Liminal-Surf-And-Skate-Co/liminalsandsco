@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, Play } from "lucide-react";
+import { Calendar, MessageCircle, Play } from "lucide-react";
 import surfboard from "@/assets/craft-surfboard.jpg";
 import { useSiteSettings } from "@/lib/site-settings";
 
@@ -42,9 +42,10 @@ export function CommunityTeaser() {
             )}
             <Link
               to="/community"
-              className="inline-flex items-center justify-center border border-silver/30 text-silver font-mono text-xs uppercase tracking-widest px-6 py-4 hover:border-primary hover:text-primary transition-colors"
+              hash="events"
+              className="inline-flex items-center justify-center gap-2 border border-silver/30 text-silver font-mono text-xs uppercase tracking-widest px-6 py-4 hover:border-primary hover:text-primary transition-colors"
             >
-              Visit the Community →
+              <Calendar className="h-4 w-4" /> Upcoming events
             </Link>
           </div>
         </div>

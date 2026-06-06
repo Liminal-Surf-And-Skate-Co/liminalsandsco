@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Calendar, MapPin, MessageCircle, Trophy, Upload, Users, Video, Waves, Clock, ExternalLink, CalendarPlus } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useSiteSettings } from "@/lib/site-settings";
-import { COMMUNITY_EVENTS, SPOT_PINS, type SpotPin } from "@/lib/community-data";
-
+import { SPOT_PINS, type SpotPin } from "@/lib/community-data";
+import { useEvents, googleCalendarUrl, formatEventDate, EVENT_CATEGORY_LABELS } from "@/lib/events";
 
 
 type Pin = SpotPin;
@@ -30,7 +30,7 @@ const spots = [
   { name: "School Yard Banks", kind: "Skate", status: "Dry", note: "Quiet after 6pm. Lights stay on til 10." },
 ];
 
-const events = COMMUNITY_EVENTS;
+// events now loaded from Supabase via useEvents()
 
 const rides = [
   { user: "Maya R.", route: "City → North Point", when: "Sat 5:30am", seats: 2 },
@@ -43,6 +43,25 @@ export function CommunityPage() {
   const DISCORD_URL = settings?.discord_invite_url || "";
   const [activePin, setActivePin] = useState<Pin | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [view, setView] = useState<"list" | "grid">("grid");
+  const { data: events = [], isLoading: eventsLoading } = useEvents({ upcomingOnly: true });
+  const groupedByMonth = useMemo(() => {
+    const map = new Map<string, typeof events>();
+    for (const e of events) {
+      const d = new Date(e.start_at);
+      const key = d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+      const arr = map.get(key) ?? [];
+      arr.push(e);
+      map.set(key, arr);
+    }
+    return Array.from(map.entries());
+  }, [events]);
+
+  useEffect(() => {
+    if (window.location.hash === "#events") {
+      setTimeout(() => document.getElementById("events")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
@@ -162,26 +181,124 @@ export function CommunityPage() {
 
 
         {/* Events */}
-        <section className="py-20 border-b border-border/40">
+        <section id="events" className="py-20 border-b border-border/40 scroll-mt-24">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-baseline justify-between mb-8">
-              <h2 className="font-display font-black text-3xl lg:text-4xl">Events Calendar</h2>
-              <Calendar className="h-5 w-5 text-primary" />
+            <div className="flex items-baseline justify-between mb-8 flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <Calendar className="h-6 w-6 text-primary" />
+                <h2 className="font-display font-black text-3xl lg:text-4xl">Events Calendar</h2>
+              </div>
+              <div className="flex gap-1 border border-border/60">
+                <button
+                  onClick={() => setView("grid")}
+                  className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 ${view === "grid" ? "bg-primary text-primary-foreground" : "text-silver/70 hover:text-primary"}`}
+                >
+                  Grid
+                </button>
+                <button
+                  onClick={() => setView("list")}
+                  className={`font-mono text-[10px] uppercase tracking-widest px-3 py-2 ${view === "list" ? "bg-primary text-primary-foreground" : "text-silver/70 hover:text-primary"}`}
+                >
+                  List
+                </button>
+              </div>
             </div>
-            <ul className="divide-y divide-border/40 border-y border-border/40">
-              {events.map((e) => (
-                <li key={e.title} className="grid md:grid-cols-12 gap-6 py-6 items-baseline px-2">
-                  <div className="md:col-span-2 font-mono text-xs uppercase tracking-widest text-silver/60">{e.date}</div>
-                  <div className="md:col-span-7">
-                    <h3 className="font-display font-bold text-xl text-silver mb-1">{e.title}</h3>
-                    <p className="text-silver/70 text-sm">{e.detail}</p>
+
+            {eventsLoading ? (
+              <p className="font-mono text-xs text-silver/60">Loading events…</p>
+            ) : events.length === 0 ? (
+              <div className="border border-dashed border-border/60 bg-card p-12 text-center">
+                <Calendar className="h-8 w-8 text-silver/40 mx-auto mb-3" />
+                <p className="font-mono text-sm text-silver/70 mb-2">No upcoming events yet.</p>
+                {DISCORD_URL && (
+                  <a href={DISCORD_URL} target="_blank" rel="noreferrer noopener" className="font-mono text-[10px] uppercase tracking-widest text-primary hover:underline">
+                    Hear about new events on Discord →
+                  </a>
+                )}
+              </div>
+            ) : view === "grid" ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {events.map((e) => {
+                  const { date, time } = formatEventDate(e.start_at);
+                  return (
+                    <article key={e.id} className="group border border-border/60 bg-card overflow-hidden flex flex-col">
+                      <div className="aspect-[16/10] bg-background overflow-hidden relative">
+                        {e.image_url ? (
+                          <img src={e.image_url} alt={e.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-purple/30">
+                            <Calendar className="h-12 w-12 text-primary/60" />
+                          </div>
+                        )}
+                        <span className="absolute top-3 left-3 font-mono text-[9px] uppercase tracking-widest bg-background/90 text-primary px-2 py-1 border border-primary/40">
+                          {EVENT_CATEGORY_LABELS[e.category]}
+                        </span>
+                      </div>
+                      <div className="p-5 flex-1 flex flex-col">
+                        <h3 className="font-display font-bold text-xl mb-2 leading-tight">{e.title}</h3>
+                        <div className="space-y-1 font-mono text-xs text-silver/70 mb-3">
+                          <p className="flex items-center gap-2"><Clock className="h-3 w-3 text-primary" />{date} · {time}</p>
+                          {e.location && <p className="flex items-center gap-2"><MapPin className="h-3 w-3 text-primary" />{e.location}</p>}
+                        </div>
+                        {e.description && <p className="text-sm text-silver/80 mb-4 line-clamp-3 flex-1">{e.description}</p>}
+                        <div className="flex gap-2 mt-auto pt-2">
+                          <a
+                            href={e.rsvp_url || DISCORD_URL || "#"}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="flex-1 inline-flex items-center justify-center gap-1 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-widest px-3 py-2 hover:opacity-90"
+                          >
+                            RSVP <ExternalLink className="h-3 w-3" />
+                          </a>
+                          <a
+                            href={googleCalendarUrl(e)}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="inline-flex items-center justify-center gap-1 border border-primary text-primary font-mono text-[10px] uppercase tracking-widest px-3 py-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+                            title="Add to Google Calendar"
+                          >
+                            <CalendarPlus className="h-3 w-3" /> GCal
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-10">
+                {groupedByMonth.map(([month, list]) => (
+                  <div key={month}>
+                    <h3 className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">{month}</h3>
+                    <ul className="divide-y divide-border/40 border-y border-border/40">
+                      {list.map((e) => {
+                        const { date, time } = formatEventDate(e.start_at);
+                        return (
+                          <li key={e.id} className="grid md:grid-cols-12 gap-4 py-5 items-center px-2">
+                            <div className="md:col-span-2 font-mono text-xs uppercase tracking-widest text-silver/80">
+                              {date}<br /><span className="text-silver/50">{time}</span>
+                            </div>
+                            <div className="md:col-span-6">
+                              <p className="font-mono text-[9px] uppercase tracking-widest text-primary mb-1">{EVENT_CATEGORY_LABELS[e.category]}</p>
+                              <h4 className="font-display font-bold text-lg text-silver mb-1">{e.title}</h4>
+                              {e.location && <p className="font-mono text-xs text-silver/60 flex items-center gap-1"><MapPin className="h-3 w-3" />{e.location}</p>}
+                            </div>
+                            <div className="md:col-span-4 flex md:justify-end gap-2">
+                              <a href={e.rsvp_url || DISCORD_URL || "#"} target="_blank" rel="noreferrer noopener" className="font-mono text-[10px] uppercase tracking-widest bg-primary text-primary-foreground px-3 py-2 hover:opacity-90">
+                                RSVP
+                              </a>
+                              <a href={googleCalendarUrl(e)} target="_blank" rel="noreferrer noopener" className="font-mono text-[10px] uppercase tracking-widest border border-primary text-primary px-3 py-2 hover:bg-primary hover:text-primary-foreground transition-colors inline-flex items-center gap-1">
+                                <CalendarPlus className="h-3 w-3" /> GCal
+                              </a>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                  <div className="md:col-span-3 md:text-right font-mono text-[10px] uppercase tracking-widest text-primary">
-                    RSVP in Discord →
-                  </div>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
