@@ -110,7 +110,7 @@ function AdminEventsPage() {
 
   async function togglePublished(e: CommunityEvent) {
     try {
-      await upsert.mutateAsync({ id: e.id, ...e, published: !e.published });
+      await upsert.mutateAsync({ ...e, published: !e.published });
       toast.success(e.published ? "Event hidden" : "Event published");
     } catch (err: any) {
       toast.error(err.message || "Failed to update");
