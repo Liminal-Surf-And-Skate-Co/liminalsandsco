@@ -25,6 +25,7 @@ import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -106,6 +107,11 @@ const AdminNewslettersRoute = AdminNewslettersRouteImport.update({
   path: '/newsletters',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/events'
     | '/admin/newsletters'
     | '/admin/products'
     | '/blog/$slug'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/events'
     | '/admin/newsletters'
     | '/admin/products'
     | '/blog/$slug'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/admin/events'
     | '/admin/newsletters'
     | '/admin/products'
     | '/blog/$slug'
@@ -348,15 +360,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNewslettersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminEventsRoute: typeof AdminEventsRoute
   AdminNewslettersRoute: typeof AdminNewslettersRoute
   AdminProductsRoute: typeof AdminProductsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminEventsRoute: AdminEventsRoute,
   AdminNewslettersRoute: AdminNewslettersRoute,
   AdminProductsRoute: AdminProductsRoute,
 }
@@ -400,3 +421,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
