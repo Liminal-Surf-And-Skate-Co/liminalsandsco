@@ -30,7 +30,7 @@ const spots = [
   { name: "School Yard Banks", kind: "Skate", status: "Dry", note: "Quiet after 6pm. Lights stay on til 10." },
 ];
 
-const events = COMMUNITY_EVENTS;
+// events now loaded from Supabase via useEvents()
 
 const rides = [
   { user: "Maya R.", route: "City → North Point", when: "Sat 5:30am", seats: 2 },
@@ -43,6 +43,25 @@ export function CommunityPage() {
   const DISCORD_URL = settings?.discord_invite_url || "";
   const [activePin, setActivePin] = useState<Pin | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [view, setView] = useState<"list" | "grid">("grid");
+  const { data: events = [], isLoading: eventsLoading } = useEvents({ upcomingOnly: true });
+  const groupedByMonth = useMemo(() => {
+    const map = new Map<string, typeof events>();
+    for (const e of events) {
+      const d = new Date(e.start_at);
+      const key = d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+      const arr = map.get(key) ?? [];
+      arr.push(e);
+      map.set(key, arr);
+    }
+    return Array.from(map.entries());
+  }, [events]);
+
+  useEffect(() => {
+    if (window.location.hash === "#events") {
+      setTimeout(() => document.getElementById("events")?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
