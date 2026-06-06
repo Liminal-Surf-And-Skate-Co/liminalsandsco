@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          end_at: string | null
+          id: string
+          image_url: string | null
+          location: string
+          published: boolean
+          rsvp_url: string | null
+          start_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          end_at?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          published?: boolean
+          rsvp_url?: string | null
+          start_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          end_at?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          published?: boolean
+          rsvp_url?: string | null
+          start_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletters: {
         Row: {
           body: string
