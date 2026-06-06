@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MessageCircle, Play } from "lucide-react";
+import { Calendar, MessageCircle, Play } from "lucide-react";
 import surfboard from "@/assets/craft-surfboard.jpg";
 import { useSiteSettings } from "@/lib/site-settings";
 
