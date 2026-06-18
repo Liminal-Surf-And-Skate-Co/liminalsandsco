@@ -33,7 +33,6 @@ export function Nav() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6 text-xs font-mono uppercase tracking-widest text-silver/80">
-          <Link to="/" className="hover:text-primary transition-colors" activeOptions={{ exact: true }} activeProps={{ className: "text-primary" }}>Home</Link>
           <Link to="/shop" className="hover:text-primary transition-colors" activeOptions={{ exact: true }} activeProps={{ className: "text-primary" }}>Shop</Link>
 
           {ALL_DEPARTMENTS.map((dept) => (
@@ -54,6 +53,7 @@ export function Nav() {
             </div>
           ))}
 
+          <Link to="/about" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Crew</Link>
           <Link to="/community" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Community</Link>
           <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Blog</Link>
         </nav>
@@ -110,8 +110,8 @@ export function Nav() {
           </div>
           <nav className="flex-1 overflow-y-auto px-6 py-6 font-mono text-sm uppercase tracking-widest text-silver">
             {[
-              { to: "/", label: "Home", exact: true },
               { to: "/shop", label: "Shop" },
+              { to: "/about", label: "Crew" },
               { to: "/community", label: "Community" },
               { to: "/blog", label: "Blog" },
               { to: "/support", label: "Support" },

@@ -150,13 +150,8 @@ export const MEGA_MENU: Record<Department, { columns: MenuColumn[]; allLabel: st
           { label: "Stickers", type: "stickers" },
         ],
       },
-    ],
-  },
-  other: {
-    allLabel: "Shop All Other",
-    columns: [
       {
-        title: "Other",
+        title: "Lifestyle",
         links: [
           { label: "Fashion", type: "fashion" },
           { label: "Jewellery", type: "jewellery" },

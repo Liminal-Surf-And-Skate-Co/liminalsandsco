@@ -228,7 +228,7 @@ function UserManagement() {
       </Card>
 
       {/* User Stats */}
-      <div className="mt-8 grid grid-cols-4 gap-4">
+      <div className="mt-8 grid grid-cols-5 gap-4">
         <Card className="p-6">
           <p className="text-3xl font-bold text-blue-600">{users.length}</p>
           <p className="text-sm text-gray-600 mt-1">Total Users</p>
@@ -246,10 +246,16 @@ function UserManagement() {
           <p className="text-sm text-gray-600 mt-1">Admins</p>
         </Card>
         <Card className="p-6">
-          <p className="text-3xl font-bold text-red-600">
-            {users.filter((u) => u.status === "suspended" || u.status === "banned").length}
+          <p className="text-3xl font-bold text-orange-600">
+            {users.filter((u) => u.status === "suspended").length}
           </p>
-          <p className="text-sm text-gray-600 mt-1">Suspended/Banned</p>
+          <p className="text-sm text-gray-600 mt-1">Suspended</p>
+        </Card>
+        <Card className="p-6">
+          <p className="text-3xl font-bold text-red-600">
+            {users.filter((u) => u.status === "banned").length}
+          </p>
+          <p className="text-sm text-gray-600 mt-1">Banned Users</p>
         </Card>
       </div>
     </div>

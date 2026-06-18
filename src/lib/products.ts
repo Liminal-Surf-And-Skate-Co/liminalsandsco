@@ -6,17 +6,16 @@ import apparel from "@/assets/apparel.jpg";
 import accessories from "@/assets/accessories.jpg";
 import workshop from "@/assets/about-workshop.jpg";
 
-export type Department = "skate" | "surf" | "clothing" | "accessories" | "other";
+export type Department = "skate" | "surf" | "clothing" | "accessories";
 
 export const DEPARTMENT_LABELS: Record<Department, string> = {
   skate: "Skate",
   surf: "Surf",
   clothing: "Clothing",
   accessories: "Accessories",
-  other: "Other",
 };
 
-export const ALL_DEPARTMENTS: Department[] = ["skate", "surf", "clothing", "accessories", "other"];
+export const ALL_DEPARTMENTS: Department[] = ["skate", "surf", "clothing", "accessories"];
 
 export type Product = {
   id: string;
@@ -47,7 +46,6 @@ const PLACEHOLDER: Record<Department, string> = {
   surf: surfboard,
   clothing: apparel,
   accessories: accessories,
-  other: workshop,
 };
 
 export function productImage(p: Pick<Product, "images" | "department">, idx = 0): string {

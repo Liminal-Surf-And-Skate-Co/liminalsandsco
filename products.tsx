@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Package, Plus, Edit2, Trash2 } from "lucide-react";
+import { Package, Plus, CreditCard as Edit2, Trash2, Download } from "lucide-react";
 
 export const Route = createFileRoute("/admin/products")({
   head: () => ({
@@ -130,10 +130,32 @@ function ProductsAdmin() {
             />
           </div>
         </div>
-        <Button onClick={addProduct} className="mt-4 bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+        <div className="mt-4 flex gap-3">
+          <Button onClick={addProduct} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const headers = ["Name", "Category", "Price", "Stock", "Status", "Created"];
+              const rows = products.map((p) =>
+                [p.name, p.category, p.price.toString(), p.stock.toString(), p.status, p.createdAt].join(",")
+              );
+              const csv = [headers.join(","), ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "products.csv";
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+        </div>
       </Card>
 
       {/* Products List */}
@@ -145,6 +167,7 @@ function ProductsAdmin() {
               <thead className="bg-gray-100 border-b">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Product Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">Product Images</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Category</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Price</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold">Stock</th>
@@ -157,6 +180,9 @@ function ProductsAdmin() {
                 {products.map((product) => (
                   <tr key={product.id} className="border-b hover:bg-gray-50">
                     <td className="px-6 py-4 font-medium">{product.name}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-400 text-sm italic">No images</span>
+                    </td>
                     <td className="px-6 py-4 text-gray-600">{product.category}</td>
                     <td className="px-6 py-4 text-gray-600">${product.price.toFixed(2)}</td>
                     <td className="px-6 py-4">
