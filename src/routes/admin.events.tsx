@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Calendar, Plus, Trash2, Pencil, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { sanitizeError } from "@/lib/error-sanitize";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -92,8 +93,8 @@ function AdminEventsPage() {
       });
       toast.success(editing ? "Event updated" : "Event created");
       setDraft(empty);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to save");
+    } catch (e) {
+      toast.error(sanitizeError(e));
     }
   }
 
@@ -103,8 +104,8 @@ function AdminEventsPage() {
       await del.mutateAsync(id);
       toast.success("Event deleted");
       if (draft.id === id) setDraft(empty);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to delete");
+    } catch (e) {
+      toast.error(sanitizeError(e));
     }
   }
 
@@ -112,8 +113,8 @@ function AdminEventsPage() {
     try {
       await upsert.mutateAsync({ ...e, published: !e.published });
       toast.success(e.published ? "Event hidden" : "Event published");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update");
+    } catch (err) {
+      toast.error(sanitizeError(err));
     }
   }
 

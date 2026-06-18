@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -46,8 +47,8 @@ function AccountPage() {
         if (error) throw error;
         toast.success("Welcome back.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+    } catch (err) {
+      toast.error(sanitizeError(err));
     } finally {
       setBusy(false);
     }

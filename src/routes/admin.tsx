@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings, useUpdateSetting, SETTING_KEYS, SETTING_LABELS } from "@/lib/site-settings";
 import { adminExists, claimFirstAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Liminal" }, { name: "robots", content: "noindex" }] }),
@@ -49,8 +50,8 @@ function AdminPage() {
     try {
       await updateSetting.mutateAsync({ key: key as any, value: draft[key] ?? "" });
       toast.success(`Saved ${SETTING_LABELS[key as keyof typeof SETTING_LABELS]}`);
-    } catch (e: any) {
-      toast.error(e.message || "Failed to save");
+    } catch (e) {
+      toast.error(sanitizeError(e));
     }
   };
 
@@ -153,7 +154,7 @@ function NonAdminGate({ userId }: { userId: string }) {
       queryClient.invalidateQueries();
       setTimeout(() => window.location.reload(), 600);
     },
-    onError: (e: any) => toast.error(e.message || "Failed to claim admin"),
+    onError: (e) => toast.error(sanitizeError(e)),
   });
 
   return (

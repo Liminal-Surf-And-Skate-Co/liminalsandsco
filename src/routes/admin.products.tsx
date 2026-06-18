@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Save, Package } from "lucide-react";
 import { toast } from "sonner";
+import { sanitizeError } from "@/lib/error-sanitize";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,7 +59,7 @@ function AdminProductsPage() {
       setEditing(null);
       toast.success("Saved");
     },
-    onError: (e: any) => toast.error(e.message || "Save failed"),
+    onError: (e) => toast.error(sanitizeError(e)),
   });
 
   const deleteMutation = useMutation({
@@ -70,7 +71,7 @@ function AdminProductsPage() {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success("Deleted");
     },
-    onError: (e: any) => toast.error(e.message || "Delete failed"),
+    onError: (e) => toast.error(sanitizeError(e)),
   });
 
   if (loading) {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 const SIGNED_URL_EXPIRY = 60 * 60 * 24 * 7; // 7 days
 
@@ -50,7 +51,7 @@ export function useProductReviews(productId: string | undefined) {
         .select("*")
         .eq("product_id", productId!)
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) throw new Error(sanitizeError(error));
       const rows = (data ?? []).map((row) => ({
         ...row,
         photos: Array.isArray(row.photos) ? row.photos.filter(Boolean) : [],
@@ -81,7 +82,7 @@ export function useCreateReview() {
         ...input,
         user_id: u.user.id,
       });
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(sanitizeError(error));
     },
     onSuccess: (_d, vars) => qc.invalidateQueries({ queryKey: ["product_reviews", vars.product_id] }),
   });
@@ -97,7 +98,7 @@ export async function uploadReviewPhoto(file: File): Promise<string> {
     contentType: file.type,
     upsert: false,
   });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(sanitizeError(error));
   return path;
 }
 

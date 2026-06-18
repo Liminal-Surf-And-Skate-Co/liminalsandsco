@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 export type EventCategory = "jam" | "cleanup" | "comp" | "party" | "other";
 
@@ -51,7 +52,7 @@ export function useEvents(opts?: { includeUnpublished?: boolean; upcomingOnly?: 
       if (!opts?.includeUnpublished) q = q.eq("published", true);
       if (opts?.upcomingOnly) q = q.gte("start_at", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString());
       const { data, error } = await q;
-      if (error) throw error;
+      if (error) throw new Error(sanitizeError(error));
       return (data ?? []).map(normalize);
     },
     staleTime: 30_000,
@@ -75,10 +76,10 @@ export function useUpsertEvent() {
       };
       if (e.id) {
         const { error } = await supabase.from("events").update(payload).eq("id", e.id);
-        if (error) throw error;
+        if (error) throw new Error(sanitizeError(error));
       } else {
         const { error } = await supabase.from("events").insert(payload as any);
-        if (error) throw error;
+        if (error) throw new Error(sanitizeError(error));
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
@@ -90,7 +91,7 @@ export function useDeleteEvent() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("events").delete().eq("id", id);
-      if (error) throw error;
+      if (error) throw new Error(sanitizeError(error));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
   });

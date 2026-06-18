@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 
 import appCss from "../styles.css?url";
@@ -37,6 +38,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const safeMessage = sanitizeError(error);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -45,7 +47,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          {safeMessage}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button

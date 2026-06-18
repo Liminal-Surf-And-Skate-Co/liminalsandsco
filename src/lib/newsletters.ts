@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 export type NewsletterLink = { label: string; url: string };
 
@@ -34,7 +35,7 @@ export async function fetchNewsletters(): Promise<Newsletter[]> {
     .from("newsletters")
     .select("*")
     .order("sent_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw new Error(sanitizeError(error));
   return (data ?? []).map(normalize);
 }
 

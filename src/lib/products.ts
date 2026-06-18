@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 import deck from "@/assets/hero-deck.jpg";
 import surfboard from "@/assets/craft-surfboard.jpg";
 import apparel from "@/assets/apparel.jpg";
@@ -99,7 +100,7 @@ export async function fetchProducts(): Promise<Product[]> {
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw new Error(sanitizeError(error));
   return (data ?? []).map(normalize);
 }
 
@@ -109,7 +110,7 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
-  if (error) throw error;
+  if (error) throw new Error(sanitizeError(error));
   return data ? normalize(data) : null;
 }
 

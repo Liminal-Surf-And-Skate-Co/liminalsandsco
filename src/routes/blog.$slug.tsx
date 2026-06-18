@@ -4,6 +4,7 @@ import { Mail, ExternalLink } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { getPost, posts } from "@/lib/posts";
+import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import type { Newsletter, NewsletterLink } from "@/lib/newsletters";
 
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/blog/$slug")({
   errorComponent: ({ error, reset }) => (
     <div className="min-h-screen flex items-center justify-center px-6 text-center">
       <div>
-        <p className="text-silver/70 mb-4">{error.message}</p>
+        <p className="text-silver/70 mb-4">{sanitizeError(error)}</p>
         <button onClick={reset} className="text-primary font-mono text-xs uppercase tracking-widest">
           Retry
         </button>
