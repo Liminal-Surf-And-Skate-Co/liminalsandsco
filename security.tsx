@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Lock, AlertTriangle, CheckCircle } from "lucide-react";
+import { Lock, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
 
 export const Route = createFileRoute("/admin/security")({
   head: () => ({

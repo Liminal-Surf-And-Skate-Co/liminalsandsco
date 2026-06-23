@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, AlertTriangle } from "lucide-react";
+import { Search, TriangleAlert as AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/admin/audit-logs")({
   head: () => ({

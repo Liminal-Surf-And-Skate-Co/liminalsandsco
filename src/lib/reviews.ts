@@ -87,10 +87,48 @@ export function useCreateReview() {
   });
 }
 
+const ALLOWED_REVIEW_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_REVIEW_PHOTO_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
+const MAX_REVIEW_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
+
+function validateReviewPhoto(file: File): void {
+  // Reject SVG and HTML explicitly to prevent XSS / content injection
+  const lowerName = file.name.toLowerCase();
+  if (
+    lowerName.endsWith(".svg") ||
+    lowerName.endsWith(".svgz") ||
+    lowerName.endsWith(".html") ||
+    lowerName.endsWith(".htm") ||
+    lowerName.endsWith(".xhtml")
+  ) {
+    throw new Error("SVG and HTML files are not allowed for review photos.");
+  }
+
+  // Validate extension against allowlist
+  const hasAllowedExt = ALLOWED_REVIEW_PHOTO_EXTS.some((ext) => lowerName.endsWith(ext));
+  if (!hasAllowedExt) {
+    throw new Error("Only .jpg, .jpeg, .png, and .webp files are allowed.");
+  }
+
+  // Validate MIME type against allowlist (do not rely solely on file.type)
+  const declaredType = file.type.toLowerCase().trim();
+  if (!ALLOWED_REVIEW_PHOTO_TYPES.includes(declaredType)) {
+    throw new Error("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
+  }
+
+  // Validate file size
+  if (file.size > MAX_REVIEW_PHOTO_BYTES) {
+    throw new Error("File too large. Maximum size is 5 MB.");
+  }
+}
+
 /** Uploads a file to the (private) review-photos bucket; returns the storage path. URLs are signed on read. */
 export async function uploadReviewPhoto(file: File): Promise<string> {
   const { data: u } = await supabase.auth.getUser();
   if (!u.user) throw new Error("Please sign in to upload photos.");
+
+  validateReviewPhoto(file);
+
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${u.user.id}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage.from("review-photos").upload(path, file, {

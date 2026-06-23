@@ -1,6 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { CreditCard, Lock, AlertTriangle, Heart, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  CreditCard,
+  Lock,
+  TriangleAlert as AlertTriangle,
+  Heart,
+  CircleCheck as CheckCircle2,
+  Loader as Loader2,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/hooks/use-cart";
