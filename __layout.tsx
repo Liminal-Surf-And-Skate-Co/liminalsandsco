@@ -85,7 +85,9 @@ function AdminLayout() {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20 px-8 py-4">
-          <p className="text-lg font-semibold text-silver">Welcome to Liminal Surf & Skate Co Admin Panel!</p>
+          <p className="text-lg font-semibold text-silver">
+            Welcome to Liminal Surf & Skate Co Admin Panel!
+          </p>
         </div>
         <Outlet />
       </div>

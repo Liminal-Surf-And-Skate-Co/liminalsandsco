@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Calendar, Plus, Edit2, Trash2 } from "lucide-react";
+import { Calendar, Plus, CreditCard as Edit2, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/events")({
   head: () => ({
@@ -181,7 +181,9 @@ function EventsAdmin() {
                     <td className="px-6 py-4 text-gray-600">{event.location}</td>
                     <td className="px-6 py-4 text-gray-600">{event.attendees}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}
+                      >
                         {event.status}
                       </span>
                     </td>

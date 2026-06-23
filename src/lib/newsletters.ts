@@ -16,15 +16,15 @@ export type Newsletter = {
   published: boolean;
 };
 
-function normalize(row: any): Newsletter {
+function normalize(row: Record<string, unknown>): Newsletter {
   return {
-    id: row.id,
-    subject: row.subject,
-    excerpt: row.excerpt ?? null,
-    body: row.body ?? "",
-    sent_at: row.sent_at,
-    scheduled_for: row.scheduled_for ?? null,
-    cover_image: row.cover_image ?? null,
+    id: row.id as string,
+    subject: row.subject as string,
+    excerpt: (row.excerpt ?? null) as string | null,
+    body: (row.body ?? "") as string,
+    sent_at: row.sent_at as string,
+    scheduled_for: (row.scheduled_for ?? null) as string | null,
+    cover_image: (row.cover_image ?? null) as string | null,
     links: Array.isArray(row.links) ? (row.links as NewsletterLink[]) : [],
     published: Boolean(row.published ?? true),
   };

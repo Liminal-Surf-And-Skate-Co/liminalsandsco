@@ -9,14 +9,14 @@ export function Hero() {
             Oh Yeah Not Bad! · Est. 2026 · Hand-crafted
           </p>
           <h1 className="font-display font-black text-6xl sm:text-7xl lg:text-[8.5rem] leading-[0.85] tracking-tighter mb-8">
-            BETWEEN<br />
-            <span className="text-stroke">WAVE</span><br />
-            & CONCRETE.
+            BETWEEN
+            <br />
+            <span className="text-stroke">WAVE</span>
+            <br />& CONCRETE.
           </h1>
           <p className="text-lg text-silver/80 max-w-xl mb-10 leading-relaxed">
-            Liminal is a one-bench workshop crafting hand-shaped skate decks
-            and surfboards. No factories. No shortcuts. Just slow craft for
-            people who feel the in-between.
+            Liminal is a one-bench workshop crafting hand-shaped skate decks and surfboards. No
+            factories. No shortcuts. Just slow craft for people who feel the in-between.
           </p>
           <div className="flex flex-wrap gap-4">
             <a
@@ -49,12 +49,20 @@ export function Hero() {
       <div className="border-y border-border/40 overflow-hidden bg-background/40">
         <div className="flex animate-marquee whitespace-nowrap py-4">
           {Array.from({ length: 2 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-12 px-6 font-display text-2xl text-silver/40">
-              <span>OH YEAH NOT BAD!</span><span className="text-primary">✦</span>
-              <span>HAND CRAFTED</span><span className="text-primary">✦</span>
-              <span>SURF · SKATE · WEAR</span><span className="text-primary">✦</span>
-              <span>MADE TO RIDE</span><span className="text-primary">✦</span>
-              <span>NO TWO ALIKE</span><span className="text-primary">✦</span>
+            <div
+              key={i}
+              className="flex items-center gap-12 px-6 font-display text-2xl text-silver/40"
+            >
+              <span>OH YEAH NOT BAD!</span>
+              <span className="text-primary">✦</span>
+              <span>HAND CRAFTED</span>
+              <span className="text-primary">✦</span>
+              <span>SURF · SKATE · WEAR</span>
+              <span className="text-primary">✦</span>
+              <span>MADE TO RIDE</span>
+              <span className="text-primary">✦</span>
+              <span>NO TWO ALIKE</span>
+              <span className="text-primary">✦</span>
             </div>
           ))}
         </div>

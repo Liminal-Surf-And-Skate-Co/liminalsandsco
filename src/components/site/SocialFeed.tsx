@@ -20,7 +20,9 @@ export function SocialFeed() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">Live Feed</p>
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">
+              Live Feed
+            </p>
             <h2 className="font-display font-black text-4xl lg:text-5xl">From the crew.</h2>
           </div>
           <a
@@ -41,10 +43,17 @@ export function SocialFeed() {
               rel="noreferrer noopener"
               className="relative group aspect-square overflow-hidden bg-card border border-border/40"
             >
-              <img src={t.img} alt={t.caption} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img
+                src={t.img}
+                alt={t.caption}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
               <div className="absolute inset-0 bg-background/0 group-hover:bg-background/70 transition-colors flex flex-col items-center justify-center text-center p-3 opacity-0 group-hover:opacity-100">
                 <Instagram className="h-5 w-5 text-primary mb-2" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-silver">{t.user}</span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-silver">
+                  {t.user}
+                </span>
                 <span className="font-mono text-[10px] text-silver/70 mt-1">{t.caption}</span>
               </div>
             </a>

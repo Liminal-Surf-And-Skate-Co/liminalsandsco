@@ -54,7 +54,10 @@ export function GlobalSearch({ compact = false }: Props) {
         <input
           ref={inputRef}
           value={q}
-          onChange={(e) => { setQ(e.target.value); setOpen(true); }}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+          }}
           onFocus={() => setOpen(true)}
           placeholder="Search products, articles, events…"
           aria-label="Site-wide search"
@@ -63,7 +66,10 @@ export function GlobalSearch({ compact = false }: Props) {
         {q && (
           <button
             type="button"
-            onClick={() => { setQ(""); inputRef.current?.focus(); }}
+            onClick={() => {
+              setQ("");
+              inputRef.current?.focus();
+            }}
             aria-label="Clear search"
             className="absolute right-2 top-1/2 -translate-y-1/2 text-silver/50 hover:text-primary"
           >
@@ -75,16 +81,20 @@ export function GlobalSearch({ compact = false }: Props) {
       {open && q.trim() && (
         <div className="absolute left-0 right-0 mt-2 max-h-[70vh] overflow-y-auto bg-background border border-border/60 shadow-2xl z-50">
           {res.loading && res.total === 0 && (
-            <div className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver/60">Searching…</div>
+            <div className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver/60">
+              Searching…
+            </div>
           )}
           {!res.loading && res.total === 0 && (
-            <div className="p-4 font-mono text-[11px] text-silver/60">
-              No results for “{q}”.
-            </div>
+            <div className="p-4 font-mono text-[11px] text-silver/60">No results for “{q}”.</div>
           )}
 
           {res.products.length > 0 && (
-            <Section title="Products" icon={<Package className="h-3 w-3" />} count={res.products.length}>
+            <Section
+              title="Products"
+              icon={<Package className="h-3 w-3" />}
+              count={res.products.length}
+            >
               {res.products.map((p) => (
                 <Link
                   key={p.id}
@@ -93,21 +103,31 @@ export function GlobalSearch({ compact = false }: Props) {
                   onClick={close}
                   className="flex items-center gap-3 px-3 py-2 hover:bg-card"
                 >
-                  <img src={productImage(p)} alt="" className="h-10 w-10 object-cover bg-card border border-border/40" />
+                  <img
+                    src={productImage(p)}
+                    alt=""
+                    className="h-10 w-10 object-cover bg-card border border-border/40"
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-[9px] uppercase tracking-widest text-primary truncate">
                       {DEPARTMENT_LABELS[p.department]}
                     </p>
                     <p className="text-xs text-silver truncate">{p.title}</p>
                   </div>
-                  <span className="font-mono text-[10px] text-silver/70 shrink-0">${effectivePrice(p)}</span>
+                  <span className="font-mono text-[10px] text-silver/70 shrink-0">
+                    ${effectivePrice(p)}
+                  </span>
                 </Link>
               ))}
             </Section>
           )}
 
           {res.posts.length > 0 && (
-            <Section title="Articles" icon={<FileText className="h-3 w-3" />} count={res.posts.length}>
+            <Section
+              title="Articles"
+              icon={<FileText className="h-3 w-3" />}
+              count={res.posts.length}
+            >
               {res.posts.map((p) => (
                 <Link
                   key={p.slug}
@@ -116,7 +136,9 @@ export function GlobalSearch({ compact = false }: Props) {
                   onClick={close}
                   className="block px-3 py-2 hover:bg-card"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">{p.category}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                    {p.category}
+                  </p>
                   <p className="text-xs text-silver truncate">{p.title}</p>
                 </Link>
               ))}
@@ -124,7 +146,11 @@ export function GlobalSearch({ compact = false }: Props) {
           )}
 
           {res.newsletters.length > 0 && (
-            <Section title="Weekly Letters" icon={<Mail className="h-3 w-3" />} count={res.newsletters.length}>
+            <Section
+              title="Weekly Letters"
+              icon={<Mail className="h-3 w-3" />}
+              count={res.newsletters.length}
+            >
               {res.newsletters.map((n) => (
                 <Link
                   key={n.id}
@@ -134,7 +160,10 @@ export function GlobalSearch({ compact = false }: Props) {
                   className="block px-3 py-2 hover:bg-card"
                 >
                   <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
-                    {new Date(n.scheduled_for ?? n.sent_at).toLocaleDateString("en-AU", { month: "short", day: "2-digit" })}
+                    {new Date(n.scheduled_for ?? n.sent_at).toLocaleDateString("en-AU", {
+                      month: "short",
+                      day: "2-digit",
+                    })}
                   </p>
                   <p className="text-xs text-silver truncate">{n.subject}</p>
                 </Link>
@@ -143,7 +172,11 @@ export function GlobalSearch({ compact = false }: Props) {
           )}
 
           {res.events.length > 0 && (
-            <Section title="Events" icon={<Calendar className="h-3 w-3" />} count={res.events.length}>
+            <Section
+              title="Events"
+              icon={<Calendar className="h-3 w-3" />}
+              count={res.events.length}
+            >
               {res.events.map((e) => (
                 <Link
                   key={e.id}
@@ -152,7 +185,9 @@ export function GlobalSearch({ compact = false }: Props) {
                   onClick={close}
                   className="block px-3 py-2 hover:bg-card"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">{e.date}</p>
+                  <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                    {e.date}
+                  </p>
                   <p className="text-xs text-silver truncate">{e.title}</p>
                 </Link>
               ))}
@@ -174,8 +209,16 @@ export function GlobalSearch({ compact = false }: Props) {
 }
 
 function Section({
-  title, icon, count, children,
-}: { title: string; icon: React.ReactNode; count: number; children: React.ReactNode }) {
+  title,
+  icon,
+  count,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  count: number;
+  children: React.ReactNode;
+}) {
   return (
     <div className="border-b border-border/40 last:border-0">
       <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">

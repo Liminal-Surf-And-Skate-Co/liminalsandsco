@@ -10,24 +10,36 @@ export function CommunityTeaser() {
     <section className="relative py-24 border-t border-border/40">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-10 items-center">
         <div className="lg:col-span-7 relative group">
-          <img src={surfboard} alt="Daily Swell — latest spot check clip" loading="lazy" className="w-full h-auto shadow-card" />
+          <img
+            src={surfboard}
+            alt="Daily Swell — latest spot check clip"
+            loading="lazy"
+            className="w-full h-auto shadow-card"
+          />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="h-20 w-20 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
               <Play className="h-8 w-8 ml-1" fill="currentColor" />
             </div>
           </div>
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-widest bg-background/80 px-3 py-1">Daily Swell · North Point</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest bg-background/80 px-3 py-1">02:14</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest bg-background/80 px-3 py-1">
+              Daily Swell · North Point
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-widest bg-background/80 px-3 py-1">
+              02:14
+            </span>
           </div>
         </div>
         <div className="lg:col-span-5">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">The Hub</p>
           <h2 className="font-display font-black text-4xl lg:text-6xl leading-none mb-5">
-            Join the<br />daily session.
+            Join the
+            <br />
+            daily session.
           </h2>
           <p className="text-silver/80 mb-8">
-            Spot reports, clips, ride-shares, gear swaps. The whole scene checks in on Discord every dawn — pull up.
+            Spot reports, clips, ride-shares, gear swaps. The whole scene checks in on Discord every
+            dawn — pull up.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             {discordUrl && (

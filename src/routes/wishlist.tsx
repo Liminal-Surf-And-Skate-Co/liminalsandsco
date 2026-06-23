@@ -10,7 +10,10 @@ export const Route = createFileRoute("/wishlist")({
   head: () => ({
     meta: [
       { title: "Wishlist — Liminal Surf & Skate Co" },
-      { name: "description", content: "Your saved pieces — boards, gear, and one-offs waiting for payday." },
+      {
+        name: "description",
+        content: "Your saved pieces — boards, gear, and one-offs waiting for payday.",
+      },
     ],
   }),
   component: WishlistPage,
@@ -36,14 +39,20 @@ function WishlistPage() {
         ) : items.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
             <p className="font-mono text-sm text-silver/70 mb-6">No saved pieces yet.</p>
-            <Link to="/shop" className="font-mono text-xs uppercase tracking-widest text-primary hover:underline">
+            <Link
+              to="/shop"
+              className="font-mono text-xs uppercase tracking-widest text-primary hover:underline"
+            >
               Browse the shop →
             </Link>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {items.map((p) => (
-              <div key={p.slug} className="group bg-card border border-border/60 overflow-hidden relative">
+              <div
+                key={p.slug}
+                className="group bg-card border border-border/60 overflow-hidden relative"
+              >
                 <button
                   onClick={() => remove(p.slug)}
                   aria-label="Remove from wishlist"
@@ -51,11 +60,21 @@ function WishlistPage() {
                 >
                   <X className="h-4 w-4" />
                 </button>
-                <Link to="/shop/$slug" params={{ slug: p.slug }} className="block aspect-square overflow-hidden bg-background">
-                  <img src={productImage(p)} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <Link
+                  to="/shop/$slug"
+                  params={{ slug: p.slug }}
+                  className="block aspect-square overflow-hidden bg-background"
+                >
+                  <img
+                    src={productImage(p)}
+                    alt={p.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
                 </Link>
                 <div className="p-5">
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">{DEPARTMENT_LABELS[p.department]}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
+                    {DEPARTMENT_LABELS[p.department]}
+                  </p>
                   <h3 className="font-display font-bold text-lg mb-3">{p.title}</h3>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>

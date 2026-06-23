@@ -27,7 +27,7 @@ export type CommunityEvent = {
   updated_at: string;
 };
 
-function normalize(row: any): CommunityEvent {
+function normalize(row: Record<string, unknown>): CommunityEvent {
   return {
     id: row.id,
     title: row.title,
@@ -50,7 +50,8 @@ export function useEvents(opts?: { includeUnpublished?: boolean; upcomingOnly?: 
     queryFn: async () => {
       let q = supabase.from("events").select("*").order("start_at", { ascending: true });
       if (!opts?.includeUnpublished) q = q.eq("published", true);
-      if (opts?.upcomingOnly) q = q.gte("start_at", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString());
+      if (opts?.upcomingOnly)
+        q = q.gte("start_at", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString());
       const { data, error } = await q;
       if (error) throw new Error(sanitizeError(error));
       return (data ?? []).map(normalize);
@@ -78,7 +79,7 @@ export function useUpsertEvent() {
         const { error } = await supabase.from("events").update(payload).eq("id", e.id);
         if (error) throw new Error(sanitizeError(error));
       } else {
-        const { error } = await supabase.from("events").insert(payload as any);
+        const { error } = await supabase.from("events").insert(payload as Record<string, unknown>);
         if (error) throw new Error(sanitizeError(error));
       }
     },
@@ -102,9 +103,13 @@ function gcalFormat(iso: string): string {
   return new Date(iso).toISOString().replace(/[-:]|\.\d{3}/g, "");
 }
 
-export function googleCalendarUrl(e: Pick<CommunityEvent, "title" | "description" | "location" | "start_at" | "end_at">): string {
+export function googleCalendarUrl(
+  e: Pick<CommunityEvent, "title" | "description" | "location" | "start_at" | "end_at">,
+): string {
   const start = gcalFormat(e.start_at);
-  const end = gcalFormat(e.end_at || new Date(new Date(e.start_at).getTime() + 2 * 60 * 60 * 1000).toISOString());
+  const end = gcalFormat(
+    e.end_at || new Date(new Date(e.start_at).getTime() + 2 * 60 * 60 * 1000).toISOString(),
+  );
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: e.title,

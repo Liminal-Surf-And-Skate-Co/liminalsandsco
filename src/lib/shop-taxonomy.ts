@@ -165,8 +165,17 @@ export const MEGA_MENU: Record<Department, { columns: MenuColumn[]; allLabel: st
 // ---------- Filter taxonomies (mirror nav + spec presets) ----------
 
 export const COLOURS = [
-  "black", "blue", "brown", "grey", "pink", "red",
-  "white", "yellow", "multi", "orange", "purple",
+  "black",
+  "blue",
+  "brown",
+  "grey",
+  "pink",
+  "red",
+  "white",
+  "yellow",
+  "multi",
+  "orange",
+  "purple",
 ] as const;
 export type Colour = (typeof COLOURS)[number];
 

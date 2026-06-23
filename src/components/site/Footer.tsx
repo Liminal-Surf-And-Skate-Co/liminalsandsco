@@ -15,7 +15,12 @@ export function Footer() {
       // lucide doesn't ship a TikTok icon; reuse a music-y glyph
       Icon: MessageCircle,
     },
-    { key: "discord_invite_url", label: "Discord", url: settings?.discord_invite_url, Icon: MessageCircle },
+    {
+      key: "discord_invite_url",
+      label: "Discord",
+      url: settings?.discord_invite_url,
+      Icon: MessageCircle,
+    },
   ].filter((s) => s.url);
 
   const emailPrimary = settings?.contact_email_primary;
@@ -28,34 +33,48 @@ export function Footer() {
           <img src={logo} alt="Liminal" className="h-16 w-auto mb-4" />
           <p className="font-display text-2xl text-primary mb-3">Oh Yeah Not Bad!</p>
           <p className="text-silver/60 text-sm max-w-xs leading-relaxed">
-            Hand-crafted surf and skate from a one-bench workshop. Made
-            between the wave and the concrete.
+            Hand-crafted surf and skate from a one-bench workshop. Made between the wave and the
+            concrete.
           </p>
         </div>
 
         <div>
-          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">Contact</h4>
+          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">
+            Contact
+          </h4>
           <ul className="space-y-2 text-silver/70 text-sm">
             {emailPrimary && (
               <li>
-                <a href={`mailto:${emailPrimary}`} className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                <a
+                  href={`mailto:${emailPrimary}`}
+                  className="hover:text-primary transition-colors inline-flex items-center gap-2"
+                >
                   <Mail className="h-3.5 w-3.5" /> {emailPrimary}
                 </a>
               </li>
             )}
             {emailSecondary && (
               <li>
-                <a href={`mailto:${emailSecondary}`} className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                <a
+                  href={`mailto:${emailSecondary}`}
+                  className="hover:text-primary transition-colors inline-flex items-center gap-2"
+                >
                   <Mail className="h-3.5 w-3.5" /> {emailSecondary}
                 </a>
               </li>
             )}
-            <li><Link to="/support" className="hover:text-primary transition-colors">Support hub</Link></li>
+            <li>
+              <Link to="/support" className="hover:text-primary transition-colors">
+                Support hub
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">Follow</h4>
+          <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">
+            Follow
+          </h4>
           {socials.length === 0 ? (
             <p className="text-silver/40 text-xs font-mono">Links coming soon</p>
           ) : (
@@ -98,10 +117,26 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-widest text-silver/50">
           <p>© {new Date().getFullYear()} Liminal Surf & Skate Co · Est. 26</p>
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <li><Link to="/support" className="hover:text-primary transition-colors">Support</Link></li>
-            <li><Link to="/support" hash="privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/support" hash="terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-            <li><Link to="/support" hash="refund" className="hover:text-primary transition-colors">Refund Policy</Link></li>
+            <li>
+              <Link to="/support" className="hover:text-primary transition-colors">
+                Support
+              </Link>
+            </li>
+            <li>
+              <Link to="/support" hash="privacy" className="hover:text-primary transition-colors">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/support" hash="terms" className="hover:text-primary transition-colors">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link to="/support" hash="refund" className="hover:text-primary transition-colors">
+                Refund Policy
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

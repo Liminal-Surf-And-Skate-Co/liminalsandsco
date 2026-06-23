@@ -44,9 +44,10 @@ export function useGlobalSearch(query: string, limitPerGroup = 20): SearchResult
       .filter((n) => match([n.subject, n.excerpt, n.body], term))
       .slice(0, limitPerGroup);
 
-    const ev = COMMUNITY_EVENTS
-      .filter((e) => match([e.title, e.detail, e.date], term))
-      .slice(0, limitPerGroup);
+    const ev = COMMUNITY_EVENTS.filter((e) => match([e.title, e.detail, e.date], term)).slice(
+      0,
+      limitPerGroup,
+    );
 
     return {
       products: prod,

@@ -71,7 +71,7 @@ export function isOutOfStock(p: Pick<Product, "stock_count">): boolean {
   return p.stock_count <= 0;
 }
 
-function normalize(row: any): Product {
+function normalize(row: Record<string, unknown>): Product {
   return {
     id: row.id,
     slug: row.slug,
@@ -82,13 +82,14 @@ function normalize(row: any): Product {
     description: row.description ?? "",
     details: Array.isArray(row.details) ? row.details : [],
     price: Number(row.price ?? 0),
-    sale_price: row.sale_price !== null && row.sale_price !== undefined ? Number(row.sale_price) : null,
+    sale_price:
+      row.sale_price !== null && row.sale_price !== undefined ? Number(row.sale_price) : null,
     colour: row.colour ?? null,
     sizes: row.sizes ?? [],
     stock_count: Number(row.stock_count ?? 0),
     images: row.images ?? [],
     tags: row.tags ?? [],
-    specs: (row.specs && typeof row.specs === "object") ? row.specs : {},
+    specs: row.specs && typeof row.specs === "object" ? row.specs : {},
     featured: Boolean(row.featured),
     created_at: row.created_at,
     updated_at: row.updated_at,
@@ -144,11 +145,15 @@ export function sortProducts(list: Product[], sort: SortKey): Product[] {
   const copy = list.slice();
   copy.sort((a, b) => {
     switch (sort) {
-      case "price-asc": return effectivePrice(a) - effectivePrice(b);
-      case "price-desc": return effectivePrice(b) - effectivePrice(a);
-      case "oldest": return a.created_at.localeCompare(b.created_at);
+      case "price-asc":
+        return effectivePrice(a) - effectivePrice(b);
+      case "price-desc":
+        return effectivePrice(b) - effectivePrice(a);
+      case "oldest":
+        return a.created_at.localeCompare(b.created_at);
       case "newest":
-      default: return b.created_at.localeCompare(a.created_at);
+      default:
+        return b.created_at.localeCompare(a.created_at);
     }
   });
   return copy;

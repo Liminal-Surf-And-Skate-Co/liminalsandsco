@@ -63,8 +63,7 @@ function BlogIndex() {
     if (!term) return list;
     return list.filter(
       (n) =>
-        n.subject.toLowerCase().includes(term) ||
-        (n.excerpt ?? "").toLowerCase().includes(term),
+        n.subject.toLowerCase().includes(term) || (n.excerpt ?? "").toLowerCase().includes(term),
     );
   }, [newsletters, q]);
 
@@ -77,7 +76,8 @@ function BlogIndex() {
             Blog · Dispatches · Weekly Letters
           </p>
           <h1 className="font-display font-black text-5xl lg:text-8xl leading-[0.85] tracking-tighter mb-6">
-            FIELD<br />
+            FIELD
+            <br />
             <span className="text-stroke">NOTES</span>
           </h1>
           <p className="text-silver/70 text-lg max-w-2xl mb-8">
@@ -108,14 +108,22 @@ function BlogIndex() {
 
           {filteredNewsletters.length === 0 ? (
             <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
-              {newsletters === undefined ? "Loading…" : q ? `No issues match "${q}".` : "No issues published yet — first letter drops Friday."}
+              {newsletters === undefined
+                ? "Loading…"
+                : q
+                  ? `No issues match "${q}".`
+                  : "No issues published yet — first letter drops Friday."}
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredNewsletters.map((n) => {
                 const d = new Date(n.scheduled_for ?? n.sent_at);
                 const weekday = d.toLocaleDateString("en-AU", { weekday: "short" });
-                const dateLabel = d.toLocaleDateString("en-AU", { month: "short", day: "2-digit", year: "numeric" });
+                const dateLabel = d.toLocaleDateString("en-AU", {
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                });
                 return (
                   <Link
                     key={n.id}
@@ -125,7 +133,12 @@ function BlogIndex() {
                   >
                     <div className="aspect-[16/10] bg-background overflow-hidden">
                       {n.cover_image ? (
-                        <img src={n.cover_image} alt={n.subject} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <img
+                          src={n.cover_image}
+                          alt={n.subject}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-transparent">
                           <Mail className="h-10 w-10 text-silver/40" />
@@ -171,7 +184,9 @@ function BlogIndex() {
                   >
                     <div className="md:col-span-2 font-mono text-[10px] uppercase tracking-widest text-silver/50">
                       {new Date(p.date).toLocaleDateString("en-US", {
-                        month: "short", day: "2-digit", year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
                       })}
                     </div>
                     <div className="md:col-span-8">
@@ -196,7 +211,9 @@ function BlogIndex() {
         {/* Media section */}
         <section className="max-w-5xl mx-auto px-6 pb-32">
           <div className="flex items-baseline justify-between mb-6">
-            <h2 className="font-display font-black text-2xl lg:text-3xl">Daily Swell · Log · Videos</h2>
+            <h2 className="font-display font-black text-2xl lg:text-3xl">
+              Daily Swell · Log · Videos
+            </h2>
             <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">
               Edits & spot checks
             </p>
@@ -208,7 +225,10 @@ function BlogIndex() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredMedia.map((m) => (
-                <div key={m.title} className="bg-card border border-border/60 overflow-hidden group cursor-pointer hover:border-primary transition-colors">
+                <div
+                  key={m.title}
+                  className="bg-card border border-border/60 overflow-hidden group cursor-pointer hover:border-primary transition-colors"
+                >
                   <div className="aspect-video bg-background flex items-center justify-center relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
                     <Play className="h-10 w-10 text-silver/70 group-hover:text-primary transition-colors relative" />
@@ -217,7 +237,9 @@ function BlogIndex() {
                     </span>
                   </div>
                   <div className="p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">{m.kind}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
+                      {m.kind}
+                    </p>
                     <h3 className="font-display font-bold text-base">{m.title}</h3>
                   </div>
                 </div>

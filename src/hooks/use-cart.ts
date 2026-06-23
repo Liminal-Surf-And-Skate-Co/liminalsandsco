@@ -42,7 +42,9 @@ export function useCart() {
   }, []);
 
   const setQty = useCallback((slug: string, qty: number) => {
-    const cur = read().map((i) => (i.slug === slug ? { ...i, qty } : i)).filter((i) => i.qty > 0);
+    const cur = read()
+      .map((i) => (i.slug === slug ? { ...i, qty } : i))
+      .filter((i) => i.qty > 0);
     write(cur);
   }, []);
 

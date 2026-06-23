@@ -62,7 +62,9 @@ function AuditLogs() {
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterSeverity, setFilterSeverity] = useState<"all" | "info" | "warning" | "critical">("all");
+  const [filterSeverity, setFilterSeverity] = useState<"all" | "info" | "warning" | "critical">(
+    "all",
+  );
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
@@ -104,7 +106,8 @@ function AuditLogs() {
         <div>
           <p className="font-semibold text-orange-900">Potential Security Alert</p>
           <p className="text-sm text-orange-800">
-            High volume of failed login attempts detected (42 attempts in the last hour from multiple IPs).
+            High volume of failed login attempts detected (42 attempts in the last hour from
+            multiple IPs).
           </p>
         </div>
       </div>
@@ -140,12 +143,16 @@ function AuditLogs() {
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Timestamp</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Timestamp
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Admin</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Target</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Details</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Severity</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Severity
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -157,7 +164,9 @@ function AuditLogs() {
                   <td className="px-6 py-4 text-sm font-mono text-gray-600">{log.target}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{log.details}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getSeverityColor(log.severity)}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getSeverityColor(log.severity)}`}
+                    >
                       <span>{getSeverityIcon(log.severity)}</span>
                       {log.severity}
                     </span>
@@ -176,15 +185,21 @@ function AuditLogs() {
           <p className="text-sm text-gray-600">Total Events</p>
         </Card>
         <Card className="p-4">
-          <p className="text-2xl font-bold text-blue-600">{logs.filter(l => l.severity === "info").length}</p>
+          <p className="text-2xl font-bold text-blue-600">
+            {logs.filter((l) => l.severity === "info").length}
+          </p>
           <p className="text-sm text-gray-600">Info Events</p>
         </Card>
         <Card className="p-4">
-          <p className="text-2xl font-bold text-yellow-600">{logs.filter(l => l.severity === "warning").length}</p>
+          <p className="text-2xl font-bold text-yellow-600">
+            {logs.filter((l) => l.severity === "warning").length}
+          </p>
           <p className="text-sm text-gray-600">Warnings</p>
         </Card>
         <Card className="p-4">
-          <p className="text-2xl font-bold text-red-600">{logs.filter(l => l.severity === "critical").length}</p>
+          <p className="text-2xl font-bold text-red-600">
+            {logs.filter((l) => l.severity === "critical").length}
+          </p>
           <p className="text-sm text-gray-600">Critical Events</p>
         </Card>
       </div>

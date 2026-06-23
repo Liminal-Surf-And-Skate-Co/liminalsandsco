@@ -36,8 +36,20 @@ function SecurityControl() {
   ]);
 
   const [sessions, setSessions] = useState([
-    { id: "1", userId: "user-123", ipAddress: "192.168.1.1", loginTime: "2024-12-17 10:30", lastActivity: "2024-12-17 14:20" },
-    { id: "2", userId: "user-456", ipAddress: "192.168.1.100", loginTime: "2024-12-16 09:15", lastActivity: "2024-12-16 15:45" },
+    {
+      id: "1",
+      userId: "user-123",
+      ipAddress: "192.168.1.1",
+      loginTime: "2024-12-17 10:30",
+      lastActivity: "2024-12-17 14:20",
+    },
+    {
+      id: "2",
+      userId: "user-456",
+      ipAddress: "192.168.1.100",
+      loginTime: "2024-12-16 09:15",
+      lastActivity: "2024-12-16 15:45",
+    },
   ]);
 
   const [adminEmail, setAdminEmail] = useState("");
@@ -117,7 +129,12 @@ function SecurityControl() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Client Secret</label>
-                  <Input value={config.clientSecret} readOnly type="password" className="bg-gray-50" />
+                  <Input
+                    value={config.clientSecret}
+                    readOnly
+                    type="password"
+                    className="bg-gray-50"
+                  />
                 </div>
               </div>
 
@@ -196,7 +213,9 @@ function SecurityControl() {
             </Button>
           </div>
           {adminMessage && (
-            <div className={`text-sm p-3 rounded mb-3 ${adminMessage.startsWith("✅") ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+            <div
+              className={`text-sm p-3 rounded mb-3 ${adminMessage.startsWith("✅") ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}
+            >
               {adminMessage}
             </div>
           )}

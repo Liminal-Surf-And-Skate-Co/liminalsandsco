@@ -14,7 +14,10 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Checkout — Liminal Surf & Skate Co" },
-      { name: "description", content: "Complete your order — secure checkout with multiple payment options." },
+      {
+        name: "description",
+        content: "Complete your order — secure checkout with multiple payment options.",
+      },
     ],
   }),
   component: CheckoutPage,
@@ -32,7 +35,14 @@ function CheckoutPage() {
   const bySlug = new Map(products.map((p) => [p.slug, p]));
   const lines = items
     .map((i) => ({ item: i, product: bySlug.get(i.slug) }))
-    .filter((l): l is { item: typeof items[number]; product: NonNullable<ReturnType<typeof bySlug.get>> } => Boolean(l.product));
+    .filter(
+      (
+        l,
+      ): l is {
+        item: (typeof items)[number];
+        product: NonNullable<ReturnType<typeof bySlug.get>>;
+      } => Boolean(l.product),
+    );
 
   const subtotal = lines.reduce((n, l) => n + effectivePrice(l.product) * l.item.qty, 0);
   const shipping = subtotal > 0 ? (subtotal >= 100 ? 0 : 12) : 0;
@@ -94,13 +104,20 @@ function CheckoutPage() {
           </div>
           <h1 className="font-display font-black text-4xl mb-3">Order confirmed</h1>
           <p className="font-mono text-sm text-silver/70 mb-8">
-            Thanks for the order. A receipt is on its way to <span className="text-primary">{email || "your inbox"}</span>.
+            Thanks for the order. A receipt is on its way to{" "}
+            <span className="text-primary">{email || "your inbox"}</span>.
           </p>
           <div className="flex gap-3 justify-center">
-            <Link to="/shop" className="font-mono text-xs uppercase tracking-widest px-6 py-3 border border-border/60 hover:border-primary">
+            <Link
+              to="/shop"
+              className="font-mono text-xs uppercase tracking-widest px-6 py-3 border border-border/60 hover:border-primary"
+            >
               Keep shopping
             </Link>
-            <Link to="/account" className="font-mono text-xs uppercase tracking-widest px-6 py-3 bg-primary text-primary-foreground hover:opacity-90">
+            <Link
+              to="/account"
+              className="font-mono text-xs uppercase tracking-widest px-6 py-3 bg-primary text-primary-foreground hover:opacity-90"
+            >
               View account
             </Link>
           </div>
@@ -122,7 +139,10 @@ function CheckoutPage() {
         {lines.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
             <p className="font-mono text-sm text-silver/70 mb-6">Your cart is empty.</p>
-            <Link to="/shop" className="font-mono text-xs uppercase tracking-widest text-primary hover:underline">
+            <Link
+              to="/shop"
+              className="font-mono text-xs uppercase tracking-widest text-primary hover:underline"
+            >
               Browse the shop →
             </Link>
           </div>
@@ -135,7 +155,9 @@ function CheckoutPage() {
                   <div className="flex items-start gap-3 mb-4">
                     <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-display font-bold text-base mb-1">Payment couldn't be completed</p>
+                      <p className="font-display font-bold text-base mb-1">
+                        Payment couldn't be completed
+                      </p>
                       <p className="font-mono text-xs text-silver/80 leading-relaxed">{errMsg}</p>
                     </div>
                   </div>
@@ -153,14 +175,16 @@ function CheckoutPage() {
 
               {/* Express pay */}
               <section>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mb-3">Express checkout</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mb-3">
+                  Express checkout
+                </p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setPay("apple")}
                     className={`h-12 flex items-center justify-center gap-2 border font-mono text-xs uppercase tracking-widest transition-colors ${pay === "apple" ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/60"}`}
                   >
-                     Pay
+                    Pay
                   </button>
                   <button
                     type="button"
@@ -174,7 +198,9 @@ function CheckoutPage() {
 
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-border/40" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50">or pay with card</span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50">
+                  or pay with card
+                </span>
                 <div className="h-px flex-1 bg-border/40" />
               </div>
 
@@ -183,24 +209,80 @@ function CheckoutPage() {
                 <h2 className="font-display font-bold text-xl">Contact & shipping</h2>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div className="sm:col-span-2">
-                    <Label htmlFor="email" className="font-mono text-[10px] uppercase tracking-widest text-silver/70">Email</Label>
-                    <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 focus-visible:ring-primary" />
+                    <Label
+                      htmlFor="email"
+                      className="font-mono text-[10px] uppercase tracking-widest text-silver/70"
+                    >
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-1 focus-visible:ring-primary"
+                    />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="name" className="font-mono text-[10px] uppercase tracking-widest text-silver/70">Full name</Label>
-                    <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} className="mt-1 focus-visible:ring-primary" />
+                    <Label
+                      htmlFor="name"
+                      className="font-mono text-[10px] uppercase tracking-widest text-silver/70"
+                    >
+                      Full name
+                    </Label>
+                    <Input
+                      id="name"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="mt-1 focus-visible:ring-primary"
+                    />
                   </div>
                   <div className="sm:col-span-2">
-                    <Label htmlFor="address" className="font-mono text-[10px] uppercase tracking-widest text-silver/70">Address</Label>
-                    <Input id="address" required value={address} onChange={(e) => setAddress(e.target.value)} className="mt-1 focus-visible:ring-primary" />
+                    <Label
+                      htmlFor="address"
+                      className="font-mono text-[10px] uppercase tracking-widest text-silver/70"
+                    >
+                      Address
+                    </Label>
+                    <Input
+                      id="address"
+                      required
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="mt-1 focus-visible:ring-primary"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="city" className="font-mono text-[10px] uppercase tracking-widest text-silver/70">City</Label>
-                    <Input id="city" required value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 focus-visible:ring-primary" />
+                    <Label
+                      htmlFor="city"
+                      className="font-mono text-[10px] uppercase tracking-widest text-silver/70"
+                    >
+                      City
+                    </Label>
+                    <Input
+                      id="city"
+                      required
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="mt-1 focus-visible:ring-primary"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="zip" className="font-mono text-[10px] uppercase tracking-widest text-silver/70">ZIP / Postcode</Label>
-                    <Input id="zip" required value={zip} onChange={(e) => setZip(e.target.value)} className="mt-1 focus-visible:ring-primary" />
+                    <Label
+                      htmlFor="zip"
+                      className="font-mono text-[10px] uppercase tracking-widest text-silver/70"
+                    >
+                      ZIP / Postcode
+                    </Label>
+                    <Input
+                      id="zip"
+                      required
+                      value={zip}
+                      onChange={(e) => setZip(e.target.value)}
+                      className="mt-1 focus-visible:ring-primary"
+                    />
                   </div>
                 </div>
               </section>
@@ -222,15 +304,34 @@ function CheckoutPage() {
                   className={`w-full text-left p-4 border transition-colors ${pay === "card" ? "border-primary bg-primary/5" : "border-border/60 hover:border-primary/60"}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`h-4 w-4 rounded-full border-2 ${pay === "card" ? "border-primary bg-primary" : "border-silver/50"}`} />
+                    <div
+                      className={`h-4 w-4 rounded-full border-2 ${pay === "card" ? "border-primary bg-primary" : "border-silver/50"}`}
+                    />
                     <CreditCard className="h-4 w-4 text-silver" />
-                    <span className="font-mono text-xs uppercase tracking-widest">Credit / Debit card</span>
+                    <span className="font-mono text-xs uppercase tracking-widest">
+                      Credit / Debit card
+                    </span>
                   </div>
                   {pay === "card" && (
                     <div className="grid sm:grid-cols-[1fr_120px_100px] gap-3 mt-4">
-                      <Input placeholder="Card number" value={card} onChange={(e) => setCard(e.target.value)} className="focus-visible:ring-primary" />
-                      <Input placeholder="MM / YY" value={exp} onChange={(e) => setExp(e.target.value)} className="focus-visible:ring-primary" />
-                      <Input placeholder="CVC" value={cvc} onChange={(e) => setCvc(e.target.value)} className="focus-visible:ring-primary" />
+                      <Input
+                        placeholder="Card number"
+                        value={card}
+                        onChange={(e) => setCard(e.target.value)}
+                        className="focus-visible:ring-primary"
+                      />
+                      <Input
+                        placeholder="MM / YY"
+                        value={exp}
+                        onChange={(e) => setExp(e.target.value)}
+                        className="focus-visible:ring-primary"
+                      />
+                      <Input
+                        placeholder="CVC"
+                        value={cvc}
+                        onChange={(e) => setCvc(e.target.value)}
+                        className="focus-visible:ring-primary"
+                      />
                     </div>
                   )}
                 </button>
@@ -241,10 +342,15 @@ function CheckoutPage() {
                   className={`w-full text-left p-4 border transition-colors ${pay === "afterpay" ? "border-primary bg-primary/5" : "border-border/60 hover:border-primary/60"}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`h-4 w-4 rounded-full border-2 ${pay === "afterpay" ? "border-primary bg-primary" : "border-silver/50"}`} />
-                    <span className="font-mono text-[10px] uppercase tracking-widest bg-foreground text-background px-2 py-1">Afterpay</span>
+                    <div
+                      className={`h-4 w-4 rounded-full border-2 ${pay === "afterpay" ? "border-primary bg-primary" : "border-silver/50"}`}
+                    />
+                    <span className="font-mono text-[10px] uppercase tracking-widest bg-foreground text-background px-2 py-1">
+                      Afterpay
+                    </span>
                     <span className="font-mono text-xs text-silver/80">
-                      or 4 interest-free payments of <span className="text-foreground">${(total / 4).toFixed(2)}</span>
+                      or 4 interest-free payments of{" "}
+                      <span className="text-foreground">${(total / 4).toFixed(2)}</span>
                     </span>
                   </div>
                 </button>
@@ -271,27 +377,38 @@ function CheckoutPage() {
                 {lines.map(({ item, product }) => (
                   <li key={product.slug} className="flex gap-3">
                     <div className="w-14 h-14 bg-background overflow-hidden shrink-0 border border-border/40">
-                      <img src={productImage(product)} alt={product.title} className="w-full h-full object-cover" />
+                      <img
+                        src={productImage(product)}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-mono text-[9px] uppercase tracking-widest text-primary">{DEPARTMENT_LABELS[product.department]}</p>
+                      <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                        {DEPARTMENT_LABELS[product.department]}
+                      </p>
                       <p className="font-display font-bold text-sm truncate">{product.title}</p>
                       <p className="font-mono text-[10px] text-silver/60">Qty {item.qty}</p>
                     </div>
-                    <p className="font-mono text-xs">${(effectivePrice(product) * item.qty).toFixed(2)}</p>
+                    <p className="font-mono text-xs">
+                      ${(effectivePrice(product) * item.qty).toFixed(2)}
+                    </p>
                   </li>
                 ))}
               </ul>
 
               <div className="space-y-2 pt-4 border-t border-border/40 font-mono text-xs">
                 <div className="flex justify-between text-silver/80">
-                  <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-silver/80">
-                  <span>Shipping</span><span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-border/40 text-base font-display font-bold">
-                  <span>Total</span><span>${total.toFixed(2)}</span>
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -301,9 +418,13 @@ function CheckoutPage() {
                 className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow font-mono text-xs uppercase tracking-widest"
               >
                 {status === "processing" ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> Processing…</>
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Processing…
+                  </>
                 ) : (
-                  <><Lock className="h-4 w-4" /> Complete purchase · ${total.toFixed(2)}</>
+                  <>
+                    <Lock className="h-4 w-4" /> Complete purchase · ${total.toFixed(2)}
+                  </>
                 )}
               </Button>
 

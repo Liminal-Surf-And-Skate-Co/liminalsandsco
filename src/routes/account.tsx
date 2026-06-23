@@ -79,11 +79,15 @@ function AccountPage() {
           <div className="border border-border/60 bg-card p-6 space-y-4">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-silver/60 font-mono text-xs uppercase tracking-widest">Email</span>
+                <span className="text-silver/60 font-mono text-xs uppercase tracking-widest">
+                  Email
+                </span>
                 <span>{user.email}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-silver/60 font-mono text-xs uppercase tracking-widest">Role</span>
+                <span className="text-silver/60 font-mono text-xs uppercase tracking-widest">
+                  Role
+                </span>
                 <span>{isAdmin ? "Admin" : "Member"}</span>
               </div>
             </div>

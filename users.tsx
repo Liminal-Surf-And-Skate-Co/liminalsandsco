@@ -46,7 +46,7 @@ function UserManagement() {
       (user) =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
@@ -93,7 +93,7 @@ function UserManagement() {
         body: JSON.stringify({ role: newRole }),
       });
       // Update local state
-      setUsers(users.map(u => u.id === userId ? {...u, role: newRole as any} : u));
+      setUsers(users.map((u) => (u.id === userId ? { ...u, role: newRole as User["role"] } : u)));
     } catch (error) {
       console.error("Failed to update role:", error);
     }
@@ -107,7 +107,9 @@ function UserManagement() {
         body: JSON.stringify({ status: newStatus }),
       });
       // Update local state
-      setUsers(users.map(u => u.id === userId ? {...u, status: newStatus as any} : u));
+      setUsers(
+        users.map((u) => (u.id === userId ? { ...u, status: newStatus as User["status"] } : u)),
+      );
     } catch (error) {
       console.error("Failed to update status:", error);
     }
@@ -162,10 +164,14 @@ function UserManagement() {
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">User</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Auth Provider</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Auth Provider
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Role</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Last Login</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                  Last Login
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -184,7 +190,10 @@ function UserManagement() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Select value={user.status} onValueChange={(val) => updateUserStatus(user.id, val)}>
+                    <Select
+                      value={user.status}
+                      onValueChange={(val) => updateUserStatus(user.id, val)}
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>

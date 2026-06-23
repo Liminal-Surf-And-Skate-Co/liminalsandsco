@@ -124,7 +124,9 @@ function NewsletterAdmin() {
                   <tr key={campaign.id} className="border-b hover:bg-gray-50">
                     <td className="px-6 py-4 font-medium">{campaign.subject}</td>
                     <td className="px-6 py-4 text-gray-600">{campaign.sentAt}</td>
-                    <td className="px-6 py-4 text-gray-600">{campaign.recipients.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {campaign.recipients.toLocaleString()}
+                    </td>
                     <td className="px-6 py-4 text-gray-600">{campaign.openRate}%</td>
                     <td className="px-6 py-4 text-gray-600">{campaign.clickRate}%</td>
                     <td className="px-6 py-4">

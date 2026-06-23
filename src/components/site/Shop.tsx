@@ -17,7 +17,9 @@ export function Shop() {
               (02) The Drop
             </p>
             <h2 className="font-display font-black text-5xl lg:text-7xl">
-              Shop the<br />latest run.
+              Shop the
+              <br />
+              latest run.
             </h2>
           </div>
           <Link
@@ -29,7 +31,9 @@ export function Shop() {
         </div>
 
         {list.length === 0 ? (
-          <p className="text-silver/60 font-mono text-xs">No products yet — add some in the admin.</p>
+          <p className="text-silver/60 font-mono text-xs">
+            No products yet — add some in the admin.
+          </p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {list.map((p) => {
@@ -60,8 +64,12 @@ export function Shop() {
                     <div className="text-right">
                       {onSale ? (
                         <>
-                          <span className="block text-silver/50 text-xs font-mono line-through">${p.price}</span>
-                          <span className="block text-primary text-sm font-mono">${effectivePrice(p)}</span>
+                          <span className="block text-silver/50 text-xs font-mono line-through">
+                            ${p.price}
+                          </span>
+                          <span className="block text-primary text-sm font-mono">
+                            ${effectivePrice(p)}
+                          </span>
                         </>
                       ) : (
                         <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>

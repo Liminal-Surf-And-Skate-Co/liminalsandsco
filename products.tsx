@@ -140,7 +140,14 @@ function ProductsAdmin() {
             onClick={() => {
               const headers = ["Name", "Category", "Price", "Stock", "Status", "Created"];
               const rows = products.map((p) =>
-                [p.name, p.category, p.price.toString(), p.stock.toString(), p.status, p.createdAt].join(",")
+                [
+                  p.name,
+                  p.category,
+                  p.price.toString(),
+                  p.stock.toString(),
+                  p.status,
+                  p.createdAt,
+                ].join(","),
               );
               const csv = [headers.join(","), ...rows].join("\n");
               const blob = new Blob([csv], { type: "text/csv" });

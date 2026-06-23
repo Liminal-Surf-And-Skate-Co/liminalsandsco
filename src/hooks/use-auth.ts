@@ -24,7 +24,9 @@ export function useAuth() {
       if (mounted) setIsAdmin(Boolean(data));
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
       // Defer Supabase call to avoid deadlock inside the listener

@@ -21,7 +21,14 @@ function CartPage() {
   const bySlug = new Map(products.map((p) => [p.slug, p]));
   const lines = items
     .map((i) => ({ item: i, product: bySlug.get(i.slug) }))
-    .filter((l): l is { item: typeof items[number]; product: NonNullable<ReturnType<typeof bySlug.get>> } => Boolean(l.product));
+    .filter(
+      (
+        l,
+      ): l is {
+        item: (typeof items)[number];
+        product: NonNullable<ReturnType<typeof bySlug.get>>;
+      } => Boolean(l.product),
+    );
 
   const subtotal = lines.reduce((n, l) => n + effectivePrice(l.product) * l.item.qty, 0);
 
@@ -39,7 +46,10 @@ function CartPage() {
         ) : lines.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
             <p className="font-mono text-sm text-silver/70 mb-6">Cart is empty.</p>
-            <Link to="/shop" className="font-mono text-xs uppercase tracking-widest text-primary hover:underline">
+            <Link
+              to="/shop"
+              className="font-mono text-xs uppercase tracking-widest text-primary hover:underline"
+            >
               Browse the shop →
             </Link>
           </div>
@@ -50,11 +60,21 @@ function CartPage() {
                 const price = effectivePrice(product);
                 return (
                   <li key={product.slug} className="flex gap-4 py-5 items-center">
-                    <Link to="/shop/$slug" params={{ slug: product.slug }} className="w-20 h-20 bg-background overflow-hidden shrink-0">
-                      <img src={productImage(product)} alt={product.title} className="w-full h-full object-cover" />
+                    <Link
+                      to="/shop/$slug"
+                      params={{ slug: product.slug }}
+                      className="w-20 h-20 bg-background overflow-hidden shrink-0"
+                    >
+                      <img
+                        src={productImage(product)}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
                     </Link>
                     <div className="flex-1 min-w-0">
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">{DEPARTMENT_LABELS[product.department]}</p>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
+                        {DEPARTMENT_LABELS[product.department]}
+                      </p>
                       <h3 className="font-display font-bold text-lg truncate">{product.title}</h3>
                       <p className="font-mono text-xs text-silver/70">${price}</p>
                     </div>
@@ -76,7 +96,11 @@ function CartPage() {
                       </button>
                     </div>
                     <p className="font-mono text-sm w-20 text-right">${price * item.qty}</p>
-                    <button onClick={() => remove(product.slug)} aria-label="Remove" className="text-silver/60 hover:text-primary">
+                    <button
+                      onClick={() => remove(product.slug)}
+                      aria-label="Remove"
+                      className="text-silver/60 hover:text-primary"
+                    >
                       <X className="h-4 w-4" />
                     </button>
                   </li>
@@ -85,11 +109,16 @@ function CartPage() {
             </ul>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <button onClick={clear} className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
+              <button
+                onClick={clear}
+                className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary"
+              >
                 Clear cart
               </button>
               <div className="text-right">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">Subtotal</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">
+                  Subtotal
+                </p>
                 <p className="font-display font-black text-3xl mb-4">${subtotal}</p>
                 <Link
                   to="/checkout"

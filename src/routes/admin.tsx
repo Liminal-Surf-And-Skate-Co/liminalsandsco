@@ -6,7 +6,12 @@ import { Shield, Package, Mail, Calendar, Settings as SettingsIcon } from "lucid
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useSiteSettings, useUpdateSetting, SETTING_KEYS, SETTING_LABELS } from "@/lib/site-settings";
+import {
+  useSiteSettings,
+  useUpdateSetting,
+  SETTING_KEYS,
+  SETTING_LABELS,
+} from "@/lib/site-settings";
 import { adminExists, claimFirstAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { sanitizeError } from "@/lib/error-sanitize";
@@ -35,7 +40,9 @@ function AdminPage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Nav />
-        <main className="max-w-3xl mx-auto px-6 py-24 text-center text-silver/60 font-mono text-xs">Loading…</main>
+        <main className="max-w-3xl mx-auto px-6 py-24 text-center text-silver/60 font-mono text-xs">
+          Loading…
+        </main>
       </div>
     );
   }
@@ -48,7 +55,10 @@ function AdminPage() {
 
   const save = async (key: string) => {
     try {
-      await updateSetting.mutateAsync({ key: key as any, value: draft[key] ?? "" });
+      await updateSetting.mutateAsync({
+        key: key as keyof typeof SETTING_LABELS,
+        value: draft[key] ?? "",
+      });
       toast.success(`Saved ${SETTING_LABELS[key as keyof typeof SETTING_LABELS]}`);
     } catch (e) {
       toast.error(sanitizeError(e));
@@ -68,20 +78,35 @@ function AdminPage() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 mb-12">
-          <Link to="/admin/products" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+          <Link
+            to="/admin/products"
+            className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors"
+          >
             <Package className="h-6 w-6 text-primary mb-3" />
             <h2 className="font-display font-bold text-xl mb-1">Products</h2>
-            <p className="font-mono text-xs text-silver/60">Create, edit, and stock the shop catalog.</p>
+            <p className="font-mono text-xs text-silver/60">
+              Create, edit, and stock the shop catalog.
+            </p>
           </Link>
-          <Link to="/admin/newsletters" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+          <Link
+            to="/admin/newsletters"
+            className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors"
+          >
             <Mail className="h-6 w-6 text-primary mb-3" />
             <h2 className="font-display font-bold text-xl mb-1">Newsletters</h2>
-            <p className="font-mono text-xs text-silver/60">Compose weekly drops and archive past sends.</p>
+            <p className="font-mono text-xs text-silver/60">
+              Compose weekly drops and archive past sends.
+            </p>
           </Link>
-          <Link to="/admin/events" className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors">
+          <Link
+            to="/admin/events"
+            className="group block border border-border/60 bg-card hover:border-primary p-5 transition-colors"
+          >
             <Calendar className="h-6 w-6 text-primary mb-3" />
             <h2 className="font-display font-bold text-xl mb-1">Events</h2>
-            <p className="font-mono text-xs text-silver/60">Add, edit, and publish community events.</p>
+            <p className="font-mono text-xs text-silver/60">
+              Add, edit, and publish community events.
+            </p>
           </Link>
         </div>
 
@@ -190,7 +215,10 @@ function NonAdminGate({ userId }: { userId: string }) {
           </>
         )}
 
-        <Link to="/account" className="block mt-8 font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
+        <Link
+          to="/account"
+          className="block mt-8 font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary"
+        >
           ← Back to account
         </Link>
       </main>

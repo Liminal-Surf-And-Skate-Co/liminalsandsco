@@ -8,10 +8,17 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useNewsletters, nextFridayISO, type Newsletter, type NewsletterLink } from "@/lib/newsletters";
+import {
+  useNewsletters,
+  nextFridayISO,
+  type Newsletter,
+  type NewsletterLink,
+} from "@/lib/newsletters";
 
 export const Route = createFileRoute("/admin/newsletters")({
-  head: () => ({ meta: [{ title: "Admin · Newsletters — Liminal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Admin · Newsletters — Liminal" }, { name: "robots", content: "noindex" }],
+  }),
   component: AdminNewslettersPage,
 });
 
@@ -30,7 +37,7 @@ function AdminNewslettersPage() {
 
   const save = useMutation({
     mutationFn: async (n: EditState) => {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         subject: n.subject,
         excerpt: n.excerpt || null,
         body: n.body || "",
@@ -61,27 +68,49 @@ function AdminNewslettersPage() {
       const { error } = await supabase.from("newsletters").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["newsletters"] }); toast.success("Deleted"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["newsletters"] });
+      toast.success("Deleted");
+    },
     onError: (e) => toast.error(sanitizeError(e)),
   });
 
-  if (loading) return <div className="min-h-screen bg-background"><Nav /><main className="py-24 text-center font-mono text-xs text-silver/60">Loading…</main></div>;
+  if (loading)
+    return (
+      <div className="min-h-screen bg-background">
+        <Nav />
+        <main className="py-24 text-center font-mono text-xs text-silver/60">Loading…</main>
+      </div>
+    );
   if (!user) return null;
-  if (!isAdmin) return (
-    <div className="min-h-screen bg-background"><Nav />
-      <main className="max-w-md mx-auto px-6 py-24 text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-silver/70">Admin only.</p>
-        <Link to="/admin" className="font-mono text-[10px] uppercase tracking-widest text-primary mt-4 inline-block">← Admin home</Link>
-      </main><Footer />
-    </div>
-  );
+  if (!isAdmin)
+    return (
+      <div className="min-h-screen bg-background">
+        <Nav />
+        <main className="max-w-md mx-auto px-6 py-24 text-center">
+          <p className="font-mono text-xs uppercase tracking-widest text-silver/70">Admin only.</p>
+          <Link
+            to="/admin"
+            className="font-mono text-[10px] uppercase tracking-widest text-primary mt-4 inline-block"
+          >
+            ← Admin home
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
 
   const newDraft = (): EditState => {
     const friday = nextFridayISO();
     return {
-      subject: "", body: "", excerpt: "", cover_image: "",
-      sent_at: friday, scheduled_for: friday,
-      links: [], published: true,
+      subject: "",
+      body: "",
+      excerpt: "",
+      cover_image: "",
+      sent_at: friday,
+      scheduled_for: friday,
+      links: [],
+      published: true,
     };
   };
 
@@ -92,8 +121,12 @@ function AdminNewslettersPage() {
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-2">Admin</p>
-            <h1 className="font-display font-black text-4xl flex items-center gap-3"><Mail className="h-8 w-8" /> Newsletters</h1>
-            <p className="text-silver/70 text-sm mt-2">Compose, schedule for Friday, and publish to the blog news archive.</p>
+            <h1 className="font-display font-black text-4xl flex items-center gap-3">
+              <Mail className="h-8 w-8" /> Newsletters
+            </h1>
+            <p className="text-silver/70 text-sm mt-2">
+              Compose, schedule for Friday, and publish to the blog news archive.
+            </p>
           </div>
           <button
             onClick={() => setEditing(newDraft())}
@@ -107,14 +140,25 @@ function AdminNewslettersPage() {
           {(newsletters ?? []).map((n) => {
             const scheduled = n.scheduled_for && new Date(n.scheduled_for) > new Date();
             return (
-              <div key={n.id} className="border border-border/60 bg-card p-4 flex items-center gap-4">
+              <div
+                key={n.id}
+                className="border border-border/60 bg-card p-4 flex items-center gap-4"
+              >
                 {n.cover_image && (
-                  <img src={n.cover_image} alt="" className="h-14 w-14 object-cover border border-border/40 shrink-0" />
+                  <img
+                    src={n.cover_image}
+                    alt=""
+                    className="h-14 w-14 object-cover border border-border/40 shrink-0"
+                  />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
-                      {new Date(n.scheduled_for ?? n.sent_at).toLocaleDateString("en-AU", { month: "short", day: "2-digit", year: "numeric" })}
+                      {new Date(n.scheduled_for ?? n.sent_at).toLocaleDateString("en-AU", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
                     </p>
                     {scheduled && (
                       <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase px-1.5 py-0.5 bg-amber-500/15 border border-amber-500/40 text-amber-300">
@@ -130,8 +174,18 @@ function AdminNewslettersPage() {
                   <h3 className="font-display font-bold truncate">{n.subject}</h3>
                   {n.excerpt && <p className="text-xs text-silver/60 line-clamp-1">{n.excerpt}</p>}
                 </div>
-                <button onClick={() => setEditing(n)} className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border/60 text-silver hover:border-primary">Edit</button>
-                <button onClick={() => { if (confirm("Delete this issue?")) del.mutate(n.id); }} className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border/60 text-silver hover:border-destructive hover:text-destructive">
+                <button
+                  onClick={() => setEditing(n)}
+                  className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border/60 text-silver hover:border-primary"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm("Delete this issue?")) del.mutate(n.id);
+                  }}
+                  className="font-mono text-[10px] uppercase tracking-widest px-3 py-2 border border-border/60 text-silver hover:border-destructive hover:text-destructive"
+                >
                   <Trash2 className="h-3 w-3" />
                 </button>
               </div>
@@ -143,7 +197,12 @@ function AdminNewslettersPage() {
             </div>
           )}
         </div>
-        <Link to="/admin" className="mt-10 inline-block font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">← Admin home</Link>
+        <Link
+          to="/admin"
+          className="mt-10 inline-block font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary"
+        >
+          ← Admin home
+        </Link>
       </main>
 
       {editing && (
@@ -161,7 +220,11 @@ function AdminNewslettersPage() {
 }
 
 function Composer({
-  value, onChange, onClose, onSave, saving,
+  value,
+  onChange,
+  onClose,
+  onSave,
+  saving,
 }: {
   value: EditState;
   onChange: (v: EditState) => void;
@@ -194,23 +257,47 @@ function Composer({
     <div className="fixed inset-0 z-[70] bg-background/80 backdrop-blur flex justify-end">
       <div className="w-full max-w-2xl h-full bg-background border-l border-border/60 overflow-y-auto">
         <div className="sticky top-0 bg-background border-b border-border/60 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="font-display font-black text-xl">{value.id ? "Edit issue" : "New issue"}</h2>
-          <button onClick={onClose} className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">Close</button>
+          <h2 className="font-display font-black text-xl">
+            {value.id ? "Edit issue" : "New issue"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary"
+          >
+            Close
+          </button>
         </div>
         <div className="p-6 space-y-5">
           <Field label="Subject">
-            <input value={value.subject ?? ""} onChange={(e) => set({ subject: e.target.value })} className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary" />
+            <input
+              value={value.subject ?? ""}
+              onChange={(e) => set({ subject: e.target.value })}
+              className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary"
+            />
           </Field>
 
           <Field label="Cover image URL (for blog archive)">
-            <input value={value.cover_image ?? ""} onChange={(e) => set({ cover_image: e.target.value })} placeholder="https://…" className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary" />
+            <input
+              value={value.cover_image ?? ""}
+              onChange={(e) => set({ cover_image: e.target.value })}
+              placeholder="https://…"
+              className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary"
+            />
             {value.cover_image && (
-              <img src={value.cover_image} alt="Preview" className="mt-2 max-h-40 border border-border/40" />
+              <img
+                src={value.cover_image}
+                alt="Preview"
+                className="mt-2 max-h-40 border border-border/40"
+              />
             )}
           </Field>
 
           <Field label="Excerpt (shown in archive)">
-            <input value={value.excerpt ?? ""} onChange={(e) => set({ excerpt: e.target.value })} className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary" />
+            <input
+              value={value.excerpt ?? ""}
+              onChange={(e) => set({ excerpt: e.target.value })}
+              className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary"
+            />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
@@ -232,12 +319,17 @@ function Composer({
             </Field>
           </div>
           <div className="flex items-center justify-between -mt-2">
-            <p className={`font-mono text-[10px] uppercase tracking-widest ${isFriday ? "text-primary" : "text-amber-400"}`}>
+            <p
+              className={`font-mono text-[10px] uppercase tracking-widest ${isFriday ? "text-primary" : "text-amber-400"}`}
+            >
               {isFriday ? "✓ Friday" : "Not a Friday — adjust if needed"}
             </p>
             <button
               type="button"
-              onClick={() => { const f = nextFridayISO(); set({ scheduled_for: f, sent_at: f }); }}
+              onClick={() => {
+                const f = nextFridayISO();
+                set({ scheduled_for: f, sent_at: f });
+              }}
               className="font-mono text-[10px] uppercase tracking-widest text-primary hover:opacity-70"
             >
               Snap to next Friday
@@ -254,13 +346,22 @@ function Composer({
                   : "border-border/60 text-silver"
               }`}
             >
-              {(value.published ?? true) ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+              {(value.published ?? true) ? (
+                <Eye className="h-3 w-3" />
+              ) : (
+                <EyeOff className="h-3 w-3" />
+              )}
               {(value.published ?? true) ? "Live in archive" : "Draft (hidden)"}
             </button>
           </Field>
 
           <Field label="Body (plain text · blank line = paragraph break · paste image URLs on their own line to embed)">
-            <textarea rows={14} value={value.body ?? ""} onChange={(e) => set({ body: e.target.value })} className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary font-mono" />
+            <textarea
+              rows={14}
+              value={value.body ?? ""}
+              onChange={(e) => set({ body: e.target.value })}
+              className="w-full px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary font-mono"
+            />
           </Field>
 
           <Field label="Related links">
@@ -279,7 +380,10 @@ function Composer({
                     placeholder="https://…"
                     className="flex-[2] px-3 py-2 bg-card border border-border/60 text-sm text-silver focus:outline-none focus:border-primary"
                   />
-                  <button onClick={() => removeLink(i)} className="h-9 w-9 flex items-center justify-center text-silver/60 hover:text-destructive">
+                  <button
+                    onClick={() => removeLink(i)}
+                    className="h-9 w-9 flex items-center justify-center text-silver/60 hover:text-destructive"
+                  >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -295,7 +399,12 @@ function Composer({
           </Field>
         </div>
         <div className="sticky bottom-0 bg-background border-t border-border/60 px-6 py-4 flex gap-3">
-          <button onClick={onClose} className="flex-1 font-mono text-xs uppercase tracking-widest px-4 py-3 border border-border/60 text-silver hover:border-primary">Cancel</button>
+          <button
+            onClick={onClose}
+            className="flex-1 font-mono text-xs uppercase tracking-widest px-4 py-3 border border-border/60 text-silver hover:border-primary"
+          >
+            Cancel
+          </button>
           <button
             onClick={onSave}
             disabled={saving || !value.subject}
@@ -312,7 +421,9 @@ function Composer({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">{label}</label>
+      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">
+        {label}
+      </label>
       {children}
     </div>
   );

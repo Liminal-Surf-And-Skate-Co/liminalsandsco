@@ -33,7 +33,14 @@ export function Nav() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-6 text-xs font-mono uppercase tracking-widest text-silver/80">
-          <Link to="/shop" className="hover:text-primary transition-colors" activeOptions={{ exact: true }} activeProps={{ className: "text-primary" }}>Shop</Link>
+          <Link
+            to="/shop"
+            className="hover:text-primary transition-colors"
+            activeOptions={{ exact: true }}
+            activeProps={{ className: "text-primary" }}
+          >
+            Shop
+          </Link>
 
           {ALL_DEPARTMENTS.map((dept) => (
             <div
@@ -53,13 +60,35 @@ export function Nav() {
             </div>
           ))}
 
-          <Link to="/about" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Crew</Link>
-          <Link to="/community" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Community</Link>
-          <Link to="/blog" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary" }}>Blog</Link>
+          <Link
+            to="/about"
+            className="hover:text-primary transition-colors"
+            activeProps={{ className: "text-primary" }}
+          >
+            Crew
+          </Link>
+          <Link
+            to="/community"
+            className="hover:text-primary transition-colors"
+            activeProps={{ className: "text-primary" }}
+          >
+            Community
+          </Link>
+          <Link
+            to="/blog"
+            className="hover:text-primary transition-colors"
+            activeProps={{ className: "text-primary" }}
+          >
+            Blog
+          </Link>
         </nav>
 
         <div className="flex items-center gap-1">
-          <Link to="/wishlist" aria-label="Wishlist" className="relative h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors">
+          <Link
+            to="/wishlist"
+            aria-label="Wishlist"
+            className="relative h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors"
+          >
             <Heart className="h-5 w-5" />
             {wishCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-mono flex items-center justify-center">
@@ -67,7 +96,11 @@ export function Nav() {
               </span>
             )}
           </Link>
-          <Link to="/cart" aria-label="Cart" className="relative h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors">
+          <Link
+            to="/cart"
+            aria-label="Cart"
+            className="relative h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors"
+          >
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-mono flex items-center justify-center">
@@ -75,7 +108,11 @@ export function Nav() {
               </span>
             )}
           </Link>
-          <Link to="/account" aria-label="Account" className="h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors">
+          <Link
+            to="/account"
+            aria-label="Account"
+            className="h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors"
+          >
             <User className="h-5 w-5" />
           </Link>
           <button
@@ -97,14 +134,18 @@ export function Nav() {
         </div>
       </div>
 
-
-
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="fixed inset-0 z-[60] bg-background lg:hidden flex flex-col">
           <div className="h-16 px-6 flex items-center justify-between border-b border-border/40">
-            <span className="font-display font-bold text-sm tracking-widest text-silver">LIMINAL</span>
-            <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="h-9 w-9 flex items-center justify-center text-silver">
+            <span className="font-display font-bold text-sm tracking-widest text-silver">
+              LIMINAL
+            </span>
+            <button
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+              className="h-9 w-9 flex items-center justify-center text-silver"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -121,13 +162,14 @@ export function Nav() {
                 to={l.to}
                 onClick={() => setMobileOpen(false)}
                 className="block py-3 hover:text-primary border-b border-border/30"
-                {...(l.exact ? { activeOptions: { exact: true } } : {})}
               >
                 {l.label}
               </Link>
             ))}
             <div className="pt-4 mt-4">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">Departments</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
+                Departments
+              </p>
               {ALL_DEPARTMENTS.map((dept) => {
                 const isOpen = mobileDept === dept;
                 return (
@@ -137,7 +179,9 @@ export function Nav() {
                       className="w-full flex items-center justify-between py-3 hover:text-primary"
                     >
                       {DEPARTMENT_LABELS[dept]}
-                      <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      />
                     </button>
                     {isOpen && (
                       <div className="pb-3 pl-3 space-y-1">
@@ -154,11 +198,15 @@ export function Nav() {
                             <Link
                               key={`${col.title}-${link.label}-${link.type ?? ""}`}
                               to="/shop"
-                              search={{
-                                dept,
-                                ...(link.type ? { type: link.type } : {}),
-                                ...((link as any).category ? { category: (link as any).category } : {}),
-                              } as any}
+                              search={
+                                {
+                                  dept,
+                                  ...(link.type ? { type: link.type } : {}),
+                                  ...((link as any).category
+                                    ? { category: (link as any).category }
+                                    : {}),
+                                } as any
+                              }
                               onClick={() => setMobileOpen(false)}
                               className="block py-1.5 text-xs text-silver/80 hover:text-primary"
                             >
@@ -202,11 +250,13 @@ function MegaPanel({ dept, onPick }: { dept: Department; onPick: () => void }) {
                   <li key={`${link.label}-${link.type ?? ""}-${(link as any).category ?? ""}`}>
                     <Link
                       to="/shop"
-                      search={{
-                        dept,
-                        ...(link.type ? { type: link.type } : {}),
-                        ...((link as any).category ? { category: (link as any).category } : {}),
-                      } as any}
+                      search={
+                        {
+                          dept,
+                          ...(link.type ? { type: link.type } : {}),
+                          ...((link as any).category ? { category: (link as any).category } : {}),
+                        } as any
+                      }
                       onClick={onPick}
                       className="text-xs font-mono text-silver hover:text-primary normal-case tracking-normal"
                     >

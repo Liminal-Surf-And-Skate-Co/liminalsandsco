@@ -46,9 +46,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {safeMessage}
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{safeMessage}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -77,17 +75,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Liminal S & S Co" },
-      { name: "description", content: "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories." },
+      {
+        name: "description",
+        content:
+          "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Liminal S & S Co" },
-      { property: "og:description", content: "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories." },
+      {
+        property: "og:description",
+        content:
+          "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Liminal S & S Co" },
-      { name: "twitter:description", content: "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fddfa0e7-b38c-47dc-be33-0a65c5757b14/id-preview-03df4814--fdc75a8e-d934-460e-8005-76599c902cb3.lovable.app-1779942966019.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fddfa0e7-b38c-47dc-be33-0a65c5757b14/id-preview-03df4814--fdc75a8e-d934-460e-8005-76599c902cb3.lovable.app-1779942966019.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Liminal Surf and Skate Company offers custom hand-crafted skateboards and surfboards, apparel, and accessories.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fddfa0e7-b38c-47dc-be33-0a65c5757b14/id-preview-03df4814--fdc75a8e-d934-460e-8005-76599c902cb3.lovable.app-1779942966019.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fddfa0e7-b38c-47dc-be33-0a65c5757b14/id-preview-03df4814--fdc75a8e-d934-460e-8005-76599c902cb3.lovable.app-1779942966019.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -134,7 +152,9 @@ function AuthSync() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
       router.invalidate();
       queryClient.invalidateQueries();
     });

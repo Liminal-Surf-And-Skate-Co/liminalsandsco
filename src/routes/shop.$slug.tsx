@@ -22,9 +22,7 @@ import { useCart } from "@/hooks/use-cart";
 
 export const Route = createFileRoute("/shop/$slug")({
   head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — Liminal Surf & Skate Co` },
-    ],
+    meta: [{ title: `${params.slug} — Liminal Surf & Skate Co` }],
   }),
   component: ProductPage,
 });
@@ -54,7 +52,9 @@ function ProductPage() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Nav />
-        <main className="max-w-3xl mx-auto px-6 py-32 text-center font-mono text-sm text-silver/60">Loading…</main>
+        <main className="max-w-3xl mx-auto px-6 py-32 text-center font-mono text-sm text-silver/60">
+          Loading…
+        </main>
         <Footer />
       </div>
     );
@@ -112,7 +112,11 @@ function ProductPage() {
           <div>
             <div className="bg-card border border-border/60">
               <div className="aspect-square overflow-hidden">
-                <img src={gallery[activeImg]} alt={product.title} className="w-full h-full object-cover" />
+                <img
+                  src={gallery[activeImg]}
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
             {gallery.length > 1 && (
@@ -135,19 +139,30 @@ function ProductPage() {
           {/* Details */}
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary mb-3">
-              {DEPARTMENT_LABELS[product.department]}{product.product_type ? ` · ${product.product_type}` : ""}
+              {DEPARTMENT_LABELS[product.department]}
+              {product.product_type ? ` · ${product.product_type}` : ""}
             </p>
-            <h1 className="font-display font-black text-4xl lg:text-5xl leading-none mb-4">{product.title}</h1>
+            <h1 className="font-display font-black text-4xl lg:text-5xl leading-none mb-4">
+              {product.title}
+            </h1>
 
             {/* Star ratings from real reviews */}
             <div className="flex items-center gap-2 mb-5">
               <div className="flex">
-                {[1,2,3,4,5].map((i) => (
-                  <Star key={i} className={`h-4 w-4 ${i <= Math.round(avg) ? "fill-primary text-primary" : "text-silver/30"}`} />
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${i <= Math.round(avg) ? "fill-primary text-primary" : "text-silver/30"}`}
+                  />
                 ))}
               </div>
-              <a href="#reviews" className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary">
-                {count > 0 ? `${avg.toFixed(1)} · ${count} review${count === 1 ? "" : "s"}` : "No reviews yet"}
+              <a
+                href="#reviews"
+                className="font-mono text-[10px] uppercase tracking-widest text-silver/60 hover:text-primary"
+              >
+                {count > 0
+                  ? `${avg.toFixed(1)} · ${count} review${count === 1 ? "" : "s"}`
+                  : "No reviews yet"}
               </a>
             </div>
 
@@ -155,16 +170,22 @@ function ProductPage() {
               {onSale ? (
                 <>
                   <span className="font-mono text-2xl text-primary">${product.sale_price}</span>
-                  <span className="font-mono text-lg text-silver/50 line-through">${product.price}</span>
+                  <span className="font-mono text-lg text-silver/50 line-through">
+                    ${product.price}
+                  </span>
                 </>
               ) : (
                 <span className="font-mono text-2xl text-silver">${price}</span>
               )}
             </div>
             <p className="font-mono text-[10px] uppercase tracking-widest mb-8">
-              {oos ? <span className="text-silver/60">Out of stock</span>
-                   : low ? <span className="text-amber-300">Only {product.stock_count} left</span>
-                         : <span className="text-primary">In stock</span>}
+              {oos ? (
+                <span className="text-silver/60">Out of stock</span>
+              ) : low ? (
+                <span className="text-amber-300">Only {product.stock_count} left</span>
+              ) : (
+                <span className="text-primary">In stock</span>
+              )}
             </p>
 
             <p className="text-silver/90 leading-relaxed mb-8">{product.description}</p>
@@ -199,11 +220,19 @@ function ProductPage() {
                 Quantity
               </label>
               <div className="inline-flex items-center border border-border/60">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-10 w-10 flex items-center justify-center text-silver hover:text-primary" aria-label="Decrease">
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  className="h-10 w-10 flex items-center justify-center text-silver hover:text-primary"
+                  aria-label="Decrease"
+                >
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="w-12 text-center font-mono text-sm">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(product.stock_count || 99, q + 1))} className="h-10 w-10 flex items-center justify-center text-silver hover:text-primary" aria-label="Increase">
+                <button
+                  onClick={() => setQty((q) => Math.min(product.stock_count || 99, q + 1))}
+                  className="h-10 w-10 flex items-center justify-center text-silver hover:text-primary"
+                  aria-label="Increase"
+                >
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
@@ -222,7 +251,9 @@ function ProductPage() {
                 onClick={() => wishToggle(product.slug)}
                 aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
                 className={`h-12 w-12 flex items-center justify-center border transition-colors ${
-                  saved ? "border-primary bg-primary/10 text-primary" : "border-border/60 text-silver hover:border-primary"
+                  saved
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/60 text-silver hover:border-primary"
                 }`}
               >
                 <Heart className={`h-5 w-5 ${saved ? "fill-primary" : ""}`} />
@@ -233,7 +264,10 @@ function ProductPage() {
             {product.details.length > 0 && (
               <ul className="border-y border-border/60 divide-y divide-border/60 mb-6">
                 {product.details.map((d) => (
-                  <li key={d} className="py-3 font-mono text-xs uppercase tracking-widest text-silver/80">
+                  <li
+                    key={d}
+                    className="py-3 font-mono text-xs uppercase tracking-widest text-silver/80"
+                  >
                     — {d}
                   </li>
                 ))}
@@ -242,11 +276,15 @@ function ProductPage() {
 
             {Object.keys(product.specs).length > 0 && (
               <div className="border border-border/60 bg-card/40 p-5 mb-8">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">Specifications</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">
+                  Specifications
+                </p>
                 <dl className="grid grid-cols-2 gap-y-2 text-xs font-mono">
                   {Object.entries(product.specs).map(([k, v]) => (
                     <div key={k} className="contents">
-                      <dt className="text-silver/60 uppercase tracking-widest">{k.replace(/_/g, " ")}</dt>
+                      <dt className="text-silver/60 uppercase tracking-widest">
+                        {k.replace(/_/g, " ")}
+                      </dt>
                       <dd className="text-silver">{String(v)}</dd>
                     </div>
                   ))}
@@ -257,10 +295,12 @@ function ProductPage() {
             {/* Inquiry / Custom order */}
             <div className="border border-border/60 bg-card p-6">
               <div className="flex gap-2 mb-5">
-                {([
-                  ["inquiry", "Inquire"],
-                  ["custom", "Custom order"],
-                ] as const).map(([k, label]) => (
+                {(
+                  [
+                    ["inquiry", "Inquire"],
+                    ["custom", "Custom order"],
+                  ] as const
+                ).map(([k, label]) => (
                   <button
                     key={k}
                     onClick={() => setMode(k)}
@@ -314,7 +354,9 @@ function ProductPage() {
         {/* Related */}
         {related.length > 0 && (
           <section className="mt-20 border-t border-border/40 pt-12">
-            <h2 className="font-display font-black text-2xl lg:text-3xl mb-2">You might also need</h2>
+            <h2 className="font-display font-black text-2xl lg:text-3xl mb-2">
+              You might also need
+            </h2>
             <p className="font-mono text-[11px] uppercase tracking-widest text-silver/60 mb-6">
               {relatedHeading(product)}
             </p>
@@ -328,10 +370,17 @@ function ProductPage() {
                 >
                   <ProductBadges product={r} />
                   <div className="aspect-square overflow-hidden bg-background">
-                    <img src={productImage(r)} alt={r.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img
+                      src={productImage(r)}
+                      alt={r.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
                   </div>
                   <div className="p-4">
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">{DEPARTMENT_LABELS[r.department]}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
+                      {DEPARTMENT_LABELS[r.department]}
+                    </p>
                     <h3 className="font-display font-bold text-base mb-1">{r.title}</h3>
                     <span className="font-mono text-xs text-silver">${effectivePrice(r)}</span>
                   </div>
@@ -361,7 +410,14 @@ function recommendRelated(current: Product, all: Product[]): Product[] {
     targetTypes = ["trucks", "wheels", "bearings", "grip", "parts", "rails"];
   } else if (current.department === "skate" && type.includes("complete")) {
     targetTypes = ["wheels", "bearings", "grip", "stickers"];
-  } else if (current.department === "surf" && (type.includes("surfboard") || type.includes("shortboard") || type.includes("longboard") || type.includes("fish") || type.includes("softtop"))) {
+  } else if (
+    current.department === "surf" &&
+    (type.includes("surfboard") ||
+      type.includes("shortboard") ||
+      type.includes("longboard") ||
+      type.includes("fish") ||
+      type.includes("softtop"))
+  ) {
     targetTypes = ["fins", "leash", "surf-wax", "traction", "boardbag"];
   } else if (current.department === "surf" && type.includes("wetsuit")) {
     targetTypes = ["rashguard", "surf-wax", "boardbag"];
@@ -369,7 +425,9 @@ function recommendRelated(current: Product, all: Product[]): Product[] {
 
   if (targetTypes.length > 0) {
     const matched = others.filter(
-      (p) => p.department === current.department && targetTypes.includes((p.product_type ?? "").toLowerCase()),
+      (p) =>
+        p.department === current.department &&
+        targetTypes.includes((p.product_type ?? "").toLowerCase()),
     );
     if (matched.length > 0) return matched.slice(0, 4);
   }
@@ -378,7 +436,12 @@ function recommendRelated(current: Product, all: Product[]): Product[] {
 
 function relatedHeading(p: Product): string {
   const t = (p.product_type ?? "").toLowerCase();
-  if (p.department === "skate" && t.includes("deck")) return "Trucks, wheels & bearings to finish the build";
-  if (p.department === "surf" && (t.includes("board") || t.includes("fish") || t.includes("softtop"))) return "Fins, leashes & wax for this board";
+  if (p.department === "skate" && t.includes("deck"))
+    return "Trucks, wheels & bearings to finish the build";
+  if (
+    p.department === "surf" &&
+    (t.includes("board") || t.includes("fish") || t.includes("softtop"))
+  )
+    return "Fins, leashes & wax for this board";
   return "More from the same department";
 }

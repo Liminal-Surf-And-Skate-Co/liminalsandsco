@@ -56,9 +56,7 @@ export function useProductReviews(productId: string | undefined) {
         ...row,
         photos: Array.isArray(row.photos) ? row.photos.filter(Boolean) : [],
       })) as Review[];
-      return Promise.all(
-        rows.map(async (r) => ({ ...r, photos: await signPhotos(r.photos) })),
-      );
+      return Promise.all(rows.map(async (r) => ({ ...r, photos: await signPhotos(r.photos) })));
     },
     staleTime: 30_000,
   });
@@ -84,7 +82,8 @@ export function useCreateReview() {
       });
       if (error) throw new Error(sanitizeError(error));
     },
-    onSuccess: (_d, vars) => qc.invalidateQueries({ queryKey: ["product_reviews", vars.product_id] }),
+    onSuccess: (_d, vars) =>
+      qc.invalidateQueries({ queryKey: ["product_reviews", vars.product_id] }),
   });
 }
 
