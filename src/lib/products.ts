@@ -73,26 +73,26 @@ export function isOutOfStock(p: Pick<Product, "stock_count">): boolean {
 
 function normalize(row: Record<string, unknown>): Product {
   return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
+    id: row.id as string,
+    slug: row.slug as string,
+    title: row.title as string,
     department: (row.department || "other") as Department,
-    product_type: row.product_type ?? null,
-    target_group: row.target_group ?? "unisex",
-    description: row.description ?? "",
-    details: Array.isArray(row.details) ? row.details : [],
+    product_type: row.product_type as string | null ?? null,
+    target_group: (row.target_group as string | null) ?? "unisex",
+    description: (row.description as string | null) ?? "",
+    details: Array.isArray(row.details) ? (row.details as string[]) : [],
     price: Number(row.price ?? 0),
     sale_price:
       row.sale_price !== null && row.sale_price !== undefined ? Number(row.sale_price) : null,
-    colour: row.colour ?? null,
-    sizes: row.sizes ?? [],
+    colour: (row.colour as string | null) ?? null,
+    sizes: Array.isArray(row.sizes) ? (row.sizes as string[]) : [],
     stock_count: Number(row.stock_count ?? 0),
-    images: row.images ?? [],
-    tags: row.tags ?? [],
-    specs: row.specs && typeof row.specs === "object" ? row.specs : {},
+    images: Array.isArray(row.images) ? (row.images as string[]) : [],
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    specs: row.specs && typeof row.specs === "object" && !Array.isArray(row.specs) ? (row.specs as Record<string, string>) : {},
     featured: Boolean(row.featured),
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    created_at: row.created_at as string,
+    updated_at: row.updated_at as string,
   };
 }
 
@@ -112,7 +112,7 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw new Error(sanitizeError(error));
-  return data ? normalize(data) : null;
+  return data ? normalize(data as Record<string, unknown>) : null;
 }
 
 export function useProducts() {

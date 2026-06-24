@@ -81,7 +81,7 @@ export function ProductReviews({ productId }: { productId: string }) {
       await create.mutateAsync({
         product_id: productId,
         rating,
-        title: title || undefined,
+        title: title || null,
         body,
         photos: photos.map((p) => p.path),
       });

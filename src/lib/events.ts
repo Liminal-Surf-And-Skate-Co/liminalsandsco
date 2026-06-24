@@ -29,18 +29,18 @@ export type CommunityEvent = {
 
 function normalize(row: Record<string, unknown>): CommunityEvent {
   return {
-    id: row.id,
-    title: row.title,
-    description: row.description ?? "",
-    location: row.location ?? "",
-    start_at: row.start_at,
-    end_at: row.end_at ?? null,
-    image_url: row.image_url ?? null,
-    rsvp_url: row.rsvp_url ?? null,
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description ?? "") as string,
+    location: (row.location ?? "") as string,
+    start_at: row.start_at as string,
+    end_at: row.end_at as string | null,
+    image_url: row.image_url as string | null,
+    rsvp_url: row.rsvp_url as string | null,
     category: (row.category || "other") as EventCategory,
     published: Boolean(row.published),
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    created_at: row.created_at as string,
+    updated_at: row.updated_at as string,
   };
 }
 
@@ -79,7 +79,7 @@ export function useUpsertEvent() {
         const { error } = await supabase.from("events").update(payload).eq("id", e.id);
         if (error) throw new Error(sanitizeError(error));
       } else {
-        const { error } = await supabase.from("events").insert(payload as Record<string, unknown>);
+        const { error } = await supabase.from("events").insert(payload);
         if (error) throw new Error(sanitizeError(error));
       }
     },

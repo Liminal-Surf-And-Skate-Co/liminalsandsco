@@ -247,6 +247,84 @@ export type Database = {
         };
         Relationships: [];
       };
+      spot_pins: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          notes: string;
+          kind: string;
+          lat: number;
+          lng: number;
+          photo_url: string | null;
+          tide_tips: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string;
+          title: string;
+          notes?: string;
+          kind?: string;
+          lat?: number;
+          lng?: number;
+          photo_url?: string | null;
+          tide_tips?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          notes?: string;
+          kind?: string;
+          lat?: number;
+          lng?: number;
+          photo_url?: string | null;
+          tide_tips?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      video_clips: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          category: string;
+          video_url: string;
+          votes: number;
+          approved: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string;
+          title: string;
+          category?: string;
+          video_url: string;
+          votes?: number;
+          approved?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          category?: string;
+          video_url?: string;
+          votes?: number;
+          approved?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
