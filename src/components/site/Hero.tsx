@@ -8,7 +8,7 @@ export function Hero() {
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-8">
             Oh Yeah Not Bad! · Est. 2026 · Hand-crafted
           </p>
-          <h1 className="font-display font-black text-6xl sm:text-7xl lg:text-[8.5rem] leading-[0.85] tracking-tighter mb-8">
+          <h1 className="font-display font-black text-4xl sm:text-6xl lg:text-[8.5rem] leading-[0.85] tracking-tighter mb-8">
             BETWEEN
             <br />
             <span className="text-stroke">WAVE</span>

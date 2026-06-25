@@ -118,7 +118,7 @@ export function Nav() {
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
-            className="lg:hidden h-9 w-9 flex items-center justify-center text-silver hover:text-primary"
+            className="lg:hidden h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-silver hover:text-primary transition-colors rounded-md active:bg-primary/10"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -144,12 +144,12 @@ export function Nav() {
             <button
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"
-              className="h-9 w-9 flex items-center justify-center text-silver"
+              className="h-11 w-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-silver hover:text-primary transition-colors rounded-md active:bg-primary/10"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto px-6 py-6 font-mono text-sm uppercase tracking-widest text-silver">
+          <nav className="flex-1 overflow-y-auto px-6 py-4 font-mono text-sm uppercase tracking-widest text-silver">
             {[
               { to: "/shop", label: "Shop" },
               { to: "/about", label: "Crew" },
@@ -161,7 +161,7 @@ export function Nav() {
                 key={l.to}
                 to={l.to}
                 onClick={() => setMobileOpen(false)}
-                className="block py-3 hover:text-primary border-b border-border/30"
+                className="block py-3.5 min-h-[44px] hover:text-primary border-b border-border/30 active:bg-primary/10"
               >
                 {l.label}
               </Link>
@@ -189,7 +189,7 @@ export function Nav() {
                           to="/shop"
                           search={{ dept } as any}
                           onClick={() => setMobileOpen(false)}
-                          className="block py-1.5 text-xs text-primary"
+                          className="block py-2.5 text-xs text-primary min-h-[44px]"
                         >
                           {MEGA_MENU[dept].allLabel} →
                         </Link>

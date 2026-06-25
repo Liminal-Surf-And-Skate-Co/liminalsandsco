@@ -16,7 +16,7 @@ export function Shop() {
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">
               (02) The Drop
             </p>
-            <h2 className="font-display font-black text-5xl lg:text-7xl">
+            <h2 className="font-display font-black text-3xl sm:text-5xl lg:text-7xl">
               Shop the
               <br />
               latest run.

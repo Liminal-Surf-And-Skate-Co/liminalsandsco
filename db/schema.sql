@@ -262,15 +262,63 @@ CREATE POLICY "admins_delete_clips" ON video_clips FOR DELETE
 CREATE SCHEMA IF NOT EXISTS private;
 
 CREATE OR REPLACE FUNCTION private.has_role(user_id UUID, required_role app_role)
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN AS $
   SELECT EXISTS (
     SELECT 1 FROM user_roles
     WHERE user_id = user_id AND role = required_role
   );
-$$ LANGUAGE sql SECURITY DEFINER;
+$ LANGUAGE sql SECURITY DEFINER;
 
 -- ============================================
--- 13. STORAGE BUCKET FOR REVIEW PHOTOS
+-- 14. LOYALTY POINTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS loyalty_points (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  points INT NOT NULL DEFAULT 0,
+  tier TEXT NOT NULL DEFAULT 'bronze',
+  total_earned INT NOT NULL DEFAULT 0,
+  total_redeemed INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE loyalty_points ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "users_select_own_loyalty" ON loyalty_points FOR SELECT
+  TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "users_insert_own_loyalty" ON loyalty_points FOR INSERT
+  TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "admins_update_loyalty" ON loyalty_points FOR UPDATE
+  TO authenticated USING (private.has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (true);
+CREATE POLICY "public_select_loyalty" ON loyalty_points FOR SELECT
+  TO public USING (true);
+
+-- ============================================
+-- 15. REWARDS TABLE (Redeemable Perks)
+-- ============================================
+CREATE TABLE IF NOT EXISTS rewards (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  points_required INT NOT NULL,
+  tier_unlocked TEXT NOT NULL DEFAULT 'bronze',
+  available BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE rewards ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "public_select_rewards" ON rewards FOR SELECT
+  TO public USING (true);
+CREATE POLICY "admins_insert_rewards" ON rewards FOR INSERT
+  TO authenticated WITH CHECK (private.has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "admins_update_rewards" ON rewards FOR UPDATE
+  TO authenticated USING (private.has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (private.has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "admins_delete_rewards" ON rewards FOR DELETE
+  TO authenticated USING (private.has_role(auth.uid(), 'admin'::app_role));
+
+-- ============================================
+-- 16. STORAGE BUCKET FOR REVIEW PHOTOS
 -- ============================================
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('review-photos', 'review-photos', true, 5242880, '{image/png,image/jpeg,image/webp,image/gif}')
