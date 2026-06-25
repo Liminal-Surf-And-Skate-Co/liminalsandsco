@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, BarChart3, Loader2, AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign } from "lucide-react";
+import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";

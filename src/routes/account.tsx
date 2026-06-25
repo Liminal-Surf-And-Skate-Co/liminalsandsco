@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { User, LogOut, Shield, Gift, Clock, Settings, HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader2 } from "lucide-react";
+import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2 } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
