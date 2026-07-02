@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart, X, Package, Gift } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/hooks/use-cart";
 import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
+
+const FREE_SHIPPING_THRESHOLD = 150; // AUD
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -45,12 +47,20 @@ function CartPage() {
           <p className="font-mono text-xs text-silver/60">Loading…</p>
         ) : lines.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
-            <p className="font-mono text-sm text-silver/70 mb-6">Cart is empty.</p>
+            <div className="h-16 w-16 rounded-full bg-silver/10 flex items-center justify-center mx-auto mb-4">
+              <span className="font-display font-black text-lg text-silver">LL</span>
+            </div>
+            <p className="font-display font-bold text-xl mb-2 text-silver">
+              Your cart is completely empty.
+            </p>
+            <p className="font-mono text-sm text-silver/70 mb-6 italic">
+              "Liam is judging you. Go get some gear."
+            </p>
             <Link
               to="/shop"
-              className="font-mono text-xs uppercase tracking-widest text-primary hover:underline"
+              className="inline-block font-mono text-xs uppercase tracking-widest bg-primary text-primary-foreground px-6 py-3 hover:opacity-90"
             >
-              Browse the shop →
+              Browse the shop
             </Link>
           </div>
         ) : (
@@ -115,11 +125,36 @@ function CartPage() {
               >
                 Clear cart
               </button>
-              <div className="text-right">
+              <div className="text-right w-full sm:w-auto">
+                {/* Free shipping progress */}
+                <div className="mb-4">
+                  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
+                    <div className="flex items-center gap-2 justify-end text-primary">
+                      <Gift className="h-4 w-4" />
+                      <span className="font-mono text-xs uppercase tracking-widest">
+                        Free shipping unlocked!
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50">
+                          ${(FREE_SHIPPING_THRESHOLD - subtotal).toFixed(0)} more for free shipping
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full max-w-xs bg-silver/20 rounded-full overflow-hidden ml-auto">
+                        <div
+                          className="h-full bg-primary transition-all"
+                          style={{ width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-silver/50">
                   Subtotal
                 </p>
-                <p className="font-display font-black text-3xl mb-4">${subtotal}</p>
+                <p className="font-display font-black text-3xl mb-4">${subtotal.toFixed(2)} AUD</p>
                 <Link
                   to="/checkout"
                   className="inline-block bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-8 py-3 hover:opacity-90 transition-opacity shadow-glow"

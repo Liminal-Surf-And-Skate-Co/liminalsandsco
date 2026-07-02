@@ -10,6 +10,7 @@ import {
 import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
+import { LiamChatWidget } from "@/components/site/LiamChatWidget";
 
 import appCss from "../styles.css?url";
 
@@ -144,6 +145,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthSync />
       <Outlet />
+      <LiamChatWidget />
     </QueryClientProvider>
   );
 }

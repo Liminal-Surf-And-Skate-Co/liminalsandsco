@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, User, Menu, X, ChevronDown } from "lucide-react";
+import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, Skull, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/liminal-logo.png";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -7,6 +7,20 @@ import { useCart } from "@/hooks/use-cart";
 import { ALL_DEPARTMENTS, DEPARTMENT_LABELS, type Department } from "@/lib/products";
 import { MEGA_MENU } from "@/lib/shop-taxonomy";
 import { GlobalSearch } from "@/components/site/GlobalSearch";
+
+// Liam the Llama brand badge component
+function LiamBrandBadge() {
+  return (
+    <div className="flex items-center gap-2 border-l border-silver/20 pl-4 ml-4">
+      <div className="h-8 w-8 rounded-full bg-silver/10 flex items-center justify-center border border-silver/30">
+        <span className="font-display font-black text-[10px] text-silver">LL</span>
+      </div>
+      <span className="hidden xl:inline font-mono text-[8px] uppercase tracking-widest text-silver/50">
+        LIAM'S WATCHING
+      </span>
+    </div>
+  );
+}
 
 export function Nav() {
   const { count: wishCount } = useWishlist();
@@ -31,6 +45,7 @@ export function Nav() {
             LIMINAL
           </span>
         </Link>
+        <LiamBrandBadge />
 
         <nav className="hidden lg:flex items-center gap-6 text-xs font-mono uppercase tracking-widest text-silver/80">
           <Link
@@ -73,6 +88,20 @@ export function Nav() {
             activeProps={{ className: "text-primary" }}
           >
             Community
+          </Link>
+          <Link
+            to="/academy"
+            className="hover:text-primary transition-colors flex items-center gap-1"
+            activeProps={{ className: "text-primary" }}
+          >
+            <BookOpen className="h-3 w-3" /> Academy
+          </Link>
+          <Link
+            to="/graveyard"
+            className="hover:text-primary transition-colors flex items-center gap-1"
+            activeProps={{ className: "text-primary" }}
+          >
+            <Skull className="h-3 w-3" /> Graveyard
           </Link>
           <Link
             to="/blog"

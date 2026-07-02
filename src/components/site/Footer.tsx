@@ -3,6 +3,20 @@ import { Lock, Instagram, Youtube, MessageCircle, Mail } from "lucide-react";
 import logo from "@/assets/liminal-logo.png";
 import { useSiteSettings } from "@/lib/site-settings";
 
+// Liam the Llama mascot placeholder
+const LIAM_PLACEHOLDER = `[ LIAM THE LLAMA BRAND CONTAINER — MASCOT IMAGE PLACEHOLDER ]`;
+
+export function LiamBadge() {
+  return (
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-silver/10 border border-silver/30 rounded-sm">
+      <div className="h-6 w-6 rounded-full bg-silver/20 flex items-center justify-center">
+        <span className="font-display font-black text-[8px] text-silver">LL</span>
+      </div>
+      <span className="font-mono text-[9px] uppercase tracking-widest text-silver/70">Liam SAYS HI</span>
+    </div>
+  );
+}
+
 export function Footer() {
   const { data: settings } = useSiteSettings();
   const socials = [
@@ -30,12 +44,16 @@ export function Footer() {
     <footer className="border-t border-border/40 mt-20">
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-2">
-          <img src={logo} alt="Liminal" className="h-16 w-auto mb-4" />
+          <div className="flex items-center gap-4 mb-4">
+            <img src={logo} alt="Liminal" className="h-16 w-auto" />
+            <LiamBadge />
+          </div>
           <p className="font-display text-2xl text-primary mb-3">Oh Yeah Not Bad!</p>
           <p className="text-silver/60 text-sm max-w-xs leading-relaxed">
             Hand-crafted surf and skate from a one-bench workshop. Made between the wave and the
             concrete.
           </p>
+          <p className="font-mono text-[9px] text-silver/30 mt-3">{LIAM_PLACEHOLDER}</p>
         </div>
 
         <div>
@@ -123,18 +141,23 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/support" hash="privacy" className="hover:text-primary transition-colors">
+              <Link to="/legal/privacy" className="hover:text-primary transition-colors">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/support" hash="terms" className="hover:text-primary transition-colors">
+              <Link to="/legal/terms" className="hover:text-primary transition-colors">
                 Terms of Service
               </Link>
             </li>
             <li>
-              <Link to="/support" hash="refund" className="hover:text-primary transition-colors">
-                Refund Policy
+              <Link to="/legal/returns" className="hover:text-primary transition-colors">
+                Returns Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/legal/liability" className="hover:text-primary transition-colors">
+                Activity Waiver
               </Link>
             </li>
           </ul>
