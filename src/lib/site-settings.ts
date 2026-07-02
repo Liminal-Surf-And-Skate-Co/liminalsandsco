@@ -9,8 +9,7 @@ export type SettingKey =
   | "tiktok_url"
   | "facebook_url"
   | "contact_email_primary"
-  | "contact_email_secondary"
-  | "discord_webhook_url";
+  | "contact_email_secondary";
 
 export const SETTING_KEYS: SettingKey[] = [
   "discord_invite_url",
@@ -20,7 +19,6 @@ export const SETTING_KEYS: SettingKey[] = [
   "facebook_url",
   "contact_email_primary",
   "contact_email_secondary",
-  "discord_webhook_url",
 ];
 
 export const SETTING_LABELS: Record<SettingKey, string> = {
@@ -31,8 +29,8 @@ export const SETTING_LABELS: Record<SettingKey, string> = {
   facebook_url: "Facebook URL",
   contact_email_primary: "Primary contact email",
   contact_email_secondary: "Secondary contact email",
-  discord_webhook_url: "Discord webhook URL (for custom order notifications)",
 };
+
 
 export type SettingsMap = Record<SettingKey, string>;
 
