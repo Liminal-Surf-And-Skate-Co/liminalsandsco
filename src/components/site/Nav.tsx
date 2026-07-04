@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, Skull, BookOpen } from "lucide-react";
+import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/liminal-logo.png";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -95,13 +95,6 @@ export function Nav() {
             activeProps={{ className: "text-primary" }}
           >
             <BookOpen className="h-3 w-3" /> Academy
-          </Link>
-          <Link
-            to="/graveyard"
-            className="hover:text-primary transition-colors flex items-center gap-1"
-            activeProps={{ className: "text-primary" }}
-          >
-            <Skull className="h-3 w-3" /> Graveyard
           </Link>
           <Link
             to="/blog"

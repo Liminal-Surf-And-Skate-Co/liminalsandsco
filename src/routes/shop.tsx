@@ -23,6 +23,9 @@ import {
 import { COLOURS, GENDERS, SIZES, DECK_SPEC_FIELDS, SURF_SPEC_FIELDS } from "@/lib/shop-taxonomy";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MOCK_PRODUCTS } from "@/lib/mock-products";
 
 const PRICE_MIN = 0;
 const PRICE_MAX = 2000;
@@ -81,7 +84,9 @@ function ShopPage() {
   const [open, setOpen] = useState(true);
   const { has: wishHas, toggle: wishToggle } = useWishlist();
   const { add: cartAdd } = useCart();
-  const { data: products, isLoading, error } = useProducts();
+  const { data: rawProducts, isLoading, error } = useProducts();
+  // Mock fallback keeps the shop browsable if the fetch errors out.
+  const products = error ? MOCK_PRODUCTS : rawProducts;
 
   const update = (patch: Partial<ShopSearch>) =>
     navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }), replace: true });
@@ -519,11 +524,23 @@ function ShopPage() {
               </div>
             )}
 
-            {error ? (
+            {isLoading ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="bg-card border border-border/60 overflow-hidden">
+                    <Skeleton className="aspect-square w-full" />
+                    <div className="p-5 space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-5 w-40" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error && (!products || products.length === 0) ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
                 Couldn't load the shop. Try refreshing.
               </div>
-            ) : !isLoading && filtered.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
                 Nothing matches those filters.
                 {badges.length > 0 && (
@@ -538,17 +555,22 @@ function ShopPage() {
                 )}
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtered.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    saved={wishHas(p.slug)}
-                    onWish={() => wishToggle(p.slug)}
-                    onCart={() => cartAdd(p.slug)}
-                  />
-                ))}
-              </div>
+              <ErrorBoundary>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filtered?.map((p) => {
+                    if (!p) return null;
+                    return (
+                      <ProductCard
+                        key={p.id}
+                        product={p}
+                        saved={wishHas(p.slug)}
+                        onWish={() => wishToggle(p.slug)}
+                        onCart={() => cartAdd(p.slug)}
+                      />
+                    );
+                  })}
+                </div>
+              </ErrorBoundary>
             )}
           </div>
         </div>
