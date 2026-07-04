@@ -23,6 +23,9 @@ import {
 import { COLOURS, GENDERS, SIZES, DECK_SPEC_FIELDS, SURF_SPEC_FIELDS } from "@/lib/shop-taxonomy";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MOCK_PRODUCTS } from "@/lib/mock-products";
 
 const PRICE_MIN = 0;
 const PRICE_MAX = 2000;
@@ -81,7 +84,9 @@ function ShopPage() {
   const [open, setOpen] = useState(true);
   const { has: wishHas, toggle: wishToggle } = useWishlist();
   const { add: cartAdd } = useCart();
-  const { data: products, isLoading, error } = useProducts();
+  const { data: rawProducts, isLoading, error } = useProducts();
+  // Mock fallback keeps the shop browsable if the fetch errors out.
+  const products = error ? MOCK_PRODUCTS : rawProducts;
 
   const update = (patch: Partial<ShopSearch>) =>
     navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }), replace: true });
