@@ -195,42 +195,86 @@ function AdminOverview() {
 }
 
 function AdminUsers() {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
-  const { data: users, isLoading } = useQuery({
-    queryKey: ["admin", "users"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("*, user_id").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
+  const [grantEmail, setGrantEmail] = useState("");
+  const queryClient = useQueryClient();
+
+  const listFn = useServerFn(listUsersWithRoles);
+  const grantFn = useServerFn(grantAdminRole);
+  const revokeFn = useServerFn(revokeAdminRole);
+
+  const { data: users, isLoading, error } = useQuery({
+    queryKey: ["admin", "users-with-roles"],
+    queryFn: () => listFn(),
   });
 
-  const { data: loyaltyData } = useQuery({
-    queryKey: ["admin", "loyalty"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("loyalty_points").select("*");
-      if (error) throw error;
-      return data ?? [];
+  const grant = useMutation({
+    mutationFn: (input: { email?: string; userId?: string }) => grantFn({ data: input }),
+    onSuccess: () => {
+      toast.success("Admin granted.");
+      setGrantEmail("");
+      queryClient.invalidateQueries({ queryKey: ["admin", "users-with-roles"] });
     },
+    onError: (e) => toast.error(sanitizeError(e)),
   });
 
-  const filtered = users?.filter((u: any) =>
-    search === "" || u.user_id?.toLowerCase().includes(search.toLowerCase()) || u.role?.toLowerCase().includes(search.toLowerCase())
-  );
+  const revoke = useMutation({
+    mutationFn: (userId: string) => revokeFn({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("Admin revoked.");
+      queryClient.invalidateQueries({ queryKey: ["admin", "users-with-roles"] });
+    },
+    onError: (e) => toast.error(sanitizeError(e)),
+  });
+
+  const filtered = (users ?? []).filter((u) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (u.email ?? "").toLowerCase().includes(q) || u.id.toLowerCase().includes(q);
+  });
 
   return (
     <div className="space-y-6">
+      {/* Grant admin by email */}
+      <div className="border border-border/60 bg-card rounded-lg p-4 md:p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Shield className="h-5 w-5 text-primary" />
+          <h2 className="font-display font-bold text-lg">Grant admin access</h2>
+        </div>
+        <p className="text-xs text-silver/60 font-mono mb-3">
+          Type an email of an already-registered user to promote them to admin.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="email"
+            value={grantEmail}
+            onChange={(e) => setGrantEmail(e.target.value)}
+            placeholder="user@example.com"
+            className="flex-1 px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary"
+          />
+          <button
+            onClick={() => grantEmail && grant.mutate({ email: grantEmail })}
+            disabled={!grantEmail || grant.isPending}
+            className="px-4 py-2.5 bg-primary text-primary-foreground text-xs font-mono uppercase tracking-widest rounded-md hover:opacity-90 disabled:opacity-50"
+          >
+            {grant.isPending ? "Granting…" : "Grant admin"}
+          </button>
+        </div>
+      </div>
+
+      {/* Search + table */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-silver/40" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search users..."
+            placeholder="Search by email or ID…"
             className="w-full pl-9 pr-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary"
           />
         </div>
-        <span className="text-xs font-mono text-silver/60">{filtered?.length ?? 0} users</span>
+        <span className="text-xs font-mono text-silver/60">{filtered.length} users</span>
       </div>
 
       <div className="border border-border/60 rounded-lg overflow-hidden">
@@ -238,11 +282,11 @@ function AdminUsers() {
           <table className="w-full text-sm">
             <thead className="bg-muted">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">User ID</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Points</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Tier</th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Email</th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Roles</th>
                 <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Joined</th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Last seen</th>
+                <th className="text-right px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -252,27 +296,66 @@ function AdminUsers() {
                     <Loader2 className="h-5 w-5 animate-spin mx-auto text-silver/40" />
                   </td>
                 </tr>
-              ) : filtered && filtered.length > 0 ? (
-                filtered.map((u: any) => {
-                  const lp = loyaltyData?.find((l: any) => l.user_id === u.user_id);
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-silver/60">
+                    <AlertCircle className="h-5 w-5 mx-auto mb-2 text-silver/40" />
+                    <p className="text-sm">Couldn't load users.</p>
+                  </td>
+                </tr>
+              ) : filtered.length > 0 ? (
+                filtered.map((u) => {
+                  const isAdminRow = u.roles.includes("admin");
+                  const isSelf = user?.id === u.id;
                   return (
                     <tr key={u.id} className="border-t border-border/30 hover:bg-muted/50">
-                      <td className="px-4 py-3 font-mono text-xs truncate max-w-[150px] sm:max-w-[200px]">{u.user_id}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 text-[10px] font-mono uppercase rounded-full ${
-                          u.role === "admin" ? "bg-primary/20 text-primary" : "bg-muted text-silver/60"
-                        }`}>
-                          {u.role}
-                        </span>
+                      <td className="px-4 py-3 text-xs">
+                        <div className="font-medium truncate max-w-[220px]">{u.email ?? "—"}</div>
+                        <div className="font-mono text-[10px] text-silver/40 truncate max-w-[220px]">{u.id}</div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs">{lp?.points ?? 0}</td>
                       <td className="px-4 py-3">
-                        <span className="text-[10px] font-bold uppercase" style={{ color: TIERS.find((t) => t.key === (lp?.tier ?? "bronze"))?.color }}>
-                          {lp?.tier ?? "bronze"}
-                        </span>
+                        {u.roles.length === 0 ? (
+                          <span className="text-[10px] font-mono text-silver/40">—</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {u.roles.map((r) => (
+                              <span
+                                key={r}
+                                className={`inline-flex px-2 py-0.5 text-[10px] font-mono uppercase rounded-full ${
+                                  r === "admin" ? "bg-primary/20 text-primary" : "bg-muted text-silver/60"
+                                }`}
+                              >
+                                {r}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-xs text-silver/60">
-                        {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
+                        {new Date(u.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-silver/60">
+                        {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {isAdminRow ? (
+                          <button
+                            onClick={() => revoke.mutate(u.id)}
+                            disabled={isSelf || revoke.isPending}
+                            title={isSelf ? "You can't revoke your own admin" : ""}
+                            className="px-2.5 py-1 border border-border/60 text-silver hover:border-primary text-[10px] font-mono uppercase tracking-widest rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            Revoke
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => grant.mutate({ userId: u.id })}
+                            disabled={grant.isPending}
+                            className="px-2.5 py-1 bg-primary text-primary-foreground text-[10px] font-mono uppercase tracking-widest rounded-md hover:opacity-90 disabled:opacity-50"
+                          >
+                            Make admin
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
