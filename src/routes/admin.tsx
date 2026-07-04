@@ -8,7 +8,7 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings, useUpdateSetting, SETTING_KEYS, SETTING_LABELS } from "@/lib/site-settings";
-import { adminExists, claimFirstAdmin } from "@/lib/admin.functions";
+import { adminExists, claimFirstAdmin, listUsersWithRoles, grantAdminRole, revokeAdminRole } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
