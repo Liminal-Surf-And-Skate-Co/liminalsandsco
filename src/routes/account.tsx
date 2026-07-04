@@ -655,3 +655,77 @@ function getTierLabel(points: number): string {
   if (points >= 100) return "Silver";
   return "Bronze";
 }
+
+function SocialAuthButtons({ mode }: { mode: "signin" | "signup" }) {
+  const [busy, setBusy] = useState<null | "google" | "discord">(null);
+  const label = mode === "signup" ? "Sign up" : "Sign in";
+
+  const handleGoogle = async () => {
+    setBusy("google");
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/account",
+      });
+      if (result.error) throw result.error;
+    } catch (e) {
+      toast.error(sanitizeError(e));
+      setBusy(null);
+    }
+  };
+
+  const handleDiscord = async () => {
+    setBusy("discord");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+        options: { redirectTo: window.location.origin + "/account" },
+      });
+      if (error) throw error;
+    } catch (e) {
+      toast.error(sanitizeError(e));
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={handleGoogle}
+        disabled={busy !== null}
+        className="w-full flex items-center justify-center gap-3 bg-background hover:bg-muted border border-border/60 hover:border-primary text-silver font-mono text-xs uppercase tracking-widest py-2.5 rounded-md transition-colors disabled:opacity-50"
+      >
+        <GoogleGlyph />
+        {busy === "google" ? "Connecting…" : `${label} with Google`}
+      </button>
+      <button
+        type="button"
+        onClick={handleDiscord}
+        disabled={busy !== null}
+        className="w-full flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752c4] text-white font-mono text-xs uppercase tracking-widest py-2.5 rounded-md transition-colors disabled:opacity-50"
+      >
+        <DiscordGlyph />
+        {busy === "discord" ? "Connecting…" : `${label} with Discord`}
+      </button>
+    </div>
+  );
+}
+
+function GoogleGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C33.9 6.1 29.2 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.9 1.2 8 3l5.7-5.7C33.9 6.1 29.2 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.1 0 9.8-2 13.3-5.2l-6.1-5.2C29.1 35.4 26.7 36 24 36c-5.2 0-9.6-3.3-11.2-8L6.2 33C9.6 39.6 16.2 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.1 4-3.9 5.3l6.1 5.2C41.8 34.6 44 29.7 44 24c0-1.3-.1-2.4-.4-3.5z"/>
+    </svg>
+  );
+}
+
+function DiscordGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.2.4a18.3 18.3 0 0 0-6.4 0L8.6 3a19.8 19.8 0 0 0-4.9 1.4C.9 8.5.2 12.5.6 16.5A20 20 0 0 0 6.6 19.5l1.2-1.7a12.8 12.8 0 0 1-2-1c.2-.1.3-.2.5-.3a14.2 14.2 0 0 0 11.4 0l.5.3a12.8 12.8 0 0 1-2 1l1.2 1.7a20 20 0 0 0 6-3c.5-4.7-.5-8.7-3.1-15zM9 14.7c-1.2 0-2.2-1.1-2.2-2.5S7.8 9.7 9 9.7s2.2 1.1 2.2 2.5S10.2 14.7 9 14.7zm6 0c-1.2 0-2.2-1.1-2.2-2.5S13.8 9.7 15 9.7s2.2 1.1 2.2 2.5S16.2 14.7 15 14.7z"/>
+    </svg>
+  );
+}
