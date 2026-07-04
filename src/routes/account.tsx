@@ -5,6 +5,7 @@ import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Awar
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { useLoyalty, TIERS, type Reward } from "@/hooks/use-loyalty";
 import { toast } from "sonner";
@@ -597,6 +598,16 @@ function AuthView({
               {k === "signin" ? "Sign in" : "Create account"}
             </button>
           ))}
+        </div>
+
+        <SocialAuthButtons mode={mode} />
+
+        <div className="flex items-center gap-3 my-4">
+          <div className="h-px flex-1 bg-border/60" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-silver/40">
+            or with email
+          </span>
+          <div className="h-px flex-1 bg-border/60" />
         </div>
 
         <form onSubmit={onSubmit} className="space-y-3">
