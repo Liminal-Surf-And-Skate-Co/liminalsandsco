@@ -524,11 +524,23 @@ function ShopPage() {
               </div>
             )}
 
-            {error ? (
+            {isLoading ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="bg-card border border-border/60 overflow-hidden">
+                    <Skeleton className="aspect-square w-full" />
+                    <div className="p-5 space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-5 w-40" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error && (!products || products.length === 0) ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
                 Couldn't load the shop. Try refreshing.
               </div>
-            ) : !isLoading && filtered.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="border border-border/60 bg-card p-12 text-center font-mono text-sm text-silver/70">
                 Nothing matches those filters.
                 {badges.length > 0 && (
@@ -543,17 +555,22 @@ function ShopPage() {
                 )}
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtered.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    saved={wishHas(p.slug)}
-                    onWish={() => wishToggle(p.slug)}
-                    onCart={() => cartAdd(p.slug)}
-                  />
-                ))}
-              </div>
+              <ErrorBoundary>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filtered?.map((p) => {
+                    if (!p) return null;
+                    return (
+                      <ProductCard
+                        key={p.id}
+                        product={p}
+                        saved={wishHas(p.slug)}
+                        onWish={() => wishToggle(p.slug)}
+                        onCart={() => cartAdd(p.slug)}
+                      />
+                    );
+                  })}
+                </div>
+              </ErrorBoundary>
             )}
           </div>
         </div>
