@@ -85,8 +85,12 @@ function ShopPage() {
   const { has: wishHas, toggle: wishToggle } = useWishlist();
   const { add: cartAdd } = useCart();
   const { data: rawProducts, isLoading, error } = useProducts();
-  // Mock fallback keeps the shop browsable if the fetch errors out.
-  const products = error ? MOCK_PRODUCTS : rawProducts;
+  // Mock fallback keeps the shop browsable if the fetch errors out
+  // OR the live catalog is empty (fresh install, RLS misconfig, etc.).
+  const products =
+    error || (!isLoading && (!rawProducts || rawProducts.length === 0))
+      ? MOCK_PRODUCTS
+      : rawProducts;
 
   const update = (patch: Partial<ShopSearch>) =>
     navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }), replace: true });
