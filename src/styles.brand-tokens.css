@@ -1,0 +1,44 @@
+:root {
+  --radius: 0.25rem;
+
+  /* Brand tokens (Batch 1) */
+
+  /* Light-variant workspace/store backgrounds */
+  --background: #F1F3F5; /* core pages */
+  --background-alt: #F3F0F7; /* alternative light surface */
+
+  /* Typography & structural colors */
+  --foreground: #1A1A1A; /* rich black for text */
+  --brand-purple: #4C1D95; /* deep royal purple for nav/containers */
+
+  /* Primary CTA (exclusive) */
+  --primary: #9B00FF; /* neon purple CTA */
+  --primary-foreground: #FFFFFF;
+
+  /* Metallic silver token */
+  --silver: #C0C4C8;
+
+  /* Derived tokens for legacy usage */
+  --card: var(--background-alt);
+  --card-foreground: var(--foreground);
+  --border: rgba(26,26,26,0.06);
+  --accent: var(--primary);
+  --accent-foreground: var(--primary-foreground);
+
+  /* Fallbacks from previous theme (preserve names used across components) */
+  --background: var(--background);
+  --foreground: var(--foreground);
+  --card: var(--card);
+  --card-foreground: var(--card-foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--card-foreground);
+  --primary: var(--primary);
+  --primary-foreground: var(--primary-foreground);
+  --secondary: var(--brand-purple);
+  --secondary-foreground: var(--foreground);
+  --muted: rgba(0,0,0,0.04);
+  --muted-foreground: rgba(26,26,26,0.6);
+  --accent: var(--primary);
+  --accent-foreground: var(--primary-foreground);
+  --silver: var(--silver);
+}
