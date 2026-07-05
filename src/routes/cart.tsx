@@ -4,6 +4,7 @@ import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/hooks/use-cart";
 import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
+import { MascotLiam } from "@/components/site/MascotLiam";
 
 const FREE_SHIPPING_THRESHOLD = 150; // AUD
 
@@ -48,7 +49,7 @@ function CartPage() {
         ) : lines.length === 0 ? (
           <div className="border border-border/60 bg-card p-12 text-center">
             <div className="h-16 w-16 rounded-full bg-silver/10 flex items-center justify-center mx-auto mb-4">
-              <span className="font-display font-black text-lg text-silver">LL</span>
+              <MascotLiam size={40} />
             </div>
             <p className="font-display font-bold text-xl mb-2 text-silver">
               Your cart is completely empty.
