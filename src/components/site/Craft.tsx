@@ -19,12 +19,15 @@ export function Craft() {
         </div>
         <div>
           <h2 className="font-display font-black text-5xl lg:text-7xl leading-none mb-8">
-            Every board<br />tells on its<br />maker.
+            Every board
+            <br />
+            tells on its
+            <br />
+            maker.
           </h2>
           <p className="text-silver/80 text-lg leading-relaxed mb-10 max-w-md">
-            From maple billet to glassed surfboard, each piece passes through
-            one set of hands. We shape it, sand it, and ride it before it
-            ever leaves the shop.
+            From maple billet to glassed surfboard, each piece passes through one set of hands. We
+            shape it, sand it, and ride it before it ever leaves the shop.
           </p>
           <dl className="grid grid-cols-2 gap-8 border-t border-border/40 pt-8">
             {[
@@ -35,7 +38,9 @@ export function Craft() {
             ].map(([k, v]) => (
               <div key={v}>
                 <dt className="font-display text-3xl text-primary">{k}</dt>
-                <dd className="font-mono text-xs uppercase tracking-widest text-silver/60 mt-1">{v}</dd>
+                <dd className="font-mono text-xs uppercase tracking-widest text-silver/60 mt-1">
+                  {v}
+                </dd>
               </div>
             ))}
           </dl>

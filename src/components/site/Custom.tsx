@@ -10,11 +10,15 @@ export function Custom() {
             (04) Commission
           </p>
           <h2 className="font-display font-black text-5xl lg:text-7xl leading-none mb-8">
-            Build the<br />board only<br />you can ride.
+            Build the
+            <br />
+            board only
+            <br />
+            you can ride.
           </h2>
           <p className="text-silver/80 text-lg leading-relaxed mb-8 max-w-md">
-            Tell us about the shape, the graphic, the feeling. We'll quote
-            within 48 hours and ship the finished piece in 2–4 weeks.
+            Tell us about the shape, the graphic, the feeling. We'll quote within 48 hours and ship
+            the finished piece in 2–4 weeks.
           </p>
           <ul className="space-y-3 font-mono text-sm text-silver/70">
             <li>✦ Skate decks · 7.5" – 10"</li>

@@ -20,9 +20,7 @@ import {
   type Product,
   type SortKey,
 } from "@/lib/products";
-import {
-  COLOURS, GENDERS, SIZES, DECK_SPEC_FIELDS, SURF_SPEC_FIELDS,
-} from "@/lib/shop-taxonomy";
+import { COLOURS, GENDERS, SIZES, DECK_SPEC_FIELDS, SURF_SPEC_FIELDS } from "@/lib/shop-taxonomy";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
 
@@ -36,13 +34,18 @@ const joinCsv = (a: string[]) => a.join(",");
 
 const shopSearchSchema = z.object({
   q: fallback(z.string(), "").default(""),
-  sort: fallback(z.enum(["newest", "oldest", "price-asc", "price-desc"]), "newest").default("newest"),
-  dept: fallback(z.enum(["skate", "surf", "clothing", "accessories", "other", "all"]), "all").default("all"),
+  sort: fallback(z.enum(["newest", "oldest", "price-asc", "price-desc"]), "newest").default(
+    "newest",
+  ),
+  dept: fallback(
+    z.enum(["skate", "surf", "clothing", "accessories", "other", "all"]),
+    "all",
+  ).default("all"),
   type: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
-  colour: csvSchema,        // CSV
-  gender: csvSchema,        // CSV
-  size: csvSchema,          // CSV
+  colour: csvSchema, // CSV
+  gender: csvSchema, // CSV
+  size: csvSchema, // CSV
   min: fallback(z.number().min(0), PRICE_MIN).default(PRICE_MIN),
   max: fallback(z.number().min(0), PRICE_MAX).default(PRICE_MAX),
 });
@@ -54,7 +57,11 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Shop — Liminal Surf & Skate Co" },
-      { name: "description", content: "Surfboards, skateboards, apparel, footwear, accessories and hand-crafted pieces from Liminal." },
+      {
+        name: "description",
+        content:
+          "Surfboards, skateboards, apparel, footwear, accessories and hand-crafted pieces from Liminal.",
+      },
       { property: "og:title", content: "Shop — Liminal Surf & Skate Co" },
       { property: "og:description", content: "Everything we make, in one place." },
     ],
@@ -85,7 +92,8 @@ function ShopPage() {
 
   const toggle = (csv: string, value: string) => {
     const set = new Set(splitCsv(csv));
-    set.has(value) ? set.delete(value) : set.add(value);
+    if (set.has(value)) set.delete(value);
+    else set.add(value);
     return joinCsv([...set]);
   };
 
@@ -94,24 +102,33 @@ function ShopPage() {
   type Dim = "colour" | "gender" | "size" | "type" | "category" | "dept";
   const applyFilters = (except?: Dim) => {
     let list = (products ?? []).slice();
-    if (except !== "dept" && search.dept !== "all") list = list.filter((p) => p.department === search.dept);
-    if (except !== "type" && search.type) list = list.filter((p) => (p.product_type ?? "") === search.type);
+    if (except !== "dept" && search.dept !== "all")
+      list = list.filter((p) => p.department === search.dept);
+    if (except !== "type" && search.type)
+      list = list.filter((p) => (p.product_type ?? "") === search.type);
     if (except !== "category" && search.category) {
       const cat = search.category.toLowerCase();
-      list = list.filter((p) =>
-        p.tags.map((t) => t.toLowerCase()).includes(cat) ||
-        (p.target_group ?? "").toLowerCase() === cat,
+      list = list.filter(
+        (p) =>
+          p.tags.map((t) => t.toLowerCase()).includes(cat) ||
+          (p.target_group ?? "").toLowerCase() === cat,
       );
     }
-    if (except !== "colour" && selColours.length) list = list.filter((p) => p.colour && selColours.includes(p.colour.toLowerCase()));
-    if (except !== "gender" && selGenders.length) list = list.filter((p) => p.target_group && selGenders.includes(p.target_group.toLowerCase()));
-    if (except !== "size" && selSizes.length) list = list.filter((p) => p.sizes.some((s) => selSizes.includes(s)));
+    if (except !== "colour" && selColours.length)
+      list = list.filter((p) => p.colour && selColours.includes(p.colour.toLowerCase()));
+    if (except !== "gender" && selGenders.length)
+      list = list.filter(
+        (p) => p.target_group && selGenders.includes(p.target_group.toLowerCase()),
+      );
+    if (except !== "size" && selSizes.length)
+      list = list.filter((p) => p.sizes.some((s) => selSizes.includes(s)));
     if (search.q.trim()) {
       const q = search.q.toLowerCase();
-      list = list.filter((p) =>
-        p.title.toLowerCase().includes(q) ||
-        (p.product_type ?? "").toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q),
+      list = list.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          (p.product_type ?? "").toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q),
       );
     }
     list = list.filter((p) => {
@@ -121,7 +138,10 @@ function ShopPage() {
     return list;
   };
 
-  const filtered = useMemo(() => sortProducts(applyFilters(), search.sort), [products, search, selColours, selGenders, selSizes]);
+  const filtered = useMemo(
+    () => sortProducts(applyFilters(), search.sort),
+    [products, search, selColours, selGenders, selSizes],
+  );
 
   // Count helpers — base list ignores own dimension so counts reflect
   // "what would match if I also picked this".
@@ -157,10 +177,20 @@ function ShopPage() {
     return map;
   }, [products, search, selColours, selGenders]);
 
-
   const reset = () =>
     navigate({
-      search: { q: "", sort: "newest", dept: "all", type: "", category: "", colour: "", gender: "", size: "", min: PRICE_MIN, max: PRICE_MAX },
+      search: {
+        q: "",
+        sort: "newest",
+        dept: "all",
+        type: "",
+        category: "",
+        colour: "",
+        gender: "",
+        size: "",
+        min: PRICE_MIN,
+        max: PRICE_MAX,
+      },
       replace: true,
     });
 
@@ -169,14 +199,45 @@ function ShopPage() {
 
   // Active filter badges
   const badges: { key: string; label: string; clear: () => void }[] = [];
-  if (search.dept !== "all") badges.push({ key: "dept", label: DEPARTMENT_LABELS[search.dept as Department], clear: () => update({ dept: "all", type: "", category: "" }) });
-  if (search.type) badges.push({ key: "type", label: search.type, clear: () => update({ type: "" }) });
-  if (search.category) badges.push({ key: "category", label: search.category, clear: () => update({ category: "" }) });
-  selColours.forEach((c) => badges.push({ key: `c-${c}`, label: `Colour: ${c}`, clear: () => update({ colour: toggle(search.colour, c) }) }));
-  selGenders.forEach((g) => badges.push({ key: `g-${g}`, label: `Gender: ${g}`, clear: () => update({ gender: toggle(search.gender, g) }) }));
-  selSizes.forEach((s) => badges.push({ key: `s-${s}`, label: `Size: ${s}`, clear: () => update({ size: toggle(search.size, s) }) }));
-  if (search.min !== PRICE_MIN || search.max !== PRICE_MAX) badges.push({ key: "price", label: `$${search.min}–$${search.max}`, clear: () => update({ min: PRICE_MIN, max: PRICE_MAX }) });
-  if (search.q.trim()) badges.push({ key: "q", label: `“${search.q}”`, clear: () => update({ q: "" }) });
+  if (search.dept !== "all")
+    badges.push({
+      key: "dept",
+      label: DEPARTMENT_LABELS[search.dept as Department],
+      clear: () => update({ dept: "all", type: "", category: "" }),
+    });
+  if (search.type)
+    badges.push({ key: "type", label: search.type, clear: () => update({ type: "" }) });
+  if (search.category)
+    badges.push({ key: "category", label: search.category, clear: () => update({ category: "" }) });
+  selColours.forEach((c) =>
+    badges.push({
+      key: `c-${c}`,
+      label: `Colour: ${c}`,
+      clear: () => update({ colour: toggle(search.colour, c) }),
+    }),
+  );
+  selGenders.forEach((g) =>
+    badges.push({
+      key: `g-${g}`,
+      label: `Gender: ${g}`,
+      clear: () => update({ gender: toggle(search.gender, g) }),
+    }),
+  );
+  selSizes.forEach((s) =>
+    badges.push({
+      key: `s-${s}`,
+      label: `Size: ${s}`,
+      clear: () => update({ size: toggle(search.size, s) }),
+    }),
+  );
+  if (search.min !== PRICE_MIN || search.max !== PRICE_MAX)
+    badges.push({
+      key: "price",
+      label: `$${search.min}–$${search.max}`,
+      clear: () => update({ min: PRICE_MIN, max: PRICE_MAX }),
+    });
+  if (search.q.trim())
+    badges.push({ key: "q", label: `“${search.q}”`, clear: () => update({ q: "" }) });
 
   const showDeckSpecs = search.dept === "skate";
   const showSurfSpecs = search.dept === "surf";
@@ -191,7 +252,8 @@ function ShopPage() {
               {search.dept === "all" ? "The Shop" : `Shop · ${currentDeptLabel}`}
             </p>
             <h1 className="font-display font-black text-5xl lg:text-7xl leading-none mb-8">
-              {currentDeptLabel},<br />in one place.
+              {currentDeptLabel},<br />
+              in one place.
             </h1>
 
             {/* Department pills */}
@@ -235,7 +297,9 @@ function ShopPage() {
         </section>
 
         <div className="max-w-7xl mx-auto px-6 py-10 flex gap-8 items-start">
-          <aside className={`${open ? "w-72" : "w-12"} shrink-0 sticky top-20 transition-[width] duration-300 hidden md:block`}>
+          <aside
+            className={`${open ? "w-72" : "w-12"} shrink-0 sticky top-20 transition-[width] duration-300 hidden md:block`}
+          >
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => setOpen((o) => !o)}
@@ -245,7 +309,10 @@ function ShopPage() {
                 {open ? <X className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
               </button>
               {open && badges.length > 0 && (
-                <button onClick={reset} className="font-mono text-[10px] uppercase tracking-widest text-primary hover:opacity-70">
+                <button
+                  onClick={reset}
+                  className="font-mono text-[10px] uppercase tracking-widest text-primary hover:opacity-70"
+                >
                   Clear all
                 </button>
               )}
@@ -256,7 +323,9 @@ function ShopPage() {
                 {/* Active filter badges */}
                 {badges.length > 0 && (
                   <div>
-                    <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">Active filters</label>
+                    <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">
+                      Active filters
+                    </label>
                     <div className="flex flex-wrap gap-1.5">
                       {badges.map((b) => (
                         <button
@@ -273,7 +342,9 @@ function ShopPage() {
 
                 <FilterGroup label="Price">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-[10px] text-silver">${search.min} – ${search.max}</span>
+                    <span className="font-mono text-[10px] text-silver">
+                      ${search.min} – ${search.max}
+                    </span>
                   </div>
                   <Slider
                     min={PRICE_MIN}
@@ -365,7 +436,6 @@ function ShopPage() {
                   </div>
                 </FilterGroup>
 
-
                 {/* Department-aware spec filters via category param */}
                 {showDeckSpecs && (
                   <FilterGroup label="Deck specs">
@@ -376,9 +446,13 @@ function ShopPage() {
                       {DECK_SPEC_FIELDS.map((f) => (
                         <button
                           key={f.key}
-                          onClick={() => update({ category: search.category === f.key ? "" : f.key })}
+                          onClick={() =>
+                            update({ category: search.category === f.key ? "" : f.key })
+                          }
                           className={`w-full text-left px-2 py-1 font-mono text-[10px] uppercase border ${
-                            search.category === f.key ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                            search.category === f.key
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border/60 text-silver hover:border-primary"
                           }`}
                         >
                           {f.label}
@@ -394,9 +468,13 @@ function ShopPage() {
                       {SURF_SPEC_FIELDS.map((f) => (
                         <button
                           key={f.key}
-                          onClick={() => update({ category: search.category === f.key ? "" : f.key })}
+                          onClick={() =>
+                            update({ category: search.category === f.key ? "" : f.key })
+                          }
                           className={`w-full text-left px-2 py-1 font-mono text-[10px] uppercase border ${
-                            search.category === f.key ? "border-primary bg-primary text-primary-foreground" : "border-border/60 text-silver hover:border-primary"
+                            search.category === f.key
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border/60 text-silver hover:border-primary"
                           }`}
                         >
                           {f.label}
@@ -412,10 +490,15 @@ function ShopPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline justify-between mb-6">
               <p className="font-mono text-xs uppercase tracking-widest text-silver/70">
-                {isLoading ? "Loading…" : `${filtered.length} ${filtered.length === 1 ? "piece" : "pieces"}`}
+                {isLoading
+                  ? "Loading…"
+                  : `${filtered.length} ${filtered.length === 1 ? "piece" : "pieces"}`}
               </p>
               {badges.length > 0 && (
-                <button onClick={reset} className="md:hidden font-mono text-[10px] uppercase tracking-widest text-primary">
+                <button
+                  onClick={reset}
+                  className="md:hidden font-mono text-[10px] uppercase tracking-widest text-primary"
+                >
                   Clear all
                 </button>
               )}
@@ -445,7 +528,12 @@ function ShopPage() {
                 Nothing matches those filters.
                 {badges.length > 0 && (
                   <div className="mt-3">
-                    <button onClick={reset} className="text-primary underline-offset-4 hover:underline">Clear all filters</button>
+                    <button
+                      onClick={reset}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Clear all filters
+                    </button>
                   </div>
                 )}
               </div>
@@ -473,14 +561,20 @@ function ShopPage() {
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">{label}</label>
+      <label className="font-mono text-[10px] uppercase tracking-widest text-silver/70 block mb-2">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
 function FilterChip({
-  children, active, disabled, count, onClick,
+  children,
+  active,
+  disabled,
+  count,
+  onClick,
 }: {
   children: React.ReactNode;
   active: boolean;
@@ -488,7 +582,8 @@ function FilterChip({
   count: number;
   onClick: () => void;
 }) {
-  const base = "inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] uppercase border transition-colors";
+  const base =
+    "inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] uppercase border transition-colors";
   const tone = active
     ? "border-primary bg-primary text-primary-foreground"
     : disabled
@@ -504,13 +599,14 @@ function FilterChip({
       className={`${base} ${tone}`}
     >
       <span>{children}</span>
-      <span className={`text-[9px] ${active ? "text-primary-foreground/80" : disabled ? "text-silver/30" : "text-silver/50"}`}>
+      <span
+        className={`text-[9px] ${active ? "text-primary-foreground/80" : disabled ? "text-silver/30" : "text-silver/50"}`}
+      >
         {count}
       </span>
     </button>
   );
 }
-
 
 function ProductCard({
   product,
@@ -530,7 +626,10 @@ function ProductCard({
     <div className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative">
       <ProductBadges product={product} />
       <button
-        onClick={(e) => { e.preventDefault(); onWish(); }}
+        onClick={(e) => {
+          e.preventDefault();
+          onWish();
+        }}
         aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
         className="absolute top-3 right-3 z-10 h-9 w-9 flex items-center justify-center bg-background/80 backdrop-blur border border-border/60 hover:border-primary"
       >
@@ -549,14 +648,17 @@ function ProductCard({
         <div className="p-5 flex items-end justify-between">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-2">
-              {DEPARTMENT_LABELS[product.department]}{product.product_type ? ` · ${product.product_type}` : ""}
+              {DEPARTMENT_LABELS[product.department]}
+              {product.product_type ? ` · ${product.product_type}` : ""}
             </p>
             <h3 className="font-display font-bold text-lg">{product.title}</h3>
           </div>
           <div className="text-right">
             {onSale ? (
               <>
-                <span className="block text-silver/50 text-xs font-mono line-through">${product.price}</span>
+                <span className="block text-silver/50 text-xs font-mono line-through">
+                  ${product.price}
+                </span>
                 <span className="block text-primary text-sm font-mono">${product.sale_price}</span>
               </>
             ) : (

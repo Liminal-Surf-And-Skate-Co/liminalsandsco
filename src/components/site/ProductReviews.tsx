@@ -12,7 +12,15 @@ import {
 
 type PhotoEntry = { path: string; preview: string };
 
-function Stars({ value, onChange, size = 4 }: { value: number; onChange?: (v: number) => void; size?: number }) {
+function Stars({
+  value,
+  onChange,
+  size = 4,
+}: {
+  value: number;
+  onChange?: (v: number) => void;
+  size?: number;
+}) {
   const cls = `h-${size} w-${size}`;
   return (
     <div className="flex">
@@ -25,7 +33,9 @@ function Stars({ value, onChange, size = 4 }: { value: number; onChange?: (v: nu
           className={onChange ? "cursor-pointer" : "cursor-default"}
           disabled={!onChange}
         >
-          <Star className={`${cls} ${i <= value ? "fill-primary text-primary" : "text-silver/30"}`} />
+          <Star
+            className={`${cls} ${i <= value ? "fill-primary text-primary" : "text-silver/30"}`}
+          />
         </button>
       ))}
     </div>
@@ -71,7 +81,7 @@ export function ProductReviews({ productId }: { productId: string }) {
       await create.mutateAsync({
         product_id: productId,
         rating,
-        title: title || undefined,
+        title: title || null,
         body,
         photos: photos.map((p) => p.path),
       });
@@ -97,7 +107,9 @@ export function ProductReviews({ productId }: { productId: string }) {
               </span>
             </div>
           ) : (
-            <p className="font-mono text-[11px] uppercase tracking-widest text-silver/50 mt-2">No reviews yet — be the first.</p>
+            <p className="font-mono text-[11px] uppercase tracking-widest text-silver/50 mt-2">
+              No reviews yet — be the first.
+            </p>
           )}
         </div>
       </div>
@@ -106,10 +118,15 @@ export function ProductReviews({ productId }: { productId: string }) {
         {/* Composer */}
         <div className="lg:col-span-1">
           <div className="border border-border/60 bg-card p-5">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">Leave a review</p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-4">
+              Leave a review
+            </p>
             {!user ? (
               <p className="font-mono text-xs text-silver/70">
-                <a href="/account" className="text-primary underline-offset-4 hover:underline">Sign in</a> to share your setup.
+                <a href="/account" className="text-primary underline-offset-4 hover:underline">
+                  Sign in
+                </a>{" "}
+                to share your setup.
               </p>
             ) : (
               <form onSubmit={submit} className="space-y-3">
@@ -147,7 +164,11 @@ export function ProductReviews({ productId }: { productId: string }) {
                     <div className="grid grid-cols-4 gap-2 mt-3">
                       {photos.map((entry, i) => (
                         <div key={entry.path} className="relative aspect-square">
-                          <img src={entry.preview} alt="" className="w-full h-full object-cover border border-border/60" />
+                          <img
+                            src={entry.preview}
+                            alt=""
+                            className="w-full h-full object-cover border border-border/60"
+                          />
                           <button
                             type="button"
                             onClick={() => setPhotos((p) => p.filter((_, idx) => idx !== i))}
@@ -203,11 +224,19 @@ function ReviewCard({ review }: { review: Review }) {
         </span>
       </div>
       {review.title && <h3 className="font-display font-bold text-base mb-2">{review.title}</h3>}
-      {review.body && <p className="text-sm text-silver/90 leading-relaxed whitespace-pre-wrap">{review.body}</p>}
+      {review.body && (
+        <p className="text-sm text-silver/90 leading-relaxed whitespace-pre-wrap">{review.body}</p>
+      )}
       {review.photos.length > 0 && (
         <div className="grid grid-cols-4 gap-2 mt-4">
           {review.photos.map((url) => (
-            <a key={url} href={url} target="_blank" rel="noreferrer" className="block aspect-square overflow-hidden border border-border/60">
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="block aspect-square overflow-hidden border border-border/60"
+            >
               <img src={url} alt="" className="w-full h-full object-cover" />
             </a>
           ))}

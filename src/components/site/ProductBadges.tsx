@@ -11,7 +11,9 @@ function Badge({ children, tone }: { children: React.ReactNode; tone: Tone }) {
     new: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
   };
   return (
-    <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 border ${styles[tone]}`}>
+    <span
+      className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 border ${styles[tone]}`}
+    >
       {children}
     </span>
   );
@@ -24,11 +26,19 @@ function isNewlyAdded(p: Pick<Product, "created_at">) {
   return Date.now() - created < 14 * 24 * 60 * 60 * 1000;
 }
 
-export function ProductBadges({ product, className = "" }: { product: Product; className?: string }) {
+export function ProductBadges({
+  product,
+  className = "",
+}: {
+  product: Product;
+  className?: string;
+}) {
   const oos = isOutOfStock(product);
   const low = !oos && isLowStock(product);
   const onSale = product.sale_price !== null && product.sale_price < product.price;
-  const pct = onSale ? Math.round(((product.price - (product.sale_price ?? 0)) / product.price) * 100) : 0;
+  const pct = onSale
+    ? Math.round(((product.price - (product.sale_price ?? 0)) / product.price) * 100)
+    : 0;
   const fresh = isNewlyAdded(product) || product.tags?.includes("new");
   const limited = product.tags?.includes("limited");
 

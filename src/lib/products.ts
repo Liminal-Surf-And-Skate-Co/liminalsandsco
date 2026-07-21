@@ -1,22 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 import deck from "@/assets/hero-deck.jpg";
 import surfboard from "@/assets/craft-surfboard.jpg";
 import apparel from "@/assets/apparel.jpg";
 import accessories from "@/assets/accessories.jpg";
 import workshop from "@/assets/about-workshop.jpg";
 
-export type Department = "skate" | "surf" | "clothing" | "accessories" | "other";
+export type Department = "skate" | "surf" | "clothing" | "accessories";
 
 export const DEPARTMENT_LABELS: Record<Department, string> = {
   skate: "Skate",
   surf: "Surf",
   clothing: "Clothing",
   accessories: "Accessories",
-  other: "Other",
 };
 
-export const ALL_DEPARTMENTS: Department[] = ["skate", "surf", "clothing", "accessories", "other"];
+export const ALL_DEPARTMENTS: Department[] = ["skate", "surf", "clothing", "accessories"];
 
 export type Product = {
   id: string;
@@ -47,7 +47,6 @@ const PLACEHOLDER: Record<Department, string> = {
   surf: surfboard,
   clothing: apparel,
   accessories: accessories,
-  other: workshop,
 };
 
 export function productImage(p: Pick<Product, "images" | "department">, idx = 0): string {
@@ -72,27 +71,28 @@ export function isOutOfStock(p: Pick<Product, "stock_count">): boolean {
   return p.stock_count <= 0;
 }
 
-function normalize(row: any): Product {
+function normalize(row: Record<string, unknown>): Product {
   return {
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
+    id: row.id as string,
+    slug: row.slug as string,
+    title: row.title as string,
     department: (row.department || "other") as Department,
-    product_type: row.product_type ?? null,
-    target_group: row.target_group ?? "unisex",
-    description: row.description ?? "",
-    details: Array.isArray(row.details) ? row.details : [],
+    product_type: row.product_type as string | null ?? null,
+    target_group: (row.target_group as string | null) ?? "unisex",
+    description: (row.description as string | null) ?? "",
+    details: Array.isArray(row.details) ? (row.details as string[]) : [],
     price: Number(row.price ?? 0),
-    sale_price: row.sale_price !== null && row.sale_price !== undefined ? Number(row.sale_price) : null,
-    colour: row.colour ?? null,
-    sizes: row.sizes ?? [],
+    sale_price:
+      row.sale_price !== null && row.sale_price !== undefined ? Number(row.sale_price) : null,
+    colour: (row.colour as string | null) ?? null,
+    sizes: Array.isArray(row.sizes) ? (row.sizes as string[]) : [],
     stock_count: Number(row.stock_count ?? 0),
-    images: row.images ?? [],
-    tags: row.tags ?? [],
-    specs: (row.specs && typeof row.specs === "object") ? row.specs : {},
+    images: Array.isArray(row.images) ? (row.images as string[]) : [],
+    tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
+    specs: row.specs && typeof row.specs === "object" && !Array.isArray(row.specs) ? (row.specs as Record<string, string>) : {},
     featured: Boolean(row.featured),
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    created_at: row.created_at as string,
+    updated_at: row.updated_at as string,
   };
 }
 
@@ -101,7 +101,7 @@ export async function fetchProducts(): Promise<Product[]> {
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw new Error(sanitizeError(error));
   return (data ?? []).map(normalize);
 }
 
@@ -111,8 +111,8 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
-  if (error) throw error;
-  return data ? normalize(data) : null;
+  if (error) throw new Error(sanitizeError(error));
+  return data ? normalize(data as Record<string, unknown>) : null;
 }
 
 export function useProducts() {
@@ -145,11 +145,15 @@ export function sortProducts(list: Product[], sort: SortKey): Product[] {
   const copy = list.slice();
   copy.sort((a, b) => {
     switch (sort) {
-      case "price-asc": return effectivePrice(a) - effectivePrice(b);
-      case "price-desc": return effectivePrice(b) - effectivePrice(a);
-      case "oldest": return a.created_at.localeCompare(b.created_at);
+      case "price-asc":
+        return effectivePrice(a) - effectivePrice(b);
+      case "price-desc":
+        return effectivePrice(b) - effectivePrice(a);
+      case "oldest":
+        return a.created_at.localeCompare(b.created_at);
       case "newest":
-      default: return b.created_at.localeCompare(a.created_at);
+      default:
+        return b.created_at.localeCompare(a.created_at);
     }
   });
   return copy;

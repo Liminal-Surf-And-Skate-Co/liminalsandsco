@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeError } from "@/lib/error-sanitize";
 
 export type SettingKey =
   | "discord_invite_url"
@@ -8,8 +9,7 @@ export type SettingKey =
   | "tiktok_url"
   | "facebook_url"
   | "contact_email_primary"
-  | "contact_email_secondary"
-  | "discord_webhook_url";
+  | "contact_email_secondary";
 
 export const SETTING_KEYS: SettingKey[] = [
   "discord_invite_url",
@@ -19,7 +19,6 @@ export const SETTING_KEYS: SettingKey[] = [
   "facebook_url",
   "contact_email_primary",
   "contact_email_secondary",
-  "discord_webhook_url",
 ];
 
 export const SETTING_LABELS: Record<SettingKey, string> = {
@@ -30,8 +29,8 @@ export const SETTING_LABELS: Record<SettingKey, string> = {
   facebook_url: "Facebook URL",
   contact_email_primary: "Primary contact email",
   contact_email_secondary: "Secondary contact email",
-  discord_webhook_url: "Discord webhook URL (for custom order notifications)",
 };
+
 
 export type SettingsMap = Record<SettingKey, string>;
 
@@ -40,7 +39,7 @@ export function useSiteSettings() {
     queryKey: ["site_settings"],
     queryFn: async (): Promise<SettingsMap> => {
       const { data, error } = await supabase.from("site_settings").select("key,value");
-      if (error) throw error;
+      if (error) throw new Error(sanitizeError(error));
       const map = Object.fromEntries(SETTING_KEYS.map((k) => [k, ""])) as SettingsMap;
       for (const row of data || []) {
         if ((SETTING_KEYS as string[]).includes(row.key)) {
@@ -60,7 +59,7 @@ export function useUpdateSetting() {
       const { error } = await supabase
         .from("site_settings")
         .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
-      if (error) throw error;
+      if (error) throw new Error(sanitizeError(error));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["site_settings"] }),
   });

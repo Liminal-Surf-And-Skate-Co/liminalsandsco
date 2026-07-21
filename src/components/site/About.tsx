@@ -19,20 +19,20 @@ export function About() {
             About · The Workshop
           </p>
           <h2 className="font-display font-black text-5xl lg:text-7xl leading-[0.9] tracking-tighter mb-8">
-            ONE BENCH.<br />
+            ONE BENCH.
+            <br />
             <span className="text-stroke">TWO WORLDS.</span>
           </h2>
           <div className="space-y-5 text-silver/80 text-lg leading-relaxed max-w-xl">
             <p>
-              Liminal started where most days end — between the last set and
-              the first push down an empty street. We make boards for the
-              in-between people: surfers who skate, skaters who paddle out,
-              anyone who lives in the gap.
+              Liminal started where most days end — between the last set and the first push down an
+              empty street. We make boards for the in-between people: surfers who skate, skaters who
+              paddle out, anyone who lives in the gap.
             </p>
             <p>
-              Every deck and blank is shaped by hand on a single bench. No
-              CNC. No outsourced glassing. Just slow work, salvaged blanks,
-              and a "oh yeah, not bad" when it finally rolls right.
+              Every deck and blank is shaped by hand on a single bench. No CNC. No outsourced
+              glassing. Just slow work, salvaged blanks, and a "oh yeah, not bad" when it finally
+              rolls right.
             </p>
           </div>
           <dl className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-border/40 pt-8 max-w-xl">
@@ -44,7 +44,9 @@ export function About() {
             ].map(([k, v]) => (
               <div key={v}>
                 <dt className="font-display text-3xl text-primary">{k}</dt>
-                <dd className="font-mono text-[10px] uppercase tracking-widest text-silver/60 mt-1">{v}</dd>
+                <dd className="font-mono text-[10px] uppercase tracking-widest text-silver/60 mt-1">
+                  {v}
+                </dd>
               </div>
             ))}
           </dl>
@@ -63,9 +65,7 @@ function Stat({ k, v }: { k: string; v: string }) {
   return (
     <div className="border-t border-primary/40 pt-3">
       <div className="font-display text-3xl text-silver">{k}</div>
-      <div className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mt-1">
-        {v}
-      </div>
+      <div className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mt-1">{v}</div>
     </div>
   );
 }

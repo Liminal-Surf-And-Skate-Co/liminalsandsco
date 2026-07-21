@@ -11,11 +11,13 @@ export function Newsletter() {
           (03) Stay in the loop
         </p>
         <h2 className="font-display font-black text-5xl lg:text-7xl leading-none mb-6">
-          Weekly dispatches<br />from the workshop.
+          Weekly dispatches
+          <br />
+          from the workshop.
         </h2>
         <p className="text-silver/80 text-lg max-w-xl mx-auto mb-10">
-          New drops, build progress, surf reports, and the occasional misfit
-          deck sale. One email a week. No fluff.
+          New drops, build progress, surf reports, and the occasional misfit deck sale. One email a
+          week. No fluff.
         </p>
 
         {sent ? (
