@@ -13,7 +13,6 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as GraveyardRouteImport } from './routes/graveyard'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -52,11 +51,6 @@ const ShopRoute = ShopRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GraveyardRoute = GraveyardRouteImport.update({
-  id: '/graveyard',
-  path: '/graveyard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -165,7 +159,6 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
-  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -191,7 +184,6 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
-  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -218,7 +210,6 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
-  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -246,7 +237,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/community'
-    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
@@ -272,7 +262,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/community'
-    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
@@ -298,7 +287,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/community'
-    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
@@ -325,7 +313,6 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   CommunityRoute: typeof CommunityRoute
-  GraveyardRoute: typeof GraveyardRoute
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRouteWithChildren
   SupportRoute: typeof SupportRoute
@@ -364,13 +351,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/graveyard': {
-      id: '/graveyard'
-      path: '/graveyard'
-      fullPath: '/graveyard'
-      preLoaderRoute: typeof GraveyardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -564,7 +544,6 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   CommunityRoute: CommunityRoute,
-  GraveyardRoute: GraveyardRoute,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRouteWithChildren,
   SupportRoute: SupportRoute,
