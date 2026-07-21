@@ -41,46 +41,65 @@
 :root {
   --radius: 0.25rem;
 
-  /* Batch 1 — Branding tokens */
-  /* Light-variant workspace/store backgrounds */
-  --background: #F1F3F5; /* core pages */
-  --background-alt: #F3F0F7; /* alternative light surface */
+  /* Liminal brand: black, purple, silver */
+  --background: oklch(0.13 0.02 290);
+  --foreground: oklch(0.96 0.005 280);
 
-  /* Typography & structural colors */
-  --foreground: #1A1A1A; /* rich black for text */
-  --brand-purple: #4C1D95; /* deep royal purple for nav/containers */
+  --card: oklch(0.17 0.025 290);
+  --card-foreground: oklch(0.96 0.005 280);
 
-  /* Primary CTA (exclusive) */
-  --primary: #9B00FF; /* neon purple CTA */
-  --primary-foreground: #FFFFFF;
+  --popover: oklch(0.17 0.025 290);
+  --popover-foreground: oklch(0.96 0.005 280);
 
-  /* Metallic silver token */
-  --silver: #C0C4C8;
+  --primary: oklch(0.55 0.22 295);
+  --primary-foreground: oklch(0.98 0 0);
+  --purple-glow: oklch(0.65 0.25 295);
 
-  /* Derived tokens for compatibility */
-  --card: var(--background-alt);
-  --card-foreground: var(--foreground);
-  --popover: var(--card);
-  --popover-foreground: var(--card-foreground);
-  --secondary: var(--brand-purple);
-  --secondary-foreground: var(--foreground);
-  --muted: rgba(0,0,0,0.04);
-  --muted-foreground: rgba(26,26,26,0.6);
+  --secondary: oklch(0.22 0.03 290);
+  --secondary-foreground: oklch(0.96 0.005 280);
 
-  --border: rgba(26,26,26,0.06);
-  --input: rgba(0,0,0,0.04);
-  --ring: var(--primary);
+  --muted: oklch(0.2 0.02 290);
+  --muted-foreground: oklch(0.7 0.02 285);
 
-  /* Shadows & accents */
-  --gradient-hero: radial-gradient(ellipse at 20% 0%, rgba(155,0,255,0.12), transparent 55%), radial-gradient(ellipse at 90% 80%, rgba(76,29,149,0.08), transparent 60%), linear-gradient(180deg, var(--background), #eceff1);
-  --gradient-purple: linear-gradient(135deg, var(--primary), var(--brand-purple));
-  --shadow-glow: 0 0 60px -10px rgba(155,0,255,0.35);
-  --shadow-card: 0 20px 50px -20px rgba(0,0,0,0.08);
+  --accent: oklch(0.45 0.2 295);
+  --accent-foreground: oklch(0.98 0 0);
+
+  --silver: oklch(0.82 0.015 285);
+
+  --destructive: oklch(0.6 0.24 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.3 0.03 290 / 50%);
+  --input: oklch(0.25 0.025 290);
+  --ring: oklch(0.55 0.22 295);
+
+  --chart-1: oklch(0.55 0.22 295);
+  --chart-2: oklch(0.82 0.015 285);
+  --chart-3: oklch(0.65 0.25 295);
+  --chart-4: oklch(0.4 0.18 295);
+  --chart-5: oklch(0.3 0.1 295);
+
+  --sidebar: oklch(0.13 0.02 290);
+  --sidebar-foreground: oklch(0.96 0.005 280);
+  --sidebar-primary: oklch(0.55 0.22 295);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.22 0.03 290);
+  --sidebar-accent-foreground: oklch(0.96 0.005 280);
+  --sidebar-border: oklch(0.3 0.03 290 / 50%);
+  --sidebar-ring: oklch(0.55 0.22 295);
+
+  --gradient-hero:
+    radial-gradient(ellipse at 20% 0%, oklch(0.35 0.18 295 / 0.5), transparent 55%),
+    radial-gradient(ellipse at 90% 80%, oklch(0.4 0.2 290 / 0.35), transparent 60%),
+    linear-gradient(180deg, oklch(0.13 0.02 290), oklch(0.1 0.015 290));
+  --gradient-purple: linear-gradient(135deg, oklch(0.55 0.22 295), oklch(0.4 0.2 290));
+  --shadow-glow: 0 0 60px -10px oklch(0.55 0.22 295 / 0.6);
+  --shadow-card: 0 20px 50px -20px oklch(0.05 0.02 290 / 0.8);
 }
 
 .dark {
-  --background: #0f0f10;
-  --foreground: #f7f7f7;
+  --background: oklch(0.13 0.02 290);
+  --foreground: oklch(0.96 0.005 280);
 }
 
 @layer base {
@@ -147,7 +166,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
     opacity: 0.06;
     pointer-events: none;
     mix-blend-mode: overlay;

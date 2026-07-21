@@ -1,26 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
 import { ProductBadges } from "@/components/site/ProductBadges";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MOCK_PRODUCTS } from "@/lib/mock-products";
 
 export function Shop() {
-  return (
-    <ErrorBoundary>
-      <ShopInner />
-    </ErrorBoundary>
-  );
-}
-
-function ShopInner() {
-  const { data: all, isLoading, error } = useProducts();
-
-  // Fall back to mock catalog if the fetch failed entirely, so the storefront
-  // never renders as a dead empty section.
-  const source = error ? MOCK_PRODUCTS : (all ?? []);
-  const featured = source.filter((p) => p?.featured).slice(0, 4);
-  const list = featured.length > 0 ? featured : source.slice(0, 4);
+  const { data: all } = useProducts();
+  const products = (all ?? []).filter((p) => p.featured).slice(0, 4);
+  const fallback = (all ?? []).slice(0, 4);
+  const list = products.length > 0 ? products : fallback;
 
   return (
     <section id="shop" className="relative py-32 border-t border-border/40">
@@ -44,26 +30,13 @@ function ShopInner() {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="bg-card border border-border/60 overflow-hidden">
-                <Skeleton className="aspect-square w-full" />
-                <div className="p-5 space-y-2">
-                  <Skeleton className="h-3 w-16" />
-                  <Skeleton className="h-5 w-40" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : list.length === 0 ? (
+        {list.length === 0 ? (
           <p className="text-silver/60 font-mono text-xs">
             No products yet — add some in the admin.
           </p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {list?.map((p) => {
-              if (!p) return null;
+            {list.map((p) => {
               const onSale = p.sale_price !== null && p.sale_price < p.price;
               return (
                 <Link
