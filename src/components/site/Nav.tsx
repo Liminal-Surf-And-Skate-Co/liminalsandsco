@@ -97,11 +97,11 @@ export function Nav() {
             <BookOpen className="h-3 w-3" /> Academy
           </Link>
           <Link
-            to="/graveyard"
+            to="/design-studio"
             className="hover:text-primary transition-colors flex items-center gap-1"
             activeProps={{ className: "text-primary" }}
           >
-            <Skull className="h-3 w-3" /> Graveyard
+            <Skull className="h-3 w-3" /> Studio
           </Link>
           <Link
             to="/blog"
