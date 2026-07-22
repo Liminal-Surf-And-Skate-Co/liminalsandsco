@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -47,7 +46,19 @@ interface ChecklistPreset {
   items: { name: string; required: boolean }[];
 }
 
-const SKATE_TRICKS = [
+interface Skill {
+  name: string;
+  steps: string[];
+  tip: string;
+  difficulty?: string;
+}
+
+interface SkillCategory {
+  category: string;
+  skills: Skill[];
+}
+
+const SKATE_TRICKS: SkillCategory[] = [
   {
     category: "Beginner Basics",
     skills: [
@@ -155,7 +166,7 @@ const SKATE_TRICKS = [
   },
 ];
 
-const SURF_BASICS = [
+const SURF_BASICS: SkillCategory[] = [
   {
     category: "First Steps",
     skills: [
@@ -238,7 +249,7 @@ export function AcademyPage() {
         .select("*")
         .order("name", { ascending: true });
       if (error) throw new Error(sanitizeError(error));
-      return (data ?? []) as ChecklistPreset[];
+      return (data ?? []) as unknown as ChecklistPreset[];
     },
   });
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeError } from "@/lib/error-sanitize";
@@ -69,7 +68,7 @@ export function useUpsertEvent() {
         title: e.title,
         description: e.description ?? "",
         location: e.location ?? "",
-        start_at: e.start_at,
+        start_at: e.start_at || "",
         end_at: e.end_at || null,
         image_url: e.image_url || null,
         rsvp_url: e.rsvp_url || null,

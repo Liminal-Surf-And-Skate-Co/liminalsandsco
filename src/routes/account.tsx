@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2 } from "lucide-react";
@@ -72,7 +71,7 @@ function AccountPage() {
         {loading ? (
           <AccountSkeleton />
         ) : user ? (
-          <DashboardView user={user} isAdmin={isAdmin} onSignOut={handleSignOut} />
+          <DashboardView user={{ email: user.email ?? null, id: user.id }} isAdmin={isAdmin} onSignOut={handleSignOut} />
         ) : (
           <AuthView
             mode={mode}
@@ -191,12 +190,12 @@ function DashboardView({
 
       {/* Tab Content */}
       {activeTab === "overview" && (
-        <OverviewTab user={user} record={record} tierInfo={tierInfo} loading={loading} addPoints={addPoints} />
+        <OverviewTab user={user} record={record ?? null} tierInfo={tierInfo} loading={loading} addPoints={addPoints} />
       )}
       {activeTab === "rewards" && (
         <RewardsTab
           allRewards={allRewards}
-          record={record}
+          record={record ?? null}
           tierInfo={tierInfo}
           loading={loading}
           redeem={redeem}

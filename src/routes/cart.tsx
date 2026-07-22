@@ -1,11 +1,56 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ShoppingCart, X, Package, Gift } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/hooks/use-cart";
-import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/lib/products";
+import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS, type Product } from "@/lib/products";
+import { getCustomDesigns, type SavedDesign } from "@/lib/design-studio";
 
 const FREE_SHIPPING_THRESHOLD = 150; // AUD
+
+const SUBTYPE_TO_DEPARTMENT: Record<SavedDesign["subType"], Product["department"]> = {
+  skate: "skate",
+  surf: "surf",
+  tee: "clothing",
+  hoodie: "clothing",
+};
+
+const SUBTYPE_LABEL: Record<SavedDesign["subType"], string> = {
+  skate: "Custom Skate Deck",
+  surf: "Custom Surfboard",
+  tee: "Custom Tee",
+  hoodie: "Custom Hoodie",
+};
+
+/** Convert a saved design-studio design into a Product-shaped object the cart can render. */
+function designToProduct(d: SavedDesign): Product {
+  const dept = SUBTYPE_TO_DEPARTMENT[d.subType];
+  const title = d.text
+    ? `${SUBTYPE_LABEL[d.subType]} — "${d.text.slice(0, 24)}"`
+    : SUBTYPE_LABEL[d.subType];
+  return {
+    id: d.id,
+    slug: d.slug,
+    title,
+    department: dept,
+    product_type: "custom",
+    target_group: "unisex",
+    description: d.text || `Custom ${d.subType} from the Design Studio.`,
+    details: [],
+    price: d.price,
+    sale_price: null,
+    colour: null,
+    sizes: [],
+    stock_count: 99,
+    images: d.image ? [d.image] : [],
+    tags: ["custom"],
+    specs: d.specs,
+    featured: false,
+    created_at: d.createdAt,
+    updated_at: d.createdAt,
+  };
+}
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -20,7 +65,19 @@ export const Route = createFileRoute("/cart")({
 function CartPage() {
   const { items, setQty, remove, clear } = useCart();
   const { data: products = [], isLoading } = useProducts();
-  const bySlug = new Map(products.map((p) => [p.slug, p]));
+  const [designsVersion, setDesignsVersion] = useState(0);
+
+  useEffect(() => {
+    const handler = () => setDesignsVersion((v) => v + 1);
+    window.addEventListener("liminal:custom-designs-change", handler);
+    return () => window.removeEventListener("liminal:custom-designs-change", handler);
+  }, []);
+
+  const bySlug = new Map<string, Product>([
+    ...products.map((p) => [p.slug, p] as const),
+    ...getCustomDesigns().map((d) => [d.slug, designToProduct(d)] as const),
+  ]);
+  void designsVersion;
   const lines = items
     .map((i) => ({ item: i, product: bySlug.get(i.slug) }))
     .filter(
@@ -70,17 +127,30 @@ function CartPage() {
                 const price = effectivePrice(product);
                 return (
                   <li key={product.slug} className="flex gap-4 py-5 items-center">
-                    <Link
-                      to="/shop/$slug"
-                      params={{ slug: product.slug }}
-                      className="w-20 h-20 bg-background overflow-hidden shrink-0"
-                    >
-                      <img
-                        src={productImage(product)}
-                        alt={product.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </Link>
+                    {product.slug.startsWith("custom-") ? (
+                      <Link
+                        to="/design-studio"
+                        className="w-20 h-20 bg-background overflow-hidden shrink-0"
+                      >
+                        <img
+                          src={productImage(product)}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/shop/$slug"
+                        params={{ slug: product.slug }}
+                        className="w-20 h-20 bg-background overflow-hidden shrink-0"
+                      >
+                        <img
+                          src={productImage(product)}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </Link>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
                         {DEPARTMENT_LABELS[product.department]}

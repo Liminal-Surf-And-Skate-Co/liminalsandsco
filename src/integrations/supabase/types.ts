@@ -253,6 +253,314 @@ export type Database = {
         }
         Relationships: []
       }
+      academy_checklist_presets: {
+        Row: {
+          id: string
+          name: string
+          activity_type: string
+          items: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          activity_type?: string
+          items?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          activity_type?: string
+          items?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      board_graveyard: {
+        Row: {
+          id: string
+          user_id: string
+          board_type: string
+          image_url: string | null
+          trick_attempted: string
+          spot_tagged: string
+          memory_date: string | null
+          description: string
+          board_name: string | null
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          board_type?: string
+          image_url?: string | null
+          trick_attempted?: string
+          spot_tagged?: string
+          memory_date?: string | null
+          description?: string
+          board_name?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          board_type?: string
+          image_url?: string | null
+          trick_attempted?: string
+          spot_tagged?: string
+          memory_date?: string | null
+          description?: string
+          board_name?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          shipping_address: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          shipping_address?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          shipping_address?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_points: {
+        Row: {
+          id: string
+          user_id: string
+          points: number
+          tier: string
+          total_earned: number
+          total_redeemed: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          points?: number
+          tier?: string
+          total_earned?: number
+          total_redeemed?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          points?: number
+          tier?: string
+          total_earned?: number
+          total_redeemed?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: string | null
+          product_slug: string
+          product_title: string
+          variant: string | null
+          quantity: number
+          unit_price: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id?: string | null
+          product_slug: string
+          product_title: string
+          variant?: string | null
+          quantity?: number
+          unit_price: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_slug?: string
+          product_title?: string
+          variant?: string | null
+          quantity?: number
+          unit_price?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          id: string
+          customer_id: string | null
+          total_amount: number
+          status: string | null
+          created_at: string
+          fulfillment_source: string | null
+          tracking_link: string | null
+          invoice_pdf_url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          customer_id?: string | null
+          total_amount: number
+          status?: string | null
+          created_at?: string
+          fulfillment_source?: string | null
+          tracking_link?: string | null
+          invoice_pdf_url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          customer_id?: string | null
+          total_amount?: number
+          status?: string | null
+          created_at?: string
+          fulfillment_source?: string | null
+          tracking_link?: string | null
+          invoice_pdf_url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      rewards: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          points_required: number
+          tier_unlocked: string
+          available: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string
+          points_required: number
+          tier_unlocked?: string
+          available?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          points_required?: number
+          tier_unlocked?: string
+          available?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      spot_pins: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          notes: string
+          kind: string
+          lat: number
+          lng: number
+          photo_url: string | null
+          tide_tips: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+          title: string
+          notes?: string
+          kind?: string
+          lat?: number
+          lng?: number
+          photo_url?: string | null
+          tide_tips?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          notes?: string
+          kind?: string
+          lat?: number
+          lng?: number
+          photo_url?: string | null
+          tide_tips?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      video_clips: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          category: string
+          video_url: string
+          votes: number
+          approved: boolean
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+          title: string
+          category?: string
+          video_url: string
+          votes?: number
+          approved?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          category?: string
+          video_url?: string
+          votes?: number
+          approved?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
