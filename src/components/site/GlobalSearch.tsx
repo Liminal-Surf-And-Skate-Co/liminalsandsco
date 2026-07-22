@@ -31,11 +31,12 @@ function safeHtml(html: string) {
   return { __html: html };
 }
 
-type Props = { compact?: boolean };
+type Props = { compact?: boolean; collapsible?: boolean };
 
-export function GlobalSearch({ compact = false }: Props) {
+export function GlobalSearch({ compact = false, collapsible = false }: Props) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(!collapsible);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,19 +53,35 @@ export function GlobalSearch({ compact = false }: Props) {
     return items;
   }, [res]);
 
+  const openSearch = useCallback(() => {
+    setExpanded(true);
+    setOpen(true);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setOpen(false);
+    if (collapsible) {
+      setExpanded(false);
+      setQ("");
+    }
+    inputRef.current?.blur();
+  }, [collapsible]);
+
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        if (collapsible && !q) setExpanded(false);
+      }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setOpen(false);
-        inputRef.current?.blur();
+        closeSearch();
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        inputRef.current?.focus();
-        setOpen(true);
+        openSearch();
       }
     };
     document.addEventListener("mousedown", onClick);
@@ -73,7 +90,8 @@ export function GlobalSearch({ compact = false }: Props) {
       document.removeEventListener("mousedown", onClick);
       document.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [collapsible, q, openSearch, closeSearch]);
+
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!open || !q.trim()) return;
