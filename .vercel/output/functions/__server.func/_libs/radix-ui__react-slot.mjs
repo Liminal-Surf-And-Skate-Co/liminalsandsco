@@ -1,10 +1,21 @@
 import { r as reactExports, j as jsxRuntimeExports, b as React } from "./react.mjs";
 import { c as composeRefs } from "./radix-ui__react-compose-refs.mjs";
+var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+var use = React[" use ".trim().toString()];
+function isPromiseLike(value) {
+  return typeof value === "object" && value !== null && "then" in value;
+}
+function isLazyComponent(element) {
+  return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
+}
 // @__NO_SIDE_EFFECTS__
 function createSlot$2(ownerName) {
   const SlotClone = /* @__PURE__ */ createSlotClone$2(ownerName);
   const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
+    let { children, ...slotProps } = props;
+    if (isLazyComponent(children) && typeof use === "function") {
+      children = use(children._payload);
+    }
     const childrenArray = reactExports.Children.toArray(children);
     const slottable = childrenArray.find(isSlottable$2);
     if (slottable) {
@@ -24,10 +35,14 @@ function createSlot$2(ownerName) {
   Slot2.displayName = `${ownerName}.Slot`;
   return Slot2;
 }
+var Slot = /* @__PURE__ */ createSlot$2("Slot");
 // @__NO_SIDE_EFFECTS__
 function createSlotClone$2(ownerName) {
   const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
+    let { children, ...slotProps } = props;
+    if (isLazyComponent(children) && typeof use === "function") {
+      children = use(children._payload);
+    }
     if (reactExports.isValidElement(children)) {
       const childrenRef = getElementRef$2(children);
       const props2 = mergeProps$2(slotProps, children.props);
@@ -164,22 +179,11 @@ function getElementRef$1(element) {
   }
   return element.props.ref || element.ref;
 }
-var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
-var use = React[" use ".trim().toString()];
-function isPromiseLike(value) {
-  return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-  return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
 // @__NO_SIDE_EFFECTS__
 function createSlot(ownerName) {
   const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
   const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
-    let { children, ...slotProps } = props;
-    if (isLazyComponent(children) && typeof use === "function") {
-      children = use(children._payload);
-    }
+    const { children, ...slotProps } = props;
     const childrenArray = reactExports.Children.toArray(children);
     const slottable = childrenArray.find(isSlottable);
     if (slottable) {
@@ -199,14 +203,10 @@ function createSlot(ownerName) {
   Slot2.displayName = `${ownerName}.Slot`;
   return Slot2;
 }
-var Slot = /* @__PURE__ */ createSlot("Slot");
 // @__NO_SIDE_EFFECTS__
 function createSlotClone(ownerName) {
   const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
-    let { children, ...slotProps } = props;
-    if (isLazyComponent(children) && typeof use === "function") {
-      children = use(children._payload);
-    }
+    const { children, ...slotProps } = props;
     if (reactExports.isValidElement(children)) {
       const childrenRef = getElementRef(children);
       const props2 = mergeProps(slotProps, children.props);
@@ -263,7 +263,7 @@ function getElementRef(element) {
 }
 export {
   Slot as S,
-  createSlot as a,
-  createSlot$1 as b,
+  createSlot$1 as a,
+  createSlot as b,
   createSlot$2 as c
 };

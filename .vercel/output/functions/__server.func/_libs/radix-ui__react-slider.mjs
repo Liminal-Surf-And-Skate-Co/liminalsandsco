@@ -7,7 +7,7 @@ import { u as useControllableState } from "./@radix-ui/react-use-controllable-st
 import { u as useDirection } from "./radix-ui__react-direction.mjs";
 import { u as usePrevious } from "./radix-ui__react-use-previous.mjs";
 import { u as useSize } from "./radix-ui__react-use-size.mjs";
-import { P as Primitive } from "./radix-ui__react-primitive.mjs";
+import { a as Primitive } from "./radix-ui__react-primitive.mjs";
 import { c as createCollection } from "./radix-ui__react-collection.mjs";
 var PAGE_KEYS = ["PageUp", "PageDown"];
 var ARROW_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];

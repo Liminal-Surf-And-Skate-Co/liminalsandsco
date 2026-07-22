@@ -65,7 +65,7 @@ export function useUpsertEvent() {
   return useMutation({
     mutationFn: async (e: Partial<CommunityEvent> & { id?: string }) => {
       const payload = {
-        title: e.title,
+        title: e.title ?? "",
         description: e.description ?? "",
         location: e.location ?? "",
         start_at: e.start_at || "",
