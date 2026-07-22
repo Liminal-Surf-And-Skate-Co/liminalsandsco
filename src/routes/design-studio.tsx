@@ -1,0 +1,1066 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Undo2,
+  Redo2,
+  Type as TypeIcon,
+  Image as ImageIcon,
+  Layers,
+  Sparkles,
+  Trash2,
+  Lock,
+  Unlock,
+  ArrowUp,
+  ArrowDown,
+  Crosshair,
+  Maximize2,
+  RotateCw,
+  Download,
+  Link2,
+  Save,
+  Upload,
+  Palette,
+} from "lucide-react";
+import { Nav } from "@/components/site/Nav";
+import { Footer } from "@/components/site/Footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+export const Route = createFileRoute("/design-studio")({
+  head: () => ({
+    meta: [
+      { title: "Design Studio — Liminal Surf & Skate Co" },
+      {
+        name: "description",
+        content:
+          "Customize skateboards, surfboards and apparel. Add graphics, pick specs and materials, save to your Garage.",
+      },
+      { property: "og:title", content: "Design Studio — Liminal" },
+      { property: "og:description", content: "Craft one-off boards and apparel in the browser." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: DesignStudioPage,
+});
+
+// ---------- Types ----------
+type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";
+type FaceKey = string;
+type LayerKind = "text" | "image" | "sticker";
+interface Layer {
+  id: string;
+  kind: LayerKind;
+  face: FaceKey;
+  x: number; // 0-100 %
+  y: number; // 0-100 %
+  scale: number;
+  rotation: number;
+  locked?: boolean;
+  // text
+  text?: string;
+  font?: string;
+  color?: string;
+  bold?: boolean;
+  italic?: boolean;
+  // image / sticker
+  src?: string;
+}
+interface DesignState {
+  product: ProductKey;
+  face: FaceKey;
+  bg: string;
+  ink: string;
+  texture: string;
+  concave?: "mellow" | "medium" | "steep";
+  hardness?: "78a" | "99a" | "101a";
+  bolts?: string;
+  tail?: "squash" | "swallow" | "pin";
+  fins?: "single" | "twin" | "thruster" | "quad";
+  layers: Layer[];
+}
+
+// ---------- Constants ----------
+const PRODUCTS: Record<
+  ProductKey,
+  { label: string; family: "hardware" | "apparel"; faces: FaceKey[]; basePrice: number; ratio: number }
+> = {
+  skateboard: { label: "Skateboard", family: "hardware", faces: ["top", "bottom"], basePrice: 120, ratio: 0.28 },
+  surfboard: { label: "Surfboard", family: "hardware", faces: ["top", "bottom"], basePrice: 780, ratio: 0.22 },
+  tshirt: { label: "T-Shirt", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 55, ratio: 0.85 },
+  hoodie: { label: "Hoodie", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 110, ratio: 0.9 },
+  cap: { label: "Cap", family: "apparel", faces: ["front", "back"], basePrice: 40, ratio: 0.75 },
+};
+
+const BRAND_COLORS = ["#0b0b0f", "#f4f1ea", "#ff5b1f", "#1f6feb", "#3ea770", "#e2b23a", "#d43f5b"];
+const FONTS = ["Inter, sans-serif", "Georgia, serif", "'Courier New', monospace", "Impact, sans-serif"];
+const TEXTURES = [
+  { key: "none", label: "None" },
+  { key: "grip", label: "Grip Tape" },
+  { key: "wood", label: "Stained Wood" },
+  { key: "gloss", label: "High-Gloss Fiberglass" },
+  { key: "cotton", label: "Heavy Cotton" },
+];
+
+const STICKERS: { id: string; label: string; svg: string }[] = [
+  {
+    id: "wave",
+    label: "Surf Wave",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'><path d='M2 40 Q 20 10 40 30 T 78 28 T 98 20' stroke='currentColor' stroke-width='4' fill='none' stroke-linecap='round'/><path d='M2 50 Q 25 30 50 42 T 98 38' stroke='currentColor' stroke-width='3' fill='none' stroke-linecap='round' opacity='.6'/></svg>`,
+  },
+  {
+    id: "chrome",
+    label: "Y2K Chrome Star",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#e8f0ff'/><stop offset='.5' stop-color='#8899bb'/><stop offset='1' stop-color='#22293a'/></linearGradient></defs><polygon points='50,4 61,38 96,38 68,58 78,92 50,72 22,92 32,58 4,38 39,38' fill='url(#g)' stroke='#0b0b0f' stroke-width='2'/></svg>`,
+  },
+  {
+    id: "flame",
+    label: "Flame",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 6 C 62 30 84 34 78 60 C 74 82 58 92 50 94 C 42 92 26 82 22 60 C 16 34 38 30 50 6 Z' fill='currentColor'/><path d='M50 30 C 56 44 68 46 64 62 C 62 76 54 84 50 86 C 46 84 38 76 36 62 C 32 46 44 44 50 30 Z' fill='#fff' opacity='.35'/></svg>`,
+  },
+  {
+    id: "stencil",
+    label: "Spray Stencil",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='currentColor'><rect x='4' y='24' width='14' height='14'/><rect x='22' y='16' width='14' height='30'/><rect x='40' y='24' width='14' height='14'/><rect x='58' y='8' width='14' height='46'/><rect x='76' y='16' width='14' height='30'/><rect x='94' y='24' width='14' height='14'/></g></svg>`,
+  },
+  {
+    id: "sun",
+    label: "Retro Sun",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='24' fill='currentColor'/><g stroke='currentColor' stroke-width='4' stroke-linecap='round'><line x1='50' y1='6' x2='50' y2='18'/><line x1='50' y1='82' x2='50' y2='94'/><line x1='6' y1='50' x2='18' y2='50'/><line x1='82' y1='50' x2='94' y2='50'/><line x1='18' y1='18' x2='27' y2='27'/><line x1='73' y1='73' x2='82' y2='82'/><line x1='82' y1='18' x2='73' y2='27'/><line x1='27' y1='73' x2='18' y2='82'/></g></svg>`,
+  },
+  {
+    id: "bolt",
+    label: "Bolt",
+    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 100'><polygon points='34,2 4,54 26,54 20,98 56,40 32,40 40,2' fill='currentColor'/></svg>`,
+  },
+];
+
+// ---------- Templates ----------
+const TEMPLATES: {
+  id: string;
+  label: string;
+  blurb: string;
+  build: (product: ProductKey) => Partial<DesignState>;
+}[] = [
+  {
+    id: "cyber-y2k",
+    label: "Cyber Y2K",
+    blurb: "Chrome stars, magenta hue, bold sans.",
+    build: (product) => ({
+      bg: "#0b0b18",
+      ink: "#ff3fa4",
+      texture: "gloss",
+      layers: [
+        stickerLayer("chrome", "top-face", 30, 30, 1.4),
+        stickerLayer("chrome", "top-face", 72, 66, 0.9),
+        textLayer("CYBER//WAVE", "top-face", 50, 78, "Impact, sans-serif", "#e8f0ff", 1.4, true),
+      ].map((l) => ({ ...l, face: primaryFace(product) })),
+    }),
+  },
+  {
+    id: "surf-70s",
+    label: "70s Surf Wave",
+    blurb: "Sun-bleached palette and rolling waves.",
+    build: (product) => ({
+      bg: "#f2c46a",
+      ink: "#7a2f14",
+      texture: "wood",
+      layers: [
+        stickerLayer("sun", "x", 50, 32, 1.2),
+        stickerLayer("wave", "x", 50, 62, 1.6),
+        textLayer("ENDLESS SUMMER", "x", 50, 84, "Georgia, serif", "#7a2f14", 1.1, false, true),
+      ].map((l) => ({ ...l, face: primaryFace(product) })),
+    }),
+  },
+  {
+    id: "min-street",
+    label: "Minimalist Street",
+    blurb: "One word. One line. Zero noise.",
+    build: (product) => ({
+      bg: "#f4f1ea",
+      ink: "#0b0b0f",
+      texture: "none",
+      layers: [
+        textLayer("LIMINAL", "x", 50, 48, "Inter, sans-serif", "#0b0b0f", 1.8, true),
+        textLayer("— est. present tense —", "x", 50, 58, "Inter, sans-serif", "#0b0b0f", 0.7),
+      ].map((l) => ({ ...l, face: primaryFace(product) })),
+    }),
+  },
+];
+
+function primaryFace(product: ProductKey): FaceKey {
+  return PRODUCTS[product].faces[0];
+}
+function textLayer(
+  text: string,
+  face: FaceKey,
+  x: number,
+  y: number,
+  font: string,
+  color: string,
+  scale = 1,
+  bold = false,
+  italic = false,
+): Layer {
+  return {
+    id: cryptoId(),
+    kind: "text",
+    face,
+    x,
+    y,
+    scale,
+    rotation: 0,
+    text,
+    font,
+    color,
+    bold,
+    italic,
+  };
+}
+function stickerLayer(id: string, face: FaceKey, x: number, y: number, scale = 1): Layer {
+  return { id: cryptoId(), kind: "sticker", face, x, y, scale, rotation: 0, src: id };
+}
+function cryptoId() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+// ---------- Component ----------
+function DesignStudioPage() {
+  const [product, setProduct] = useState<ProductKey>("skateboard");
+  const [state, setState] = useState<DesignState>(() => initialState("skateboard"));
+  const [history, setHistory] = useState<DesignState[]>([]);
+  const [future, setFuture] = useState<DesignState[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [snapLines, setSnapLines] = useState<{ x?: boolean; y?: boolean }>({});
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ id: string; ox: number; oy: number } | null>(null);
+
+  const meta = PRODUCTS[product];
+  const activeFace = state.face;
+
+  // pushHistory before mutating
+  const commit = useCallback(
+    (updater: (s: DesignState) => DesignState) => {
+      setState((prev) => {
+        setHistory((h) => [...h.slice(-49), prev]);
+        setFuture([]);
+        return updater(prev);
+      });
+    },
+    [],
+  );
+  const undo = () => {
+    setHistory((h) => {
+      if (!h.length) return h;
+      const prev = h[h.length - 1];
+      setFuture((f) => [state, ...f].slice(0, 50));
+      setState(prev);
+      return h.slice(0, -1);
+    });
+  };
+  const redo = () => {
+    setFuture((f) => {
+      if (!f.length) return f;
+      const next = f[0];
+      setHistory((h) => [...h, state].slice(-50));
+      setState(next);
+      return f.slice(1);
+    });
+  };
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if (mod && (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, history, future]);
+
+  // Switch product
+  const switchProduct = (p: ProductKey) => {
+    if (p === product) return;
+    setProduct(p);
+    commit(() => initialState(p));
+    setSelectedId(null);
+  };
+
+  const setFace = (f: FaceKey) => commit((s) => ({ ...s, face: f }));
+
+  // Layer helpers
+  const facedLayers = state.layers.filter((l) => l.face === activeFace);
+  const selected = state.layers.find((l) => l.id === selectedId) || null;
+  const patchLayer = (id: string, patch: Partial<Layer>) =>
+    commit((s) => ({ ...s, layers: s.layers.map((l) => (l.id === id ? { ...l, ...patch } : l)) }));
+  const deleteLayer = (id: string) =>
+    commit((s) => ({ ...s, layers: s.layers.filter((l) => l.id !== id) }));
+  const addLayer = (l: Layer) => commit((s) => ({ ...s, layers: [...s.layers, l] }));
+  const reorderLayer = (id: string, dir: 1 | -1) =>
+    commit((s) => {
+      const idx = s.layers.findIndex((l) => l.id === id);
+      if (idx < 0) return s;
+      const target = idx + dir;
+      if (target < 0 || target >= s.layers.length) return s;
+      const next = s.layers.slice();
+      const [item] = next.splice(idx, 1);
+      next.splice(target, 0, item);
+      return { ...s, layers: next };
+    });
+
+  // Drag
+  const onPointerDown = (e: React.PointerEvent, id: string) => {
+    const l = state.layers.find((x) => x.id === id);
+    if (!l || l.locked) return;
+    setSelectedId(id);
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const px = (l.x / 100) * rect.width;
+    const py = (l.y / 100) * rect.height;
+    dragRef.current = { id, ox: e.clientX - (rect.left + px), oy: e.clientY - (rect.top + py) };
+    (e.target as Element).setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!d || !rect) return;
+    let x = ((e.clientX - rect.left - d.ox) / rect.width) * 100;
+    let y = ((e.clientY - rect.top - d.oy) / rect.height) * 100;
+    x = Math.max(0, Math.min(100, x));
+    y = Math.max(0, Math.min(100, y));
+    // magnetic snap to centerlines (50% ± 2%)
+    const snapX = Math.abs(x - 50) < 2.5;
+    const snapY = Math.abs(y - 50) < 2.5;
+    if (snapX) x = 50;
+    if (snapY) y = 50;
+    setSnapLines({ x: snapX, y: snapY });
+    patchLayer(d.id, { x, y });
+  };
+  const onPointerUp = () => {
+    dragRef.current = null;
+    setSnapLines({});
+  };
+
+  // File drop
+  const onDropFile = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach((f) => {
+      if (!/^image\/(png|svg\+xml|jpe?g|webp)$/.test(f.type)) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const src = String(reader.result);
+        addLayer({
+          id: cryptoId(),
+          kind: "image",
+          face: activeFace,
+          x: 50,
+          y: 50,
+          scale: 1,
+          rotation: 0,
+          src,
+        });
+      };
+      reader.readAsDataURL(f);
+    });
+  };
+
+  // Positioning
+  const centerX = () => selected && patchLayer(selected.id, { x: 50 });
+  const centerY = () => selected && patchLayer(selected.id, { y: 50 });
+  const fitCanvas = () => selected && patchLayer(selected.id, { scale: 2, x: 50, y: 50 });
+  const rot90 = () => selected && patchLayer(selected.id, { rotation: (selected.rotation + 90) % 360 });
+
+  // Templates
+  const applyTemplate = (id: string) => {
+    const t = TEMPLATES.find((x) => x.id === id);
+    if (!t) return;
+    const patch = t.build(product);
+    const layers = (patch.layers ?? []).map((l) => ({ ...l, face: primaryFace(product) }));
+    commit((s) => ({ ...s, ...patch, layers: [...layers], face: primaryFace(product) }));
+    toast.success(`${t.label} template loaded`);
+  };
+
+  // Price
+  const price = useMemo(() => {
+    let p = meta.basePrice;
+    const uploads = state.layers.filter((l) => l.kind === "image").length;
+    p += uploads * 8;
+    const stickers = state.layers.filter((l) => l.kind === "sticker").length;
+    p += stickers * 3;
+    if (state.texture === "gloss") p += 25;
+    if (state.texture === "grip") p += 12;
+    if (state.texture === "wood") p += 18;
+    if (state.texture === "cotton") p += 10;
+    if (state.concave === "steep") p += 15;
+    else if (state.concave === "medium") p += 8;
+    if (state.hardness === "101a") p += 12;
+    else if (state.hardness === "99a") p += 8;
+    if (state.tail === "swallow" || state.tail === "pin") p += 20;
+    if (state.fins === "quad" || state.fins === "thruster") p += 25;
+    return p;
+  }, [state, meta.basePrice]);
+
+  // Save / export / share
+  const saveToGarage = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) {
+      toast.error("Sign in to save to your Garage");
+      return;
+    }
+    try {
+      // Best-effort save; table may not exist yet.
+      const { error } = await supabase.from("saved_designs" as any).insert({
+        user_id: data.user.id,
+        product,
+        design: state as any,
+        price,
+      });
+      if (error) throw error;
+      toast.success("Saved to your Garage");
+    } catch {
+      const key = `liminal:garage:${data.user.id}`;
+      const cur = JSON.parse(localStorage.getItem(key) || "[]");
+      cur.unshift({ id: cryptoId(), product, state, price, at: Date.now() });
+      localStorage.setItem(key, JSON.stringify(cur.slice(0, 50)));
+      toast.success("Saved locally to your Garage");
+    }
+  };
+  const exportPNG = async () => {
+    const node = canvasRef.current;
+    if (!node) return;
+    // Rasterize via foreignObject + SVG
+    const rect = node.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    const clone = node.cloneNode(true) as HTMLElement;
+    clone.style.margin = "0";
+    const xml = new XMLSerializer().serializeToString(clone);
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'><foreignObject width='100%' height='100%'>${xml.replace(
+      /^<div /,
+      "<div xmlns='http://www.w3.org/1999/xhtml' ",
+    )}</foreignObject></svg>`;
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext("2d")!;
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0);
+      c.toBlob((b) => {
+        if (!b) return;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = `liminal-${product}-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      toast.error("Export failed — try again");
+    };
+    img.src = url;
+  };
+  const copyShareLink = async () => {
+    try {
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify({ product, state }))));
+      const url = `${window.location.origin}/design-studio?d=${encoded}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Shareable link copied");
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+
+  // Load from ?d= on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const d = params.get("d");
+    if (!d) return;
+    try {
+      const parsed = JSON.parse(decodeURIComponent(escape(atob(d))));
+      if (parsed?.product && parsed?.state) {
+        setProduct(parsed.product);
+        setState(parsed.state);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Nav />
+      <main className="mx-auto max-w-7xl px-4 py-10">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Studio</p>
+            <h1 className="text-3xl font-semibold md:text-4xl">Design Studio</h1>
+            <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+              Load a template, drop your own graphics, dial in the specs — then save it to your Garage.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={undo} disabled={!history.length}>
+              <Undo2 className="mr-1 h-4 w-4" /> Undo
+            </Button>
+            <Button variant="outline" size="sm" onClick={redo} disabled={!future.length}>
+              <Redo2 className="mr-1 h-4 w-4" /> Redo
+            </Button>
+          </div>
+        </header>
+
+        {/* Product picker */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          {(Object.keys(PRODUCTS) as ProductKey[]).map((k) => (
+            <button
+              key={k}
+              onClick={() => switchProduct(k)}
+              className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                product === k
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border hover:border-foreground"
+              }`}
+            >
+              {PRODUCTS[k].label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)_300px]">
+          {/* LEFT: Tabs */}
+          <aside className="rounded-lg border border-border bg-card p-3">
+            <Tabs defaultValue="templates">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="templates" title="Templates">
+                  <Sparkles className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="text" title="Text">
+                  <TypeIcon className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="graphics" title="Graphics">
+                  <ImageIcon className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="specs" title="Specs">
+                  <Palette className="h-4 w-4" />
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="templates" className="mt-3 space-y-2">
+                {TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => applyTemplate(t.id)}
+                    className="w-full rounded-md border border-border p-3 text-left transition hover:border-foreground"
+                  >
+                    <div className="text-sm font-medium">{t.label}</div>
+                    <div className="text-xs text-muted-foreground">{t.blurb}</div>
+                  </button>
+                ))}
+              </TabsContent>
+
+              <TabsContent value="text" className="mt-3 space-y-3">
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={() =>
+                    addLayer(
+                      textLayer("YOUR TEXT", activeFace, 50, 50, FONTS[0], state.ink, 1),
+                    )
+                  }
+                >
+                  <TypeIcon className="mr-1 h-4 w-4" /> Add text
+                </Button>
+                {selected?.kind === "text" && (
+                  <div className="space-y-2">
+                    <Input
+                      value={selected.text || ""}
+                      onChange={(e) => patchLayer(selected.id, { text: e.target.value })}
+                    />
+                    <select
+                      className="w-full rounded-md border border-border bg-background p-2 text-sm"
+                      value={selected.font}
+                      onChange={(e) => patchLayer(selected.id, { font: e.target.value })}
+                    >
+                      {FONTS.map((f) => (
+                        <option key={f} value={f} style={{ fontFamily: f }}>
+                          {f.split(",")[0]}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={selected.bold ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => patchLayer(selected.id, { bold: !selected.bold })}
+                      >
+                        B
+                      </Button>
+                      <Button
+                        variant={selected.italic ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => patchLayer(selected.id, { italic: !selected.italic })}
+                      >
+                        <span className="italic">I</span>
+                      </Button>
+                      <Input
+                        type="color"
+                        className="h-9 w-14 p-1"
+                        value={selected.color || "#000"}
+                        onChange={(e) => patchLayer(selected.id, { color: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="graphics" className="mt-3 space-y-3">
+                <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground hover:border-foreground">
+                  <Upload className="mb-1 h-4 w-4" />
+                  Drop PNG/SVG or click
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                    multiple
+                    onChange={(e) => onDropFile(e.target.files)}
+                  />
+                </label>
+                <div>
+                  <div className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">
+                    Sticker library
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {STICKERS.map((s) => (
+                      <button
+                        key={s.id}
+                        title={s.label}
+                        onClick={() => addLayer(stickerLayer(s.id, activeFace, 50, 50, 1))}
+                        className="aspect-square rounded-md border border-border p-2 transition hover:border-foreground"
+                        style={{ color: state.ink }}
+                        dangerouslySetInnerHTML={{ __html: s.svg }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="specs" className="mt-3 space-y-4">
+                <ColorRow label="Background" value={state.bg} onChange={(bg) => commit((s) => ({ ...s, bg }))} />
+                <ColorRow label="Ink" value={state.ink} onChange={(ink) => commit((s) => ({ ...s, ink }))} />
+                <Field label="Texture">
+                  <select
+                    className="w-full rounded-md border border-border bg-background p-2 text-sm"
+                    value={state.texture}
+                    onChange={(e) => commit((s) => ({ ...s, texture: e.target.value }))}
+                  >
+                    {TEXTURES.map((t) => (
+                      <option key={t.key} value={t.key}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+
+                {product === "skateboard" && (
+                  <>
+                    <Field label="Concave">
+                      <Segmented
+                        options={["mellow", "medium", "steep"]}
+                        value={state.concave || "medium"}
+                        onChange={(v) => commit((s) => ({ ...s, concave: v as any }))}
+                      />
+                    </Field>
+                    <Field label="Wheel hardness">
+                      <Segmented
+                        options={["78a", "99a", "101a"]}
+                        value={state.hardness || "99a"}
+                        onChange={(v) => commit((s) => ({ ...s, hardness: v as any }))}
+                      />
+                    </Field>
+                    <Field label="Mounting bolts">
+                      <div className="flex flex-wrap gap-2">
+                        {BRAND_COLORS.map((c) => (
+                          <button
+                            key={c}
+                            onClick={() => commit((s) => ({ ...s, bolts: c }))}
+                            className={`h-7 w-7 rounded-full border-2 ${
+                              state.bolts === c ? "border-foreground" : "border-transparent"
+                            }`}
+                            style={{ background: c }}
+                            aria-label={`Bolt ${c}`}
+                          />
+                        ))}
+                      </div>
+                    </Field>
+                  </>
+                )}
+                {product === "surfboard" && (
+                  <>
+                    <Field label="Tail shape">
+                      <Segmented
+                        options={["squash", "swallow", "pin"]}
+                        value={state.tail || "squash"}
+                        onChange={(v) => commit((s) => ({ ...s, tail: v as any }))}
+                      />
+                    </Field>
+                    <Field label="Fin setup">
+                      <Segmented
+                        options={["single", "twin", "thruster", "quad"]}
+                        value={state.fins || "thruster"}
+                        onChange={(v) => commit((s) => ({ ...s, fins: v as any }))}
+                      />
+                    </Field>
+                  </>
+                )}
+              </TabsContent>
+            </Tabs>
+          </aside>
+
+          {/* CENTER: Canvas */}
+          <section>
+            {/* Face tabs */}
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-2">
+                {meta.faces.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFace(f)}
+                    className={`rounded-full border px-3 py-1 text-xs uppercase tracking-wider ${
+                      activeFace === f
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                <Button variant="outline" size="sm" onClick={centerX} disabled={!selected}>
+                  <Crosshair className="mr-1 h-3.5 w-3.5" /> Center X
+                </Button>
+                <Button variant="outline" size="sm" onClick={centerY} disabled={!selected}>
+                  <Crosshair className="mr-1 h-3.5 w-3.5 rotate-90" /> Center Y
+                </Button>
+                <Button variant="outline" size="sm" onClick={fitCanvas} disabled={!selected}>
+                  <Maximize2 className="mr-1 h-3.5 w-3.5" /> Fit
+                </Button>
+                <Button variant="outline" size="sm" onClick={rot90} disabled={!selected}>
+                  <RotateCw className="mr-1 h-3.5 w-3.5" /> 90°
+                </Button>
+              </div>
+            </div>
+
+            <div
+              className="relative mx-auto flex items-center justify-center rounded-lg border border-border bg-muted/30 p-4"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                onDropFile(e.dataTransfer.files);
+              }}
+            >
+              <div
+                ref={canvasRef}
+                className="relative overflow-hidden shadow-lg"
+                style={{
+                  width: "min(560px, 100%)",
+                  aspectRatio: `${meta.ratio}`,
+                  background: textureBackground(state.bg, state.texture),
+                  borderRadius: shapeRadius(product),
+                  clipPath: shapeClip(product, state),
+                }}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerLeave={onPointerUp}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setSelectedId(null);
+                }}
+              >
+                {/* Snap guides */}
+                {snapLines.x && (
+                  <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-primary/70" />
+                )}
+                {snapLines.y && (
+                  <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-primary/70" />
+                )}
+
+                {facedLayers.map((l) => (
+                  <div
+                    key={l.id}
+                    onPointerDown={(e) => onPointerDown(e, l.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedId(l.id);
+                    }}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 select-none ${
+                      selectedId === l.id ? "outline outline-2 outline-primary" : ""
+                    } ${l.locked ? "cursor-not-allowed" : "cursor-grab active:cursor-grabbing"}`}
+                    style={{
+                      left: `${l.x}%`,
+                      top: `${l.y}%`,
+                      transform: `translate(-50%,-50%) rotate(${l.rotation}deg) scale(${l.scale})`,
+                    }}
+                  >
+                    {l.kind === "text" && (
+                      <div
+                        style={{
+                          fontFamily: l.font,
+                          color: l.color,
+                          fontWeight: l.bold ? 700 : 400,
+                          fontStyle: l.italic ? "italic" : "normal",
+                          fontSize: 24,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {l.text}
+                      </div>
+                    )}
+                    {l.kind === "image" && l.src && (
+                      <img
+                        src={l.src}
+                        alt=""
+                        draggable={false}
+                        style={{ width: 140, height: "auto", pointerEvents: "none" }}
+                      />
+                    )}
+                    {l.kind === "sticker" && l.src && (
+                      <div
+                        style={{ width: 100, height: 100, color: state.ink }}
+                        dangerouslySetInnerHTML={{
+                          __html: STICKERS.find((s) => s.id === l.src)?.svg || "",
+                        }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Price + actions */}
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Live price</div>
+                <div className="text-2xl font-semibold">${price.toFixed(0)} AUD</div>
+                <div className="text-xs text-muted-foreground">
+                  Base ${meta.basePrice} + graphics/specs
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={copyShareLink}>
+                  <Link2 className="mr-1 h-4 w-4" /> Copy link
+                </Button>
+                <Button variant="outline" onClick={exportPNG}>
+                  <Download className="mr-1 h-4 w-4" /> Export PNG
+                </Button>
+                <Button onClick={saveToGarage}>
+                  <Save className="mr-1 h-4 w-4" /> Save to Garage
+                </Button>
+              </div>
+            </div>
+          </section>
+
+          {/* RIGHT: Layers + selected controls */}
+          <aside className="space-y-4">
+            <div className="rounded-lg border border-border bg-card p-3">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+                <Layers className="h-4 w-4" /> Layers
+              </div>
+              {facedLayers.length === 0 && (
+                <p className="text-xs text-muted-foreground">Nothing on this face yet.</p>
+              )}
+              <ul className="space-y-1">
+                {facedLayers
+                  .slice()
+                  .reverse()
+                  .map((l) => (
+                    <li
+                      key={l.id}
+                      className={`flex items-center gap-1 rounded-md border px-2 py-1.5 text-xs ${
+                        selectedId === l.id ? "border-foreground" : "border-border"
+                      }`}
+                    >
+                      <button
+                        className="flex-1 truncate text-left"
+                        onClick={() => setSelectedId(l.id)}
+                      >
+                        {l.kind === "text"
+                          ? `T · ${l.text}`
+                          : l.kind === "sticker"
+                            ? `★ ${l.src}`
+                            : `🖼 image`}
+                      </button>
+                      <button title="Up" onClick={() => reorderLayer(l.id, 1)}>
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </button>
+                      <button title="Down" onClick={() => reorderLayer(l.id, -1)}>
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        title={l.locked ? "Unlock" : "Lock"}
+                        onClick={() => patchLayer(l.id, { locked: !l.locked })}
+                      >
+                        {l.locked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                      </button>
+                      <button title="Delete" onClick={() => deleteLayer(l.id)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+
+            {selected && (
+              <div className="space-y-3 rounded-lg border border-border bg-card p-3">
+                <div className="text-sm font-medium">Selected</div>
+                <div>
+                  <Label className="text-xs">Scale</Label>
+                  <Slider
+                    min={0.2}
+                    max={3}
+                    step={0.05}
+                    value={[selected.scale]}
+                    onValueChange={([v]) => patchLayer(selected.id, { scale: v })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Rotation</Label>
+                  <Slider
+                    min={-180}
+                    max={180}
+                    step={1}
+                    value={[selected.rotation]}
+                    onValueChange={([v]) => patchLayer(selected.id, { rotation: v })}
+                  />
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+// ---------- Small components ----------
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+      {children}
+    </div>
+  );
+}
+function ColorRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <Field label={label}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input type="color" className="h-9 w-14 p-1" value={value} onChange={(e) => onChange(e.target.value)} />
+        {BRAND_COLORS.map((c) => (
+          <button
+            key={c}
+            className={`h-6 w-6 rounded-full border-2 ${value === c ? "border-foreground" : "border-transparent"}`}
+            style={{ background: c }}
+            onClick={() => onChange(c)}
+            aria-label={c}
+          />
+        ))}
+      </div>
+    </Field>
+  );
+}
+function Segmented({
+  options,
+  value,
+  onChange,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1 rounded-md border border-border p-0.5">
+      {options.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          className={`flex-1 rounded px-2 py-1 text-xs uppercase tracking-wider ${
+            value === o ? "bg-foreground text-background" : "hover:bg-muted"
+          }`}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ---------- Helpers ----------
+function initialState(product: ProductKey): DesignState {
+  return {
+    product,
+    face: PRODUCTS[product].faces[0],
+    bg: "#f4f1ea",
+    ink: "#0b0b0f",
+    texture: product === "surfboard" ? "gloss" : product === "skateboard" ? "wood" : "cotton",
+    concave: "medium",
+    hardness: "99a",
+    bolts: "#0b0b0f",
+    tail: "squash",
+    fins: "thruster",
+    layers: [],
+  };
+}
+function textureBackground(bg: string, tex: string) {
+  switch (tex) {
+    case "grip":
+      return `radial-gradient(rgba(0,0,0,0.5) 1px, transparent 1px) 0 0/6px 6px, ${bg}`;
+    case "wood":
+      return `repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 2px, transparent 2px 8px), ${bg}`;
+    case "gloss":
+      return `linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 45%), ${bg}`;
+    case "cotton":
+      return `repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 3px), ${bg}`;
+    default:
+      return bg;
+  }
+}
+function shapeRadius(product: ProductKey) {
+  if (product === "skateboard") return "9999px";
+  if (product === "surfboard") return "9999px";
+  if (product === "cap") return "40% 40% 20% 20%";
+  return "12px";
+}
+function shapeClip(product: ProductKey, s: DesignState) {
+  if (product === "surfboard") {
+    if (s.tail === "pin") return "polygon(50% 0, 100% 20%, 50% 100%, 0 20%)";
+    if (s.tail === "swallow")
+      return "polygon(50% 0, 100% 20%, 85% 100%, 50% 90%, 15% 100%, 0 20%)";
+    return "polygon(50% 0, 100% 20%, 90% 100%, 10% 100%, 0 20%)";
+  }
+  return "none";
+}
