@@ -34,6 +34,7 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
+import { Route as AccountGarageRouteImport } from './routes/account.garage'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -160,6 +161,11 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountGarageRoute = AccountGarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
+  getParentRoute: () => AccountRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -315,6 +326,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -526,14 +538,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountOrdersRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/garage': {
+      id: '/account/garage'
+      path: '/garage'
+      fullPath: '/account/garage'
+      preLoaderRoute: typeof AccountGarageRouteImport
+      parentRoute: typeof AccountRoute
+    }
   }
 }
 
 interface AccountRouteChildren {
+  AccountGarageRoute: typeof AccountGarageRoute
   AccountOrdersRoute: typeof AccountOrdersRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
+  AccountGarageRoute: AccountGarageRoute,
   AccountOrdersRoute: AccountOrdersRoute,
 }
 
