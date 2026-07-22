@@ -71,7 +71,7 @@ function AccountPage() {
         {loading ? (
           <AccountSkeleton />
         ) : user ? (
-          <DashboardView user={{ email: user.email ?? null, id: user.id }} isAdmin={isAdmin} onSignOut={handleSignOut} />
+          <DashboardView user={user} isAdmin={isAdmin} onSignOut={handleSignOut} />
         ) : (
           <AuthView
             mode={mode}
@@ -190,12 +190,12 @@ function DashboardView({
 
       {/* Tab Content */}
       {activeTab === "overview" && (
-        <OverviewTab user={user} record={record ?? null} tierInfo={tierInfo} loading={loading} addPoints={addPoints} />
+        <OverviewTab user={user} record={record} tierInfo={tierInfo} loading={loading} addPoints={addPoints} />
       )}
       {activeTab === "rewards" && (
         <RewardsTab
           allRewards={allRewards}
-          record={record ?? null}
+          record={record}
           tierInfo={tierInfo}
           loading={loading}
           redeem={redeem}

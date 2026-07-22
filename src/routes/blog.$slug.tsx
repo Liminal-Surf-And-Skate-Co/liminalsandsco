@@ -127,7 +127,7 @@ function NewsletterPage({ id }: { id: string }) {
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
-      return (data as unknown as Newsletter | null);
+      return data as Record<string, unknown> | null;
     },
   });
 

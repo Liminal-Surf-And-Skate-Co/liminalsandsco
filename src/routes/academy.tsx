@@ -46,19 +46,7 @@ interface ChecklistPreset {
   items: { name: string; required: boolean }[];
 }
 
-interface Skill {
-  name: string;
-  steps: string[];
-  tip: string;
-  difficulty?: string;
-}
-
-interface SkillCategory {
-  category: string;
-  skills: Skill[];
-}
-
-const SKATE_TRICKS: SkillCategory[] = [
+const SKATE_TRICKS = [
   {
     category: "Beginner Basics",
     skills: [
@@ -166,7 +154,7 @@ const SKATE_TRICKS: SkillCategory[] = [
   },
 ];
 
-const SURF_BASICS: SkillCategory[] = [
+const SURF_BASICS = [
   {
     category: "First Steps",
     skills: [
@@ -249,7 +237,7 @@ export function AcademyPage() {
         .select("*")
         .order("name", { ascending: true });
       if (error) throw new Error(sanitizeError(error));
-      return (data ?? []) as unknown as ChecklistPreset[];
+      return (data ?? []) as ChecklistPreset[];
     },
   });
 
