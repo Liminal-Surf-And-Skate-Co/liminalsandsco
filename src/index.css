@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light-variant workspace backgrounds — clean light silver/gray */
+    --background: 210 17% 95%;       /* #F1F3F5 */
+    --foreground: 0 0% 10%;          /* #1A1A1A rich black — typography */
+
+    --card: 0 0% 100%;               /* white cards on light bg */
+    --card-foreground: 0 0% 10%;
+
+    /* Deep royal purple — structural: nav, sidebars, borders */
+    --primary: 263 70% 34%;          /* #4C1D95 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 30% 96%;        /* soft lavender surface */
+    --secondary-foreground: 263 70% 34%;
+
+    /* High-contrast metallic silver / neon-purple CTA accent */
+    --accent: 276 100% 50%;         /* saturated neon-purple for CTAs */
+    --accent-foreground: 0 0% 100%;
+
+    --silver: 220 10% 46%;          /* mid silver for body text */
+    --border: 260 15% 85%;          /* lavender-tinted border */
+    --muted: 260 20% 93%;
+    --muted-foreground: 220 10% 40%;
+
+    --destructive: 0 72% 51%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}

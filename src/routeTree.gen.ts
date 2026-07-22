@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AccountRouteImport } from './routes/account'
@@ -34,11 +33,6 @@ import { Route as LegalReturnsRouteImport } from './routes/legal.returns'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -156,7 +150,6 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/account': typeof AccountRouteWithChildren
@@ -182,7 +175,6 @@ export interface FileRoutesByFullPath {
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/account': typeof AccountRouteWithChildren
@@ -209,7 +201,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/account': typeof AccountRouteWithChildren
@@ -237,7 +228,6 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/about'
     | '/academy'
     | '/account'
@@ -263,7 +253,6 @@ export interface FileRouteTypes {
     | '/shop/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/about'
     | '/academy'
     | '/account'
@@ -289,7 +278,6 @@ export interface FileRouteTypes {
     | '/shop/$slug'
   id:
     | '__root__'
-    | '/'
     | '/about'
     | '/academy'
     | '/account'
@@ -316,7 +304,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AcademyRoute: typeof AcademyRoute
   AccountRoute: typeof AccountRouteWithChildren
@@ -338,13 +325,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -555,7 +535,6 @@ const ShopRouteChildren: ShopRouteChildren = {
 const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AcademyRoute: AcademyRoute,
   AccountRoute: AccountRouteWithChildren,
