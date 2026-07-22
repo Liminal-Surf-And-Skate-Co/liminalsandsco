@@ -1,37 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import { toast } from "sonner";
-import {
-  Plus,
-  Trash2,
-  Upload,
-  ShoppingCart,
-  Palette,
-  Settings,
-  Type,
-  Image as ImageIcon,
-  Sparkles,
-  Eye,
-  RotateCw,
-  ChevronDown,
-  Undo2,
-  Redo2,
-  FlipHorizontal2,
-  FlipVertical2,
-  MoveHorizontal,
-  MoveVertical,
-  Maximize2,
-  Lock,
-  Unlock,
-  ArrowUp,
-  ArrowDown,
-  Copy,
-  Download,
-  Link as LinkIcon,
-  Search,
-  Grid3x3,
-  Sticker,
-} from "lucide-react";
+import { Plus, Trash2, Upload, ShoppingCart, Palette, Settings, Type, Image as ImageIcon, Sparkles, Eye, RotateCw, ChevronDown, Undo2, Redo2, FlipHorizontal2, FlipVertical2, MoveHorizontal, MoveVertical, Maximize2, Lock, Clock as Unlock, ArrowUp, ArrowDown, Copy, Download, Link as LinkIcon, Search, Grid3x3, Sticker } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/hooks/use-cart";
