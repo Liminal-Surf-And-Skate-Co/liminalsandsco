@@ -31,11 +31,12 @@ function safeHtml(html: string) {
   return { __html: html };
 }
 
-type Props = { compact?: boolean };
+type Props = { compact?: boolean; collapsible?: boolean };
 
-export function GlobalSearch({ compact = false }: Props) {
+export function GlobalSearch({ compact = false, collapsible = false }: Props) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(!collapsible);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,19 +53,35 @@ export function GlobalSearch({ compact = false }: Props) {
     return items;
   }, [res]);
 
+  const openSearch = useCallback(() => {
+    setExpanded(true);
+    setOpen(true);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setOpen(false);
+    if (collapsible) {
+      setExpanded(false);
+      setQ("");
+    }
+    inputRef.current?.blur();
+  }, [collapsible]);
+
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        if (collapsible && !q) setExpanded(false);
+      }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setOpen(false);
-        inputRef.current?.blur();
+        closeSearch();
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        inputRef.current?.focus();
-        setOpen(true);
+        openSearch();
       }
     };
     document.addEventListener("mousedown", onClick);
@@ -73,7 +90,8 @@ export function GlobalSearch({ compact = false }: Props) {
       document.removeEventListener("mousedown", onClick);
       document.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [collapsible, q, openSearch, closeSearch]);
+
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!open || !q.trim()) return;
@@ -110,37 +128,65 @@ export function GlobalSearch({ compact = false }: Props) {
   const showNoResults = q.trim() && !res.loading && res.total === 0 && !hasRecents;
 
   return (
-    <div ref={containerRef} className={`relative ${compact ? "w-full" : "w-full max-w-md"}`}>
-      <form onSubmit={submit}>
-        <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-silver/50 pointer-events-none" />
-        <input
-          ref={inputRef}
-          value={q}
-          onChange={(e) => {
-            setQ(e.target.value);
-            setOpen(true);
-            setSelectedIndex(-1);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder="Search products, articles, events..."
-          aria-label="Site-wide search"
-          className="w-full h-9 pl-9 pr-9 bg-card/70 border border-border/60 text-xs font-mono text-silver placeholder:text-silver/40 focus:outline-none focus:border-primary"
-        />
-        {q && (
-          <button
-            type="button"
-            onClick={() => {
-              setQ("");
-              inputRef.current?.focus();
+    <div ref={containerRef} className={`relative flex justify-end ${compact ? "w-full" : "w-full max-w-md"}`}>
+      {collapsible && !expanded ? (
+        <button
+          type="button"
+          onClick={openSearch}
+          aria-label="Open search (Cmd+K)"
+          title="Search  ⌘K"
+          className="h-9 w-9 flex items-center justify-center text-silver hover:text-primary transition-colors border border-border/60 rounded-md"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+      ) : (
+        <form onSubmit={submit} className="relative w-full transition-all duration-200 ease-out">
+          <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-silver/50 pointer-events-none" />
+          <input
+            ref={inputRef}
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setOpen(true);
+              setSelectedIndex(-1);
             }}
-            aria-label="Clear search"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-silver/50 hover:text-primary"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        )}
-      </form>
+            onFocus={() => setOpen(true)}
+            onKeyDown={handleKeyDown}
+            placeholder="Search products, articles, events..."
+            aria-label="Site-wide search"
+            className="w-full h-9 pl-9 pr-16 bg-card/70 border border-border/60 rounded-md text-xs font-mono text-silver placeholder:text-silver/40 focus:outline-none focus:border-primary"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {q && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  inputRef.current?.focus();
+                }}
+                aria-label="Clear search"
+                className="text-silver/50 hover:text-primary p-1"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {collapsible && (
+              <button
+                type="button"
+                onClick={closeSearch}
+                aria-label="Close search"
+                className="text-silver/50 hover:text-primary p-1"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {!q && !collapsible && (
+              <kbd className="hidden sm:inline font-mono text-[9px] text-silver/40 border border-border/40 rounded px-1">⌘K</kbd>
+            )}
+          </div>
+        </form>
+      )}
+
 
       {open && (hasResults || hasRecents || showNoResults) && (
         <div className="absolute left-0 right-0 mt-2 max-h-[70vh] overflow-y-auto bg-background border border-border/60 shadow-2xl z-50">
