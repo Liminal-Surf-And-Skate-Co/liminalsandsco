@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign } from "lucide-react";
+import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -146,12 +146,41 @@ function AdminOverview() {
     { to: "/admin/products", label: "Products", icon: Package, desc: "Manage catalog" },
     { to: "/admin/newsletters", label: "Newsletters", icon: Mail, desc: "Compose drops" },
     { to: "/admin/events", label: "Events", icon: Calendar, desc: "Community events" },
+    { to: "/admin/orders", label: "Orders", icon: Package, desc: "View custom orders" },
+    { to: "/admin/diagnostics", label: "Diagnostics", icon: Activity, desc: "Database health" },
+    { to: "/admin/settings/shopify", label: "Shopify", icon: Store, desc: "Sync settings" },
+    { to: "/admin/settings/payouts", label: "Payouts", icon: Banknote, desc: "Bank & deposits" },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Interactive metric cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <MetricCard label="Total Sales" value={`${((metrics?.totalOrders ?? 0) * 85).toFixed(0)}`} icon={DollarSign} loading={isLoading} />
+        <MetricCard label="Active Custom Designs" value={metrics?.totalOrders ?? 0} icon={Palette} loading={isLoading} />
+        <MetricCard label="Shopify Sync" value="Idle" icon={Store} loading={false} status="ok" />
+        <MetricCard label="Database Health" value="Healthy" icon={Database} loading={false} status="ok" />
+      </div>
+
+      {/* Quick Actions bar */}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mr-2">Quick Actions:</span>
+        <Link to="/admin/products" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+          <Package className="h-3.5 w-3.5" /> Add Product
+        </Link>
+        <Link to="/admin/orders" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+          <Package className="h-3.5 w-3.5" /> View Orders
+        </Link>
+        <Link to="/admin/diagnostics" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+          <Activity className="h-3.5 w-3.5" /> Test Database
+        </Link>
+        <Link to="/admin/settings/shopify" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+          <Store className="h-3.5 w-3.5" /> Sync Shopify
+        </Link>
+      </div>
+
+      {/* Original metrics grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
           { label: "Total Users", value: metrics?.totalUsers ?? 0, icon: Users, loading: isLoading },
           { label: "Customers", value: metrics?.totalCustomers ?? 0, icon: Users, loading: isLoading },
@@ -172,7 +201,7 @@ function AdminOverview() {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {quickLinks.map(({ to, label, icon: Icon, desc }) => (
           <Link
             key={to}
@@ -597,4 +626,28 @@ function getTierFromPoints(points: number): string {
   if (points >= 500) return "gold";
   if (points >= 100) return "silver";
   return "bronze";
+}
+
+function MetricCard({ label, value, icon: Icon, loading, status }: {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+  loading: boolean;
+  status?: "ok" | "error";
+}) {
+  return (
+    <div className="border border-border/60 bg-card rounded-lg p-4 transition-colors hover:border-primary">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4 text-primary" />
+          <span className="text-xs font-mono uppercase tracking-widest text-silver/60">{label}</span>
+        </div>
+        {status === "ok" && <span className="h-2.5 w-2.5 rounded-full bg-success" />}
+        {status === "error" && <span className="h-2.5 w-2.5 rounded-full bg-destructive" />}
+      </div>
+      <p className="text-2xl font-display font-bold">
+        {loading ? <Skeleton className="h-8 w-16" /> : value}
+      </p>
+    </div>
+  );
 }

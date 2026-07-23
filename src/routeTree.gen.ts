@@ -30,9 +30,13 @@ import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as LegalLiabilityRouteImport } from './routes/legal.liability'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
+import { Route as AdminSettingsShopifyRouteImport } from './routes/admin.settings.shopify'
+import { Route as AdminSettingsPayoutsRouteImport } from './routes/admin.settings.payouts'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -139,6 +143,11 @@ const AdminProductsRoute = AdminProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNewslettersRoute = AdminNewslettersRouteImport.update({
   id: '/newsletters',
   path: '/newsletters',
@@ -149,10 +158,25 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
+  id: '/diagnostics',
+  path: '/diagnostics',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountOrdersRoute = AccountOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
   getParentRoute: () => AccountRoute,
+} as any)
+const AdminSettingsShopifyRoute = AdminSettingsShopifyRouteImport.update({
+  id: '/settings/shopify',
+  path: '/settings/shopify',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsPayoutsRoute = AdminSettingsPayoutsRouteImport.update({
+  id: '/settings/payouts',
+  path: '/settings/payouts',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -171,8 +195,10 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
@@ -180,6 +206,8 @@ export interface FileRoutesByFullPath {
   '/legal/returns': typeof LegalReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/admin/settings/payouts': typeof AdminSettingsPayoutsRoute
+  '/admin/settings/shopify': typeof AdminSettingsShopifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -197,8 +225,10 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
@@ -206,6 +236,8 @@ export interface FileRoutesByTo {
   '/legal/returns': typeof LegalReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/admin/settings/payouts': typeof AdminSettingsPayoutsRoute
+  '/admin/settings/shopify': typeof AdminSettingsShopifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -224,8 +256,10 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
+  '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
@@ -233,6 +267,8 @@ export interface FileRoutesById {
   '/legal/returns': typeof LegalReturnsRoute
   '/legal/terms': typeof LegalTermsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/admin/settings/payouts': typeof AdminSettingsPayoutsRoute
+  '/admin/settings/shopify': typeof AdminSettingsShopifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,8 +288,10 @@ export interface FileRouteTypes {
     | '/support'
     | '/wishlist'
     | '/account/orders'
+    | '/admin/diagnostics'
     | '/admin/events'
     | '/admin/newsletters'
+    | '/admin/orders'
     | '/admin/products'
     | '/blog/$slug'
     | '/legal/liability'
@@ -261,6 +299,8 @@ export interface FileRouteTypes {
     | '/legal/returns'
     | '/legal/terms'
     | '/shop/$slug'
+    | '/admin/settings/payouts'
+    | '/admin/settings/shopify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -278,8 +318,10 @@ export interface FileRouteTypes {
     | '/support'
     | '/wishlist'
     | '/account/orders'
+    | '/admin/diagnostics'
     | '/admin/events'
     | '/admin/newsletters'
+    | '/admin/orders'
     | '/admin/products'
     | '/blog/$slug'
     | '/legal/liability'
@@ -287,6 +329,8 @@ export interface FileRouteTypes {
     | '/legal/returns'
     | '/legal/terms'
     | '/shop/$slug'
+    | '/admin/settings/payouts'
+    | '/admin/settings/shopify'
   id:
     | '__root__'
     | '/'
@@ -304,8 +348,10 @@ export interface FileRouteTypes {
     | '/support'
     | '/wishlist'
     | '/account/orders'
+    | '/admin/diagnostics'
     | '/admin/events'
     | '/admin/newsletters'
+    | '/admin/orders'
     | '/admin/products'
     | '/blog/$slug'
     | '/legal/liability'
@@ -313,6 +359,8 @@ export interface FileRouteTypes {
     | '/legal/returns'
     | '/legal/terms'
     | '/shop/$slug'
+    | '/admin/settings/payouts'
+    | '/admin/settings/shopify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -485,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/newsletters': {
       id: '/admin/newsletters'
       path: '/newsletters'
@@ -499,12 +554,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/diagnostics': {
+      id: '/admin/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/admin/diagnostics'
+      preLoaderRoute: typeof AdminDiagnosticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/orders': {
       id: '/account/orders'
       path: '/orders'
       fullPath: '/account/orders'
       preLoaderRoute: typeof AccountOrdersRouteImport
       parentRoute: typeof AccountRoute
+    }
+    '/admin/settings/shopify': {
+      id: '/admin/settings/shopify'
+      path: '/settings/shopify'
+      fullPath: '/admin/settings/shopify'
+      preLoaderRoute: typeof AdminSettingsShopifyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings/payouts': {
+      id: '/admin/settings/payouts'
+      path: '/settings/payouts'
+      fullPath: '/admin/settings/payouts'
+      preLoaderRoute: typeof AdminSettingsPayoutsRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
@@ -521,15 +597,23 @@ const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
+  AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminNewslettersRoute: typeof AdminNewslettersRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminSettingsPayoutsRoute: typeof AdminSettingsPayoutsRoute
+  AdminSettingsShopifyRoute: typeof AdminSettingsShopifyRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminDiagnosticsRoute: AdminDiagnosticsRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminNewslettersRoute: AdminNewslettersRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminSettingsPayoutsRoute: AdminSettingsPayoutsRoute,
+  AdminSettingsShopifyRoute: AdminSettingsShopifyRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

@@ -253,6 +253,129 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_orders: {
+        Row: {
+          id: string
+          user_id: string | null
+          email: string
+          product_type: string
+          product_name: string
+          design_json: Json
+          specs_json: Json
+          image_data_url: string | null
+          share_slug: string
+          price: number
+          status: string
+          customer_note: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          email: string
+          product_type?: string
+          product_name?: string
+          design_json?: Json
+          specs_json?: Json
+          image_data_url?: string | null
+          share_slug?: string
+          price?: number
+          status?: string
+          customer_note?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          email?: string
+          product_type?: string
+          product_name?: string
+          design_json?: Json
+          specs_json?: Json
+          image_data_url?: string | null
+          share_slug?: string
+          price?: number
+          status?: string
+          customer_note?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          id: string
+          customer_id: string | null
+          total_amount: number | null
+          status: string | null
+          created_at: string
+          fulfillment_source: string | null
+          tracking_link: string | null
+          invoice_pdf_url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          customer_id?: string | null
+          total_amount?: number | null
+          status?: string | null
+          created_at?: string
+          fulfillment_source?: string | null
+          tracking_link?: string | null
+          invoice_pdf_url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          customer_id?: string | null
+          total_amount?: number | null
+          status?: string | null
+          created_at?: string
+          fulfillment_source?: string | null
+          tracking_link?: string | null
+          invoice_pdf_url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id: string
+          updated_at: string
+          username: string | null
+          avatar_url: string | null
+          points_balance: number | null
+          role: string | null
+          gear_specs: Json | null
+          full_name: string | null
+          created_at: string
+        }
+        Insert: {
+          id: string
+          updated_at?: string
+          username?: string | null
+          avatar_url?: string | null
+          points_balance?: number | null
+          role?: string | null
+          gear_specs?: Json | null
+          full_name?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          updated_at?: string
+          username?: string | null
+          avatar_url?: string | null
+          points_balance?: number | null
+          role?: string | null
+          gear_specs?: Json | null
+          full_name?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
