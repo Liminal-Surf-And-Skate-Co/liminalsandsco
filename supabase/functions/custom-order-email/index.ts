@@ -14,6 +14,37 @@ const RECIPIENTS = [
 
 const SUBJECT = "New Custom Product Inquiry";
 
+// Structured logging with correlation ID
+interface StructuredLog {
+  timestamp: string;
+  level: "info" | "warn" | "error";
+  message: string;
+  correlation_id: string;
+  user_id?: string;
+  request_id?: string;
+  [key: string]: unknown;
+}
+
+function generateCorrelationId(): string {
+  return `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function logStructured(
+  level: "info" | "warn" | "error",
+  message: string,
+  correlationId: string,
+  extra?: Record<string, unknown>
+): void {
+  const log: StructuredLog = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    correlation_id: correlationId,
+    ...extra,
+  };
+  console.log(JSON.stringify(log));
+}
+
 function getSupabaseClient() {
   const url = Deno.env.get("SUPABASE_URL");
   const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -24,14 +55,37 @@ function getSupabaseClient() {
 }
 
 Deno.serve(async (req: Request) => {
+  const correlationId = req.headers.get("X-Correlation-ID") || generateCorrelationId();
+  const requestId = `${correlationId}-${crypto.randomUUID().slice(0, 8)}`;
+
+  logStructured("info", "Incoming request", correlationId, {
+    method: req.method,
+    url: req.url,
+    request_id: requestId,
+  });
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return new Response(null, {
+      status: 200,
+      headers: { ...corsHeaders, "X-Correlation-ID": correlationId },
+    });
   }
 
   if (req.method !== "POST") {
+    logStructured("warn", "Method not allowed", correlationId, {
+      method: req.method,
+      request_id: requestId,
+    });
     return new Response(
       JSON.stringify({ error: "Method not allowed" }),
-      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      }
     );
   }
 
@@ -40,9 +94,20 @@ Deno.serve(async (req: Request) => {
     const { name, email, phone, product_type, dimensions, materials, budget, notes, deadline } = body;
 
     if (!name || !email || !product_type) {
+      logStructured("warn", "Missing required fields", correlationId, {
+        request_id: requestId,
+        provided_fields: Object.keys(body),
+      });
       return new Response(
         JSON.stringify({ error: "Missing required fields: name, email, product_type" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "X-Correlation-ID": correlationId,
+          },
+        }
       );
     }
 
@@ -62,6 +127,12 @@ Deno.serve(async (req: Request) => {
     `;
 
     const supabase = getSupabaseClient();
+    logStructured("info", "Sending email", correlationId, {
+      request_id: requestId,
+      email: email,
+      recipient_count: RECIPIENTS.length,
+    });
+
     const { error: emailError } = await supabase.auth.admin.sendEmail({
       email: RECIPIENTS[0],
       subject: SUBJECT,
@@ -69,22 +140,55 @@ Deno.serve(async (req: Request) => {
     });
 
     if (emailError) {
-      console.error("Email send failed:", emailError);
+      logStructured("error", "Email send failed", correlationId, {
+        request_id: requestId,
+        error: emailError.message,
+        email: email,
+      });
       return new Response(
         JSON.stringify({ error: "Failed to send email" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "X-Correlation-ID": correlationId,
+          },
+        }
       );
     }
 
+    logStructured("info", "Email sent successfully", correlationId, {
+      request_id: requestId,
+      email: email,
+    });
+
     return new Response(
-      JSON.stringify({ success: true, message: "Inquiry submitted successfully" }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ success: true, message: "Inquiry submitted successfully", request_id: requestId }),
+      {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      }
     );
   } catch (err) {
-    console.error(err);
+    logStructured("error", "Unexpected error", correlationId, {
+      request_id: requestId,
+      error: (err as Error).message,
+    });
     return new Response(
       JSON.stringify({ error: (err as Error).message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      }
     );
   }
 });
