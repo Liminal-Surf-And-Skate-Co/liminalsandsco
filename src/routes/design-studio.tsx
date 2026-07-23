@@ -26,7 +26,18 @@ export const Route = createFileRoute("/design-studio")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DesignStudioPage,
+  component: DesignStudioPageWithBoundary,
+});
+
+function DesignStudioPageWithBoundary() {
+  return (
+    <ErrorBoundary name="DesignStudio">
+      <DesignStudioPage />
+    </ErrorBoundary>
+  );
+}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const __routeExportEnd = {
 });
 
 // ---------- Types ----------
