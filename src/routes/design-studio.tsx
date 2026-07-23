@@ -36,9 +36,7 @@ function DesignStudioPageWithBoundary() {
     </ErrorBoundary>
   );
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __routeExportEnd = {
-});
+
 
 // ---------- Types ----------
 type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";
