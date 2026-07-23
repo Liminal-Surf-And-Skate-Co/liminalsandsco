@@ -28,7 +28,11 @@ export const Route = createFileRoute("/checkout")({
       },
     ],
   }),
-  component: CheckoutPage,
+  component: () => (
+    <ErrorBoundary name="Checkout">
+      <CheckoutPage />
+    </ErrorBoundary>
+  ),
 });
 
 type PayMethod = "card" | "apple" | "google" | "afterpay";
