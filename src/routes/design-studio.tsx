@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 
 export const Route = createFileRoute("/design-studio")({
   head: () => ({
@@ -26,8 +27,17 @@ export const Route = createFileRoute("/design-studio")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DesignStudioPage,
+  component: DesignStudioPageWithBoundary,
 });
+
+function DesignStudioPageWithBoundary() {
+  return (
+    <ErrorBoundary name="DesignStudio">
+      <DesignStudioPage />
+    </ErrorBoundary>
+  );
+}
+
 
 // ---------- Types ----------
 type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";

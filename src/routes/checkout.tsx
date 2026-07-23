@@ -16,6 +16,7 @@ import { useProducts, productImage, effectivePrice, DEPARTMENT_LABELS } from "@/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -27,7 +28,11 @@ export const Route = createFileRoute("/checkout")({
       },
     ],
   }),
-  component: CheckoutPage,
+  component: () => (
+    <ErrorBoundary name="Checkout">
+      <CheckoutPage />
+    </ErrorBoundary>
+  ),
 });
 
 type PayMethod = "card" | "apple" | "google" | "afterpay";

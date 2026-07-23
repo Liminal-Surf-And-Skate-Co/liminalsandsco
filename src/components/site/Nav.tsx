@@ -103,6 +103,13 @@ export function Nav() {
           >
             Blog
           </Link>
+          <Link
+            to="/design-studio"
+            className="hover:text-primary transition-colors"
+            activeProps={{ className: "text-primary" }}
+          >
+            Design
+          </Link>
         </nav>
 
         <div className="flex items-center gap-1">
