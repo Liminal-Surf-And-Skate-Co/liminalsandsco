@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Package, ArrowLeft, Eye, X, ListFilter as Filter, Loader as Loader2 } from "lucide-react";

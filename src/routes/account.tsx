@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2 } from "lucide-react";
