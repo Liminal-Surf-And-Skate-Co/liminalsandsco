@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Trash2, Pencil, ShoppingCart, ExternalLink, Plus, Loader as Loader2 } from "lucide-react";
+import { Trash2, Pencil, ShoppingCart, ExternalLink, Plus, Loader as Loader2, Share2 } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,6 +105,12 @@ function GaragePage() {
     toast.success("Added to cart");
   };
 
+  const shareDesign = (design: SavedDesign) => {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify({ product: design.product, state: design.state }))));
+    const url = `${window.location.origin}/design-studio?d=${encoded}`;
+    navigator.clipboard.writeText(url).then(() => toast.success("Share link copied"));
+  };
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -173,6 +179,7 @@ function GaragePage() {
                 onRename={renameDesign}
                 onLoad={loadInStudio}
                 onAddToCart={addToCart}
+                onShare={shareDesign}
                 editingId={editingId}
                 editTitle={editTitle}
                 setEditTitle={setEditTitle}
@@ -193,6 +200,7 @@ function DesignCard({
   onRename,
   onLoad,
   onAddToCart,
+  onShare,
   editingId,
   editTitle,
   setEditTitle,
@@ -203,6 +211,7 @@ function DesignCard({
   onRename: (id: string, title: string) => void;
   onLoad: (d: SavedDesign) => void;
   onAddToCart: (d: SavedDesign) => void;
+  onShare: (d: SavedDesign) => void;
   editingId: string | null;
   editTitle: string;
   setEditTitle: (s: string) => void;
@@ -212,7 +221,7 @@ function DesignCard({
   const title = design.title || `${design.product} design`;
 
   return (
-    <div className="border border-border/60 bg-card rounded-lg overflow-hidden">
+    <div className="border border-border/60 bg-card rounded-lg overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg active:scale-95">
       {/* Thumbnail preview */}
       <div
         className="aspect-video flex items-center justify-center relative overflow-hidden"
@@ -285,10 +294,17 @@ function DesignCard({
           </button>
           <button
             onClick={() => onAddToCart(design)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 border border-border/60 text-xs font-mono uppercase tracking-wider rounded-md hover:border-primary"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 border border-border/60 text-xs font-mono uppercase tracking-wider rounded-md hover:border-primary transition-all hover:scale-105 active:scale-95"
             title="Add to Cart"
           >
             <ShoppingCart className="h-3 w-3" /> Cart
+          </button>
+          <button
+            onClick={() => onShare(design)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 border border-border/60 text-xs font-mono uppercase tracking-wider rounded-md hover:border-primary transition-all hover:scale-105 active:scale-95"
+            title="Share Design"
+          >
+            <Share2 className="h-3 w-3" /> Share
           </button>
           <button
             onClick={() => onDelete(design.id)}

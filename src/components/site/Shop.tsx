@@ -43,7 +43,7 @@ export function Shop() {
                   key={p.slug}
                   to="/shop/$slug"
                   params={{ slug: p.slug }}
-                  className="group block bg-card border border-border/60 hover:border-primary transition-colors overflow-hidden relative"
+                  className="group block bg-card border border-border/60 hover:border-primary transition-all overflow-hidden relative hover:scale-[1.02] active:scale-95 duration-200"
                 >
                   <ProductBadges product={p} />
                   <div className="aspect-square overflow-hidden bg-background">

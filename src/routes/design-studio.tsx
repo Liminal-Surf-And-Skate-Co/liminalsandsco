@@ -480,19 +480,31 @@ function DesignStudioPage() {
     }
   };
 
-  // Load from ?d= on mount
+  // Load from ?d= or ?product= on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const d = params.get("d");
-    if (!d) return;
-    try {
-      const parsed = JSON.parse(decodeURIComponent(escape(atob(d))));
-      if (parsed?.product && parsed?.state) {
-        setProduct(parsed.product);
-        setState(parsed.state);
+    if (d) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(escape(atob(d))));
+        if (parsed?.product && parsed?.state) {
+          setProduct(parsed.product);
+          setState(parsed.state);
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
+      return;
+    }
+    const p = params.get("product");
+    if (p) {
+      const key = (Object.keys(PRODUCTS) as ProductKey[]).find((k) =>
+        p.toLowerCase().includes(k) || k.includes(p.toLowerCase().split("-")[0]),
+      );
+      if (key && key !== product) {
+        setProduct(key);
+        setState(initialState(key));
+      }
     }
   }, []);
 

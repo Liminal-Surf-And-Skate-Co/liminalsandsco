@@ -19,6 +19,10 @@ import {
 } from "@/lib/products";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useCart } from "@/hooks/use-cart";
+import { FitCalculator } from "@/components/site/FitCalculator";
+import { openCartDrawer } from "@/components/site/CartDrawer";
+import { useNavigate } from "@tanstack/react-router";
+import { Palette } from "lucide-react";
 
 export const Route = createFileRoute("/shop/$slug")({
   head: ({ params }) => ({
@@ -83,12 +87,25 @@ function ProductPage() {
   const price = effectivePrice(product);
   const needsSize = product.sizes && product.sizes.length > 0;
 
+  const navigate = useNavigate();
+  const isCustomizable = (() => {
+    const t = (product.product_type ?? "").toLowerCase();
+    const d = product.department;
+    return d === "skate" && (t.includes("deck") || t.includes("complete")) ||
+      d === "surf" && (t.includes("board") || t.includes("fish") || t.includes("softtop")) ||
+      t.includes("t-shirt") || t.includes("hoodie") || t.includes("cap");
+  })();
+  const fitType: "skateboard" | "surfboard" | "apparel" =
+    product.department === "skate" ? "skateboard" :
+    product.department === "surf" ? "surfboard" : "apparel";
+
   const handleAddToCart = () => {
     if (needsSize && !size) {
       alert("Please choose a size first.");
       return;
     }
     for (let i = 0; i < qty; i++) cartAdd(product.slug);
+    openCartDrawer();
   };
 
   const submit = (e: React.FormEvent) => {
@@ -238,8 +255,13 @@ function ProductPage() {
               </div>
             </div>
 
+            {/* Fit calculator */}
+            <div className="mb-6">
+              <FitCalculator productType={fitType} />
+            </div>
+
             {/* Cart + Wishlist actions */}
-            <div className="flex gap-3 mb-8">
+            <div className="flex gap-3 mb-3">
               <button
                 onClick={handleAddToCart}
                 disabled={oos}
@@ -258,6 +280,35 @@ function ProductPage() {
               >
                 <Heart className={`h-5 w-5 ${saved ? "fill-primary" : ""}`} />
               </button>
+            </div>
+
+            {/* Open in Design Studio */}
+            {isCustomizable && (
+              <button
+                onClick={() => navigate({ to: "/design-studio", search: { product: product.slug } })}
+                className="w-full mb-8 inline-flex items-center justify-center gap-2 border border-primary text-primary font-mono text-xs uppercase tracking-widest py-3 hover:bg-primary/5 transition-colors"
+              >
+                <Palette className="h-4 w-4" /> Open in Design Studio
+              </button>
+            )}
+
+            {/* Production timeline */}
+            <div className="mb-8 rounded-lg border border-border/60 bg-card/40 p-4">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">Production Timeline</p>
+              <div className="flex items-center gap-2">
+                {["Custom Print", "Quality Check", "Ships 3–5 Days"].map((label, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div className="flex items-center w-full">
+                      {i > 0 && <div className="flex-1 h-px bg-border" />}
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                        {i + 1}
+                      </div>
+                      {i < 2 && <div className="flex-1 h-px bg-border" />}
+                    </div>
+                    <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground text-center">{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Details + Specs */}
