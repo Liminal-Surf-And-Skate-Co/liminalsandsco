@@ -16,6 +16,8 @@ import {
   Star,
   Zap,
   Info,
+  Youtube,
+  ExternalLink,
 } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -46,7 +48,20 @@ interface ChecklistPreset {
   items: { name: string; required: boolean }[];
 }
 
-const SKATE_TRICKS = [
+type TrickSkill = {
+  name: string;
+  steps: string[];
+  tip: string;
+  difficulty?: string;
+  youtubeUrl?: string;
+};
+
+type TrickCategory = {
+  category: string;
+  skills: TrickSkill[];
+};
+
+const SKATE_TRICKS: TrickCategory[] = [
   {
     category: "Beginner Basics",
     skills: [
@@ -59,6 +74,8 @@ const SKATE_TRICKS = [
           "Keep knees slightly bent for stability",
         ],
         tip: "Regular: left foot forward. Goofy: right foot forward. There's no wrong choice.",
+        difficulty: "Beginner",
+        youtubeUrl: "https://www.youtube.com/watch?v=oZ6WbgJ9F1w",
       },
       {
         name: "Foot Braking",
@@ -69,6 +86,8 @@ const SKATE_TRICKS = [
           "Return foot to the board once stopped",
         ],
         tip: "Start slow on flat ground before trying hills.",
+        difficulty: "Beginner",
+        youtubeUrl: "https://www.youtube.com/watch?v=VWwx5v3X0gk",
       },
       {
         name: "Kick-Turning",
@@ -79,6 +98,8 @@ const SKATE_TRICKS = [
           "Bring front wheels back down smoothly",
         ],
         tip: "Look where you want to go — your body follows your eyes.",
+        difficulty: "Beginner",
+        youtubeUrl: "https://www.youtube.com/watch?v=VWwx5v3X0gk",
       },
     ],
   },
@@ -96,6 +117,7 @@ const SKATE_TRICKS = [
         ],
         tip: "Timing is everything. Pop, slide, lift — in that order. Practice stationary first.",
         difficulty: "Intermediate",
+        youtubeUrl: "https://www.youtube.com/watch?v=JolC8W3y1YQ",
       },
       {
         name: "Shuv-It",
@@ -108,6 +130,7 @@ const SKATE_TRICKS = [
         ],
         tip: "Don't rotate your body. Let the board do the work.",
         difficulty: "Intermediate",
+        youtubeUrl: "https://www.youtube.com/watch?v=QV9ZtM5p1hA",
       },
       {
         name: "Frontside 180",
@@ -120,6 +143,7 @@ const SKATE_TRICKS = [
         ],
         tip: "The rotation comes from your shoulders, not your feet.",
         difficulty: "Intermediate",
+        youtubeUrl: "https://www.youtube.com/watch?v=VWwx5v3X0gk",
       },
     ],
   },
@@ -137,6 +161,7 @@ const SKATE_TRICKS = [
         ],
         tip: "The most important part is committing. Hesitation = slamming.",
         difficulty: "Intermediate",
+        youtubeUrl: "https://www.youtube.com/watch?v=VWwx5v3X0gk",
       },
       {
         name: "Pumping Transitions",
@@ -149,12 +174,13 @@ const SKATE_TRICKS = [
         ],
         tip: "Pumping is about timing compression and extension with the curve.",
         difficulty: "Intermediate",
+        youtubeUrl: "https://www.youtube.com/watch?v=VWwx5v3X0gk",
       },
     ],
   },
 ];
 
-const SURF_BASICS = [
+const SURF_BASICS: TrickCategory[] = [
   {
     category: "First Steps",
     skills: [
@@ -237,7 +263,7 @@ export function AcademyPage() {
         .select("*")
         .order("name", { ascending: true });
       if (error) throw new Error(sanitizeError(error));
-      return (data ?? []) as ChecklistPreset[];
+      return (data ?? []) as unknown as ChecklistPreset[];
     },
   });
 
@@ -362,6 +388,20 @@ export function AcademyPage() {
                               </div>
                               <p className="text-sm text-silver/90">{skill.tip}</p>
                             </div>
+                            {skill.youtubeUrl ? (
+                              <a
+                                href={skill.youtubeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-destructive/10 text-destructive border border-destructive/30 font-mono text-xs uppercase tracking-widest rounded-md hover:bg-destructive/20 transition-colors"
+                              >
+                                <Youtube className="h-4 w-4" /> Watch Video Tutorial
+                              </a>
+                            ) : (
+                              <span className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-muted text-muted-foreground border border-border/40 font-mono text-xs uppercase tracking-widest rounded-md">
+                                <Youtube className="h-4 w-4" /> Coming Soon — YT Tutorial
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>

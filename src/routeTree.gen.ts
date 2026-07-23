@@ -35,6 +35,7 @@ import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
+import { Route as AccountGarageRouteImport } from './routes/account.garage'
 import { Route as AdminSettingsShopifyRouteImport } from './routes/admin.settings.shopify'
 import { Route as AdminSettingsPayoutsRouteImport } from './routes/admin.settings.payouts'
 
@@ -168,6 +169,11 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AccountRoute,
 } as any)
+const AccountGarageRoute = AccountGarageRouteImport.update({
+  id: '/garage',
+  path: '/garage',
+  getParentRoute: () => AccountRoute,
+} as any)
 const AdminSettingsShopifyRoute = AdminSettingsShopifyRouteImport.update({
   id: '/settings/shopify',
   path: '/settings/shopify',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
+  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/diagnostics'
     | '/admin/events'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/diagnostics'
     | '/admin/events'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/support'
     | '/wishlist'
+    | '/account/garage'
     | '/account/orders'
     | '/admin/diagnostics'
     | '/admin/events'
@@ -568,6 +580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountOrdersRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/account/garage': {
+      id: '/account/garage'
+      path: '/garage'
+      fullPath: '/account/garage'
+      preLoaderRoute: typeof AccountGarageRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/admin/settings/shopify': {
       id: '/admin/settings/shopify'
       path: '/settings/shopify'
@@ -586,10 +605,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AccountRouteChildren {
+  AccountGarageRoute: typeof AccountGarageRoute
   AccountOrdersRoute: typeof AccountOrdersRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
+  AccountGarageRoute: AccountGarageRoute,
   AccountOrdersRoute: AccountOrdersRoute,
 }
 

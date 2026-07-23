@@ -376,6 +376,234 @@ export type Database = {
         }
         Relationships: []
       }
+      academy_checklist_presets: {
+        Row: {
+          id: string
+          name: string
+          items: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          items?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          items?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      saved_designs: {
+        Row: {
+          id: string
+          user_id: string
+          product: string
+          state: Json
+          price: number
+          title: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          product: string
+          state?: Json
+          price?: number
+          title?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          product?: string
+          state?: Json
+          price?: number
+          title?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          phone: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          phone?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          phone?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      loyalty_points: {
+        Row: {
+          id: string
+          user_id: string
+          points: number
+          total_earned: number
+          total_redeemed: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          points?: number
+          total_earned?: number
+          total_redeemed?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          points?: number
+          total_earned?: number
+          total_redeemed?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rewards: {
+        Row: {
+          id: string
+          name: string
+          points_cost: number
+          description: string | null
+          active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          points_cost?: number
+          description?: string | null
+          active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          points_cost?: number
+          description?: string | null
+          active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      spot_pins: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          kind: string
+          lat: number
+          lng: number
+          notes: string
+          tide_tips: string | null
+          photo_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          kind?: string
+          lat?: number
+          lng?: number
+          notes?: string
+          tide_tips?: string | null
+          photo_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          kind?: string
+          lat?: number
+          lng?: number
+          notes?: string
+          tide_tips?: string | null
+          photo_url?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      video_clips: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          category: string
+          video_url: string
+          votes: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          category?: string
+          video_url: string
+          votes?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          category?: string
+          video_url?: string
+          votes?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      board_graveyard: {
+        Row: {
+          id: string
+          user_id: string | null
+          board_name: string
+          story: string
+          photo_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          board_name: string
+          story: string
+          photo_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          board_name?: string
+          story?: string
+          photo_url?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

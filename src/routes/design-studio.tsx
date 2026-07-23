@@ -1,26 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  Undo2,
-  Redo2,
-  Type as TypeIcon,
-  Image as ImageIcon,
-  Layers,
-  Sparkles,
-  Trash2,
-  Lock,
-  Unlock,
-  ArrowUp,
-  ArrowDown,
-  Crosshair,
-  Maximize2,
-  RotateCw,
-  Download,
-  Link2,
-  Save,
-  Upload,
-  Palette,
-} from "lucide-react";
+import { Undo2, Redo2, Type as TypeIcon, Image as ImageIcon, Layers, Sparkles, Trash2, Lock, Clock as Unlock, ArrowUp, ArrowDown, Crosshair, Maximize2, RotateCw, Download, Link2, Save, Upload, Palette } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -390,25 +370,38 @@ function DesignStudioPage() {
     toast.success(`${t.label} template loaded`);
   };
 
-  // Price
-  const price = useMemo(() => {
-    let p = meta.basePrice;
+  // Price breakdown
+  const priceBreakdown = useMemo(() => {
+    const items: { label: string; amount: number }[] = [];
+    let total = meta.basePrice;
+    items.push({ label: `Base ${meta.label}`, amount: meta.basePrice });
+
     const uploads = state.layers.filter((l) => l.kind === "image").length;
-    p += uploads * 8;
+    if (uploads > 0) {
+      const cost = uploads * 8;
+      total += cost;
+      items.push({ label: `Custom image upload (${uploads})`, amount: cost });
+    }
     const stickers = state.layers.filter((l) => l.kind === "sticker").length;
-    p += stickers * 3;
-    if (state.texture === "gloss") p += 25;
-    if (state.texture === "grip") p += 12;
-    if (state.texture === "wood") p += 18;
-    if (state.texture === "cotton") p += 10;
-    if (state.concave === "steep") p += 15;
-    else if (state.concave === "medium") p += 8;
-    if (state.hardness === "101a") p += 12;
-    else if (state.hardness === "99a") p += 8;
-    if (state.tail === "swallow" || state.tail === "pin") p += 20;
-    if (state.fins === "quad" || state.fins === "thruster") p += 25;
-    return p;
-  }, [state, meta.basePrice]);
+    if (stickers > 0) {
+      const cost = stickers * 3;
+      total += cost;
+      items.push({ label: `Sticker layers (${stickers})`, amount: cost });
+    }
+    if (state.texture === "gloss") { total += 25; items.push({ label: "High-Gloss Fiberglass", amount: 25 }); }
+    if (state.texture === "grip") { total += 12; items.push({ label: "Grip Tape", amount: 12 }); }
+    if (state.texture === "wood") { total += 18; items.push({ label: "Stained Wood Grain", amount: 18 }); }
+    if (state.texture === "cotton") { total += 10; items.push({ label: "Heavy Cotton", amount: 10 }); }
+    if (state.concave === "steep") { total += 15; items.push({ label: "Steep Concave", amount: 15 }); }
+    else if (state.concave === "medium") { total += 8; items.push({ label: "Medium Concave", amount: 8 }); }
+    if (state.hardness === "101a") { total += 12; items.push({ label: "101a Wheels", amount: 12 }); }
+    else if (state.hardness === "99a") { total += 8; items.push({ label: "99a Wheels", amount: 8 }); }
+    if (state.tail === "swallow" || state.tail === "pin") { total += 20; items.push({ label: `${state.tail} tail`, amount: 20 }); }
+    if (state.fins === "quad" || state.fins === "thruster") { total += 25; items.push({ label: `${state.fins} fin setup`, amount: 25 }); }
+    return { items, total };
+  }, [state, meta]);
+
+  const price = priceBreakdown.total;
 
   // Save / export / share
   const saveToGarage = async () => {
@@ -852,13 +845,21 @@ function DesignStudioPage() {
               </div>
             </div>
 
-            {/* Price + actions */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
-              <div>
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">Live price</div>
-                <div className="text-2xl font-semibold">${price.toFixed(0)} AUD</div>
-                <div className="text-xs text-muted-foreground">
-                  Base ${meta.basePrice} + graphics/specs
+            {/* Price breakdown + actions */}
+            <div className="mt-4 rounded-lg border border-border bg-card p-4">
+              <div className="mb-3">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Price Breakdown</div>
+                <div className="space-y-1.5">
+                  {priceBreakdown.items.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">{item.label}</span>
+                      <span className="font-mono">${item.amount.toFixed(0)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 pt-2 border-t border-border flex items-center justify-between">
+                  <span className="text-sm font-bold uppercase tracking-wider">Subtotal</span>
+                  <span className="text-2xl font-bold font-display">${priceBreakdown.total.toFixed(0)} AUD</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">

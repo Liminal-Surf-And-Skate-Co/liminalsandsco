@@ -11,4 +11,10 @@ export default defineConfig({
     tailwindcss(), 
     tsConfigPaths()
   ],
+  ssr: {
+    noExternal: ["react-leaflet", "leaflet"],
+  },
+  optimizeDeps: {
+    include: ["react-leaflet", "leaflet"],
+  },
 });
