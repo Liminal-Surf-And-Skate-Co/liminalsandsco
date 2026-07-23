@@ -16,15 +16,61 @@ interface OrderPayload {
   isTest?: boolean;
 }
 
+interface StructuredLog {
+  timestamp: string;
+  level: "info" | "warn" | "error";
+  message: string;
+  correlation_id: string;
+  user_id?: string;
+  request_id?: string;
+  [key: string]: unknown;
+}
+
+function generateCorrelationId(): string {
+  return `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function logStructured(
+  level: "info" | "warn" | "error",
+  message: string,
+  correlationId: string,
+  extra?: Record<string, unknown>
+): void {
+  const log: StructuredLog = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    correlation_id: correlationId,
+    ...extra,
+  };
+  console.log(JSON.stringify(log));
+}
+
 Deno.serve(async (req: Request) => {
+  const correlationId = req.headers.get("X-Correlation-ID") || generateCorrelationId();
+  const requestId = `${correlationId}-${crypto.randomUUID().slice(0, 8)}`;
+
+  logStructured("info", "Incoming webhook request", correlationId, {
+    method: req.method,
+    request_id: requestId,
+  });
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return new Response(null, {
+      status: 200,
+      headers: { ...corsHeaders, "X-Correlation-ID": correlationId },
+    });
   }
 
   if (req.method !== "POST") {
+    logStructured("warn", "Invalid method", correlationId, { method: req.method, request_id: requestId });
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
     });
   }
 
@@ -34,10 +80,14 @@ Deno.serve(async (req: Request) => {
     const discordWebhookUrl = Deno.env.get("DISCORD_ORDERS_WEBHOOK_URL");
 
     if (!discordWebhookUrl) {
-      console.error("Discord webhook URL not configured");
+      logStructured("error", "Discord webhook URL not configured", correlationId, { request_id: requestId });
       return new Response(JSON.stringify({ error: "Webhook not configured" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
       });
     }
 
@@ -45,6 +95,14 @@ Deno.serve(async (req: Request) => {
 
     const body: OrderPayload = await req.json();
     const { orderId, fulfillmentSource, products, totalAmount, pointsEarned, isTest } = body;
+
+    logStructured("info", "Processing order", correlationId, {
+      order_id: orderId,
+      fulfillment_source: fulfillmentSource,
+      total_amount: totalAmount,
+      points_earned: pointsEarned,
+      request_id: requestId,
+    });
 
     // Build embed
     const productLines = products
@@ -89,6 +147,11 @@ Deno.serve(async (req: Request) => {
     };
 
     // Send to Discord
+    logStructured("info", "Sending Discord webhook", correlationId, {
+      order_id: orderId,
+      request_id: requestId,
+    });
+
     const discordResponse = await fetch(discordWebhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -100,24 +163,50 @@ Deno.serve(async (req: Request) => {
     });
 
     if (!discordResponse.ok) {
-      console.error("Discord webhook failed:", await discordResponse.text());
+      const discordError = await discordResponse.text();
+      logStructured("error", "Discord webhook failed", correlationId, {
+        order_id: orderId,
+        status: discordResponse.status,
+        error: discordError,
+        request_id: requestId,
+      });
       return new Response(JSON.stringify({ error: "Failed to send webhook" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    logStructured("info", "Discord webhook sent successfully", correlationId, {
+      order_id: orderId,
+      request_id: requestId,
+    });
+
+    return new Response(JSON.stringify({ success: true, request_id: requestId }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
     });
   } catch (error) {
-    console.error("Error in discord-order-webhook:", error);
+    logStructured("error", "Unexpected error in discord-order-webhook", correlationId, {
+      error: (error as Error).message,
+      request_id: requestId,
+    });
     return new Response(
       JSON.stringify({ error: "Something went wrong. Please try again." }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
       }
     );
   }
