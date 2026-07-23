@@ -13,6 +13,7 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as GraveyardRouteImport } from './routes/graveyard'
 import { Route as DesignStudioRouteImport } from './routes/design-studio'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -33,7 +34,6 @@ import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
-import { Route as AccountGarageRouteImport } from './routes/account.garage'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -53,6 +53,11 @@ const ShopRoute = ShopRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraveyardRoute = GraveyardRouteImport.update({
+  id: '/graveyard',
+  path: '/graveyard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DesignStudioRoute = DesignStudioRouteImport.update({
@@ -155,11 +160,6 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AccountRoute,
 } as any)
-const AccountGarageRoute = AccountGarageRouteImport.update({
-  id: '/garage',
-  path: '/garage',
-  getParentRoute: () => AccountRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -172,11 +172,11 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
-  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -199,11 +199,11 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
-  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -227,11 +227,11 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/graveyard': typeof GraveyardRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
   '/wishlist': typeof WishlistRoute
-  '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
@@ -256,11 +256,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
     | '/wishlist'
-    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -283,11 +283,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
     | '/wishlist'
-    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -310,11 +310,11 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/graveyard'
     | '/search'
     | '/shop'
     | '/support'
     | '/wishlist'
-    | '/account/garage'
     | '/account/orders'
     | '/admin/events'
     | '/admin/newsletters'
@@ -338,6 +338,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CommunityRoute: typeof CommunityRoute
   DesignStudioRoute: typeof DesignStudioRoute
+  GraveyardRoute: typeof GraveyardRoute
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRouteWithChildren
   SupportRoute: typeof SupportRoute
@@ -376,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/graveyard': {
+      id: '/graveyard'
+      path: '/graveyard'
+      fullPath: '/graveyard'
+      preLoaderRoute: typeof GraveyardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design-studio': {
@@ -518,23 +526,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountOrdersRouteImport
       parentRoute: typeof AccountRoute
     }
-    '/account/garage': {
-      id: '/account/garage'
-      path: '/garage'
-      fullPath: '/account/garage'
-      preLoaderRoute: typeof AccountGarageRouteImport
-      parentRoute: typeof AccountRoute
-    }
   }
 }
 
 interface AccountRouteChildren {
-  AccountGarageRoute: typeof AccountGarageRoute
   AccountOrdersRoute: typeof AccountOrdersRoute
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
-  AccountGarageRoute: AccountGarageRoute,
   AccountOrdersRoute: AccountOrdersRoute,
 }
 
@@ -586,6 +585,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CommunityRoute: CommunityRoute,
   DesignStudioRoute: DesignStudioRoute,
+  GraveyardRoute: GraveyardRoute,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRouteWithChildren,
   SupportRoute: SupportRoute,

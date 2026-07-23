@@ -154,15 +154,14 @@ export function Nav() {
         </div>
       </div>
 
-      {/* Secondary row: collapsible global search */}
+      {/* Secondary row: global search */}
       <div className="border-t border-border/30 bg-background/60">
         <div className="max-w-7xl mx-auto px-6 py-2 flex justify-end">
           <div className="w-full md:max-w-sm">
-            <GlobalSearch collapsible />
+            <GlobalSearch />
           </div>
         </div>
       </div>
-
 
       {/* Mobile menu */}
       {mobileOpen && (
