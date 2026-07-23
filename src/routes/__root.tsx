@@ -156,9 +156,13 @@ function AuthSync() {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      router.invalidate();
-      queryClient.invalidateQueries();
+    } = supabase.auth.onAuthStateChange((event) => {
+      // Only invalidate on actual auth changes, not token refresh or initial load
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        router.invalidate();
+        queryClient.invalidateQueries({ queryKey: ["loyalty"] });
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+      }
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
