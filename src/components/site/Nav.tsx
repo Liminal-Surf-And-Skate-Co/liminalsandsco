@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, Skull, BookOpen } from "lucide-react";
+import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/liminal-logo.png";
 import { useWishlist } from "@/hooks/use-wishlist";
