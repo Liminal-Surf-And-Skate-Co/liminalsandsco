@@ -16,7 +16,7 @@ export type Newsletter = {
   published: boolean;
 };
 
-export function normalizeNewsletter(row: Record<string, unknown>): Newsletter {
+function normalize(row: Record<string, unknown>): Newsletter {
   return {
     id: row.id as string,
     subject: row.subject as string,
@@ -36,7 +36,7 @@ export async function fetchNewsletters(): Promise<Newsletter[]> {
     .select("*")
     .order("sent_at", { ascending: false });
   if (error) throw new Error(sanitizeError(error));
-  return (data ?? []).map(normalizeNewsletter);
+  return (data ?? []).map(normalize);
 }
 
 export function useNewsletters() {

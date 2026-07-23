@@ -7,7 +7,6 @@ import { getPost, posts } from "@/lib/posts";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import type { Newsletter, NewsletterLink } from "@/lib/newsletters";
-import { normalizeNewsletter } from "@/lib/newsletters";
 
 const NL_PREFIX = "newsletter-";
 
@@ -128,7 +127,7 @@ function NewsletterPage({ id }: { id: string }) {
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
-      return data ? normalizeNewsletter(data as Record<string, unknown>) : null;
+      return data as Record<string, unknown> | null;
     },
   });
 
@@ -155,7 +154,9 @@ function NewsletterPage({ id }: { id: string }) {
   }
 
   const d = new Date(data.scheduled_for ?? data.sent_at);
-  const links = data.links;
+  const links = Array.isArray((data as Record<string, unknown>).links)
+    ? ((data as Record<string, unknown>).links as NewsletterLink[])
+    : [];
   const paragraphs = (data.body ?? "").split(/\n\s*\n/);
   const isImage = (s: string) =>
     /^https?:\/\/\S+\.(png|jpe?g|gif|webp|avif)(\?\S*)?$/i.test(s.trim());

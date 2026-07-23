@@ -11,8 +11,6 @@ import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
-import { BottomNav } from "@/components/site/BottomNav";
-import { CartDrawer } from "@/components/site/CartDrawer";
 
 import appCss from "../styles.css?url";
 
@@ -148,8 +146,6 @@ function RootComponent() {
       <AuthSync />
       <Outlet />
       <LiamChatWidget />
-      <CartDrawer />
-      <BottomNav />
     </QueryClientProvider>
   );
 }
