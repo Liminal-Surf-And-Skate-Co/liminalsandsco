@@ -99,38 +99,8 @@ const TEXTURES = [
   { key: "cotton", label: "Heavy Cotton" },
 ];
 
-const STICKERS: { id: string; label: string; svg: string }[] = [
-  {
-    id: "wave",
-    label: "Surf Wave",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'><path d='M2 40 Q 20 10 40 30 T 78 28 T 98 20' stroke='currentColor' stroke-width='4' fill='none' stroke-linecap='round'/><path d='M2 50 Q 25 30 50 42 T 98 38' stroke='currentColor' stroke-width='3' fill='none' stroke-linecap='round' opacity='.6'/></svg>`,
-  },
-  {
-    id: "chrome",
-    label: "Y2K Chrome Star",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#e8f0ff'/><stop offset='.5' stop-color='#8899bb'/><stop offset='1' stop-color='#22293a'/></linearGradient></defs><polygon points='50,4 61,38 96,38 68,58 78,92 50,72 22,92 32,58 4,38 39,38' fill='url(#g)' stroke='#0b0b0f' stroke-width='2'/></svg>`,
-  },
-  {
-    id: "flame",
-    label: "Flame",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 6 C 62 30 84 34 78 60 C 74 82 58 92 50 94 C 42 92 26 82 22 60 C 16 34 38 30 50 6 Z' fill='currentColor'/><path d='M50 30 C 56 44 68 46 64 62 C 62 76 54 84 50 86 C 46 84 38 76 36 62 C 32 46 44 44 50 30 Z' fill='#fff' opacity='.35'/></svg>`,
-  },
-  {
-    id: "stencil",
-    label: "Spray Stencil",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='currentColor'><rect x='4' y='24' width='14' height='14'/><rect x='22' y='16' width='14' height='30'/><rect x='40' y='24' width='14' height='14'/><rect x='58' y='8' width='14' height='46'/><rect x='76' y='16' width='14' height='30'/><rect x='94' y='24' width='14' height='14'/></g></svg>`,
-  },
-  {
-    id: "sun",
-    label: "Retro Sun",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='24' fill='currentColor'/><g stroke='currentColor' stroke-width='4' stroke-linecap='round'><line x1='50' y1='6' x2='50' y2='18'/><line x1='50' y1='82' x2='50' y2='94'/><line x1='6' y1='50' x2='18' y2='50'/><line x1='82' y1='50' x2='94' y2='50'/><line x1='18' y1='18' x2='27' y2='27'/><line x1='73' y1='73' x2='82' y2='82'/><line x1='82' y1='18' x2='73' y2='27'/><line x1='27' y1='73' x2='18' y2='82'/></g></svg>`,
-  },
-  {
-    id: "bolt",
-    label: "Bolt",
-    svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 100'><polygon points='34,2 4,54 26,54 20,98 56,40 32,40 40,2' fill='currentColor'/></svg>`,
-  },
-];
+// Legacy alias — the real library lives in @/lib/sticker-library
+const STICKERS = ALL_STICKERS;
 
 // ---------- Templates ----------
 const TEMPLATES: {
