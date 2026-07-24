@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope, KeyRound, MoreVertical, RefreshCw, Copy } from "lucide-react";
+import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope, KeyRound, MoveVertical as MoreVertical, RefreshCw, Copy } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -102,10 +102,26 @@ function AdminPage() {
           ))}
         </div>
 
-        {activeTab === "overview" && <AdminOverview />}
-        {activeTab === "users" && <AdminUsers />}
-        {activeTab === "loyalty" && <AdminLoyalty />}
-        {activeTab === "settings" && <AdminSettings />}
+        {activeTab === "overview" && (
+          <ErrorBoundary name="Admin Overview" fallback={<AdminModuleError name="Overview" />}>
+            <AdminOverview />
+          </ErrorBoundary>
+        )}
+        {activeTab === "users" && (
+          <ErrorBoundary name="Admin Users" fallback={<AdminModuleError name="Users" />}>
+            <AdminUsers />
+          </ErrorBoundary>
+        )}
+        {activeTab === "loyalty" && (
+          <ErrorBoundary name="Admin Loyalty" fallback={<AdminModuleError name="Loyalty" />}>
+            <AdminLoyalty />
+          </ErrorBoundary>
+        )}
+        {activeTab === "settings" && (
+          <ErrorBoundary name="Admin Settings" fallback={<AdminModuleError name="Settings" />}>
+            <AdminSettings />
+          </ErrorBoundary>
+        )}
       </main>
       <Footer />
     </div>
@@ -128,6 +144,24 @@ function AdminSkeleton() {
         <Skeleton className="h-24 rounded-lg" />
         <Skeleton className="h-24 rounded-lg" />
       </div>
+    </div>
+  );
+}
+
+function AdminModuleError({ name }: { name: string }) {
+  return (
+    <div className="border border-destructive/40 bg-destructive/5 p-8 text-center rounded-lg">
+      <AlertCircle className="h-8 w-8 mx-auto mb-3 text-destructive/60" />
+      <p className="font-display font-bold text-lg mb-1">{name} module unavailable</p>
+      <p className="font-mono text-xs text-silver/60 mb-4">
+        An error occurred while loading this section. This may be due to a network issue or database permissions.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-5 py-2.5 border border-primary text-primary font-mono text-xs uppercase tracking-widest rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
+      >
+        Retry
+      </button>
     </div>
   );
 }

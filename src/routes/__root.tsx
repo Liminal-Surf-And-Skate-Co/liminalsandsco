@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
+import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 
 import appCss from "../styles.css?url";
 
@@ -141,11 +142,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    const onError = (e: ErrorEvent) => {
+      console.error("[App Crash]:", e.message, e.filename, e.lineno);
+    };
+    const onRejection = (e: PromiseRejectionEvent) => {
+      console.error("[Unhandled Promise]:", e.reason);
+    };
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthSync />
-      <Outlet />
-      <LiamChatWidget />
+      <ErrorBoundary name="Application Root">
+        <AuthSync />
+        <Outlet />
+        <LiamChatWidget />
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
