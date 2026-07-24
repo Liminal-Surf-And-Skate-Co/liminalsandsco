@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope } from "lucide-react";
+import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope, KeyRound, MoreVertical, RefreshCw, Copy } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,6 +14,18 @@ import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TIERS } from "@/hooks/use-loyalty";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+
+// Close action menu when clicking outside
+if (typeof window !== "undefined") {
+  window.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest("[data-action-menu]") && !target.closest("[data-action-trigger]")) {
+      // handled by React state
+    }
+  });
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Liminal" }, { name: "robots", content: "noindex" }] }),
@@ -225,6 +237,14 @@ function AdminOverview() {
 
 function AdminUsers() {
   const [search, setSearch] = useState("");
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [resetTarget, setResetTarget] = useState<{ userId: string; email: string } | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [forceChange, setForceChange] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const queryClient = useQueryClient();
+
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin", "users"],
     queryFn: async () => {
@@ -246,6 +266,62 @@ function AdminUsers() {
   const filtered = users?.filter((u: any) =>
     search === "" || u.user_id?.toLowerCase().includes(search.toLowerCase()) || u.role?.toLowerCase().includes(search.toLowerCase())
   );
+
+  async function callPasswordApi(action: "reset-email" | "force-update", payload: Record<string, unknown>) {
+    const url = `${import.meta.env.VITE_SUPABASE_URL || ""}/functions/v1/admin-password-management`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`,
+      },
+      body: JSON.stringify({ action, ...payload }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Request failed (${res.status})`);
+    }
+    return res.json();
+  }
+
+  async function sendResetEmail(email: string) {
+    try {
+      await callPasswordApi("reset-email", { email });
+      toast.success("Password reset email sent");
+    } catch (e) {
+      toast.error(sanitizeError(e));
+    }
+  }
+
+  async function forcePasswordUpdate() {
+    if (!resetTarget || !newPassword) return;
+    setResetLoading(true);
+    try {
+      await callPasswordApi("force-update", { targetUserId: resetTarget.userId, newPassword });
+      setResetSuccess(true);
+      toast.success("Password updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    } catch (e) {
+      toast.error(sanitizeError(e));
+    } finally {
+      setResetLoading(false);
+    }
+  }
+
+  function generateSecurePassword() {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let pw = "";
+    for (let i = 0; i < 16; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    setNewPassword(pw);
+  }
+
+  function closeResetModal() {
+    setResetTarget(null);
+    setNewPassword("");
+    setForceChange(false);
+    setResetSuccess(false);
+    setResetLoading(false);
+  }
 
   return (
     <div className="space-y-6">
@@ -272,12 +348,13 @@ function AdminUsers() {
                 <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Points</th>
                 <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Tier</th>
                 <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Joined</th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center">
+                  <td colSpan={6} className="px-4 py-8 text-center">
                     <Loader2 className="h-5 w-5 animate-spin mx-auto text-silver/40" />
                   </td>
                 </tr>
@@ -303,12 +380,42 @@ function AdminUsers() {
                       <td className="px-4 py-3 text-xs text-silver/60">
                         {u.created_at ? new Date(u.created_at).toLocaleDateString() : "—"}
                       </td>
+                      <td className="px-4 py-3 relative">
+                        <button
+                          onClick={() => setMenuOpen(menuOpen === u.id ? null : u.id)}
+                          className="p-1.5 rounded hover:bg-muted"
+                        >
+                          <MoreVertical className="h-4 w-4 text-silver/60" />
+                        </button>
+                        {menuOpen === u.id && (
+                          <div className="absolute right-4 top-10 z-20 w-56 bg-card border border-border/60 rounded-lg shadow-lg py-1">
+                            <button
+                              onClick={() => {
+                                setMenuOpen(null);
+                                sendResetEmail(u.email || "");
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs font-mono text-silver hover:bg-muted flex items-center gap-2"
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" /> Send Password Reset Email
+                            </button>
+                            <button
+                              onClick={() => {
+                                setMenuOpen(null);
+                                setResetTarget({ userId: u.user_id, email: u.email || "" });
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs font-mono text-silver hover:bg-muted flex items-center gap-2"
+                            >
+                              <KeyRound className="h-3.5 w-3.5" /> Force Password Update
+                            </button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-silver/60">
+                  <td colSpan={6} className="px-4 py-8 text-center text-silver/60">
                     <AlertCircle className="h-5 w-5 mx-auto mb-2 text-silver/40" />
                     <p className="text-sm">No users found</p>
                   </td>
@@ -318,6 +425,76 @@ function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* Force Password Update Modal */}
+      <Dialog open={!!resetTarget} onOpenChange={(open) => { if (!open) closeResetModal(); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              Force Password Update
+            </DialogTitle>
+          </DialogHeader>
+          {resetTarget && (
+            <div className="space-y-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">Target User</label>
+                <p className="font-mono text-xs text-silver mt-1 break-all">{resetTarget.email || resetTarget.userId}</p>
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">New Temporary Password</label>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="text"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter or generate a password"
+                    className="flex-1 px-3 py-2 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary"
+                  />
+                  <button
+                    onClick={generateSecurePassword}
+                    className="px-3 py-2 border border-border/60 text-xs font-mono uppercase tracking-widest rounded-md hover:border-primary hover:text-primary whitespace-nowrap"
+                  >
+                    Generate
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch checked={forceChange} onCheckedChange={setForceChange} />
+                <span className="text-xs font-mono text-silver/70">Force user to change password on next login</span>
+              </div>
+              {resetSuccess && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(newPassword)}
+                    className="inline-flex items-center gap-2 px-3 py-2 border border-primary text-primary text-xs font-mono uppercase tracking-widest rounded-md hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Copy className="h-3.5 w-3.5" /> Copy Password to Clipboard
+                  </button>
+                  <span className="text-xs text-success font-mono">Password updated</span>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            {!resetSuccess && (
+              <button
+                onClick={forcePasswordUpdate}
+                disabled={resetLoading || !newPassword}
+                className="px-4 py-2 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest rounded-md hover:opacity-90 disabled:opacity-40"
+              >
+                {resetLoading ? "Updating..." : "Update Password"}
+              </button>
+            )}
+            <button
+              onClick={closeResetModal}
+              className="px-4 py-2 border border-border/60 font-mono text-xs uppercase tracking-widest rounded-md hover:border-primary"
+            >
+              {resetSuccess ? "Close" : "Cancel"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
