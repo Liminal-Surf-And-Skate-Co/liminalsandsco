@@ -26,11 +26,15 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AccountGarageRouteImport } from './routes/account.garage'
 import { Route as AccountOrdersRouteImport } from './routes/account.orders'
+import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminDiagnosticsRouteImport } from './routes/admin.diagnostics'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminModerationRouteImport } from './routes/admin.moderation'
 import { Route as AdminNewslettersRouteImport } from './routes/admin.newsletters'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminSecurityRouteImport } from './routes/admin.security'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as LegalLiabilityRouteImport } from './routes/legal.liability'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
@@ -125,6 +129,11 @@ const AccountOrdersRoute = AccountOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AccountRoute,
 } as any)
+const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
   id: '/diagnostics',
   path: '/diagnostics',
@@ -133,6 +142,11 @@ const AdminDiagnosticsRoute = AdminDiagnosticsRouteImport.update({
 const AdminEventsRoute = AdminEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModerationRoute = AdminModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminNewslettersRoute = AdminNewslettersRouteImport.update({
@@ -148,6 +162,16 @@ const AdminOrdersRoute = AdminOrdersRouteImport.update({
 const AdminProductsRoute = AdminProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -209,11 +233,15 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/users': typeof AdminUsersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -241,11 +269,15 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/users': typeof AdminUsersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -274,11 +306,15 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/account/garage': typeof AccountGarageRoute
   '/account/orders': typeof AccountOrdersRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/diagnostics': typeof AdminDiagnosticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/moderation': typeof AdminModerationRoute
   '/admin/newsletters': typeof AdminNewslettersRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/users': typeof AdminUsersRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/liability': typeof LegalLiabilityRoute
   '/legal/privacy': typeof LegalPrivacyRoute
@@ -308,11 +344,15 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/garage'
     | '/account/orders'
+    | '/admin/audit-logs'
     | '/admin/diagnostics'
     | '/admin/events'
+    | '/admin/moderation'
     | '/admin/newsletters'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/security'
+    | '/admin/users'
     | '/blog/$slug'
     | '/legal/liability'
     | '/legal/privacy'
@@ -340,11 +380,15 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/garage'
     | '/account/orders'
+    | '/admin/audit-logs'
     | '/admin/diagnostics'
     | '/admin/events'
+    | '/admin/moderation'
     | '/admin/newsletters'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/security'
+    | '/admin/users'
     | '/blog/$slug'
     | '/legal/liability'
     | '/legal/privacy'
@@ -372,11 +416,15 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/account/garage'
     | '/account/orders'
+    | '/admin/audit-logs'
     | '/admin/diagnostics'
     | '/admin/events'
+    | '/admin/moderation'
     | '/admin/newsletters'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/security'
+    | '/admin/users'
     | '/blog/$slug'
     | '/legal/liability'
     | '/legal/privacy'
@@ -530,6 +578,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountOrdersRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/admin/audit-logs': {
+      id: '/admin/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/admin/audit-logs'
+      preLoaderRoute: typeof AdminAuditLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/diagnostics': {
       id: '/admin/diagnostics'
       path: '/diagnostics'
@@ -542,6 +597,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/admin/events'
       preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/moderation': {
+      id: '/admin/moderation'
+      path: '/moderation'
+      fullPath: '/admin/moderation'
+      preLoaderRoute: typeof AdminModerationRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/newsletters': {
@@ -563,6 +625,20 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/admin/products'
       preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/security': {
+      id: '/admin/security'
+      path: '/security'
+      fullPath: '/admin/security'
+      preLoaderRoute: typeof AdminSecurityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/blog/$slug': {
@@ -638,21 +714,29 @@ const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
+  AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminDiagnosticsRoute: typeof AdminDiagnosticsRoute
   AdminEventsRoute: typeof AdminEventsRoute
+  AdminModerationRoute: typeof AdminModerationRoute
   AdminNewslettersRoute: typeof AdminNewslettersRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  AdminSecurityRoute: typeof AdminSecurityRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminSettingsPayoutsRoute: typeof AdminSettingsPayoutsRoute
   AdminSettingsShopifyRoute: typeof AdminSettingsShopifyRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminDiagnosticsRoute: AdminDiagnosticsRoute,
   AdminEventsRoute: AdminEventsRoute,
+  AdminModerationRoute: AdminModerationRoute,
   AdminNewslettersRoute: AdminNewslettersRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminSettingsPayoutsRoute: AdminSettingsPayoutsRoute,
   AdminSettingsShopifyRoute: AdminSettingsShopifyRoute,
 }
