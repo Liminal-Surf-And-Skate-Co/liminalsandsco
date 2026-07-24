@@ -1,3 +1,0 @@
-[build]
-  command = "npx tsc --noEmit && vite build"
-  publish = "dist/client"
