@@ -617,18 +617,52 @@ function DesignStudioPage() {
                   />
                 </label>
                 <div>
-                  <div className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">
-                    Sticker library
+                  <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground">
+                    <span>Sticker Book</span>
+                    <span className="font-mono normal-case text-[10px] text-muted-foreground/70">
+                      {ALL_STICKERS.length} decals
+                    </span>
+                  </div>
+                  <Tabs defaultValue={STICKER_CATEGORIES[0].id}>
+                    <TabsList className="grid w-full grid-cols-4 h-auto">
+                      {STICKER_CATEGORIES.map((cat) => (
+                        <TabsTrigger key={cat.id} value={cat.id} className="text-[10px] px-1 py-1.5">
+                          {cat.label.split(" ")[0]}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    {STICKER_CATEGORIES.map((cat) => (
+                      <TabsContent key={cat.id} value={cat.id} className="mt-2">
+                        <div className="grid grid-cols-3 gap-2">
+                          {cat.stickers.map((s) => (
+                            <button
+                              key={s.id}
+                              title={s.label}
+                              onClick={() => addLayer(stickerLayer(s.id, activeFace, 50, 50, 1))}
+                              className="aspect-square rounded-md border border-border p-2 transition hover:border-foreground hover:bg-muted/50"
+                              style={{ color: state.ink }}
+                              dangerouslySetInnerHTML={{ __html: s.svg }}
+                            />
+                          ))}
+                        </div>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </div>
+                {/* Metallic quick presets */}
+                <div>
+                  <div className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                    Metallic Finishes
                   </div>
                   <div className="grid grid-cols-3 gap-2">
-                    {STICKERS.map((s) => (
+                    {METALLIC_PALETTES.map((p) => (
                       <button
-                        key={s.id}
-                        title={s.label}
-                        onClick={() => addLayer(stickerLayer(s.id, activeFace, 50, 50, 1))}
-                        className="aspect-square rounded-md border border-border p-2 transition hover:border-foreground"
-                        style={{ color: state.ink }}
-                        dangerouslySetInnerHTML={{ __html: s.svg }}
+                        key={p.id}
+                        title={p.label}
+                        onClick={() => commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))}
+                        className="aspect-video rounded-md border border-border overflow-hidden hover:border-foreground"
+                        style={{ background: p.bg }}
+                        aria-label={p.label}
                       />
                     ))}
                   </div>
@@ -816,9 +850,9 @@ function DesignStudioPage() {
                     )}
                     {l.kind === "sticker" && l.src && (
                       <div
-                        style={{ width: 100, height: 100, color: state.ink }}
+                        style={{ width: 100, height: 100, color: l.color || state.ink }}
                         dangerouslySetInnerHTML={{
-                          __html: STICKERS.find((s) => s.id === l.src)?.svg || "",
+                          __html: findSticker(l.src)?.svg || "",
                         }}
                       />
                     )}
@@ -959,22 +993,121 @@ function ColorRow({
   value: string;
   onChange: (v: string) => void;
 }) {
+  // If the value is a gradient, we can't feed it to <input type=color>; store a solid fallback.
+  const isGradient = /gradient\(/i.test(value);
+  const solid = isGradient ? "#888888" : value;
+  const [h, s, l] = useMemo(() => hexToHsl(solid), [solid]);
+  const setHsl = (nh: number, ns: number, nl: number) => onChange(hslToHex(nh, ns, nl));
   return (
     <Field label={label}>
-      <div className="flex flex-wrap items-center gap-2">
-        <Input type="color" className="h-9 w-14 p-1" value={value} onChange={(e) => onChange(e.target.value)} />
-        {BRAND_COLORS.map((c) => (
-          <button
-            key={c}
-            className={`h-6 w-6 rounded-full border-2 ${value === c ? "border-foreground" : "border-transparent"}`}
-            style={{ background: c }}
-            onClick={() => onChange(c)}
-            aria-label={c}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="color"
+            className="h-9 w-14 p-1"
+            value={solid}
+            onChange={(e) => onChange(e.target.value)}
           />
-        ))}
+          <div
+            className="h-9 flex-1 min-w-[80px] rounded-md border border-border"
+            style={{ background: value }}
+            aria-label="Current color"
+          />
+          {BRAND_COLORS.map((c) => (
+            <button
+              key={c}
+              className={`h-6 w-6 rounded-full border-2 ${value === c ? "border-foreground" : "border-transparent"}`}
+              style={{ background: c }}
+              onClick={() => onChange(c)}
+              aria-label={c}
+            />
+          ))}
+        </div>
+        {/* HSL wheel-style sliders */}
+        <div className="grid grid-cols-3 gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <label className="space-y-1">
+            <span>Hue</span>
+            <input
+              type="range"
+              min={0}
+              max={360}
+              value={h}
+              onChange={(e) => setHsl(Number(e.target.value), s, l)}
+              className="w-full accent-primary"
+              style={{ background: "linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)" }}
+            />
+          </label>
+          <label className="space-y-1">
+            <span>Sat</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={s}
+              onChange={(e) => setHsl(h, Number(e.target.value), l)}
+              className="w-full accent-primary"
+            />
+          </label>
+          <label className="space-y-1">
+            <span>Lum</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={l}
+              onChange={(e) => setHsl(h, s, Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+          </label>
+        </div>
+        {/* Metallic preset chips */}
+        <div className="flex flex-wrap gap-1.5">
+          {METALLIC_PALETTES.map((p) => (
+            <button
+              key={p.id}
+              title={p.label}
+              onClick={() => onChange(p.bg)}
+              className="h-6 w-10 rounded-md border border-border hover:border-foreground"
+              style={{ background: p.bg }}
+              aria-label={p.label}
+            />
+          ))}
+        </div>
       </div>
     </Field>
   );
+}
+
+function hexToHsl(hex: string): [number, number, number] {
+  const m = /^#?([a-f0-9]{6}|[a-f0-9]{3})$/i.exec(hex || "");
+  if (!m) return [0, 0, 50];
+  let raw = m[1];
+  if (raw.length === 3) raw = raw.split("").map((c) => c + c).join("");
+  const r = parseInt(raw.slice(0, 2), 16) / 255;
+  const g = parseInt(raw.slice(2, 4), 16) / 255;
+  const b = parseInt(raw.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      default: h = (r - g) / d + 4;
+    }
+    h *= 60;
+  }
+  return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+}
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100; l /= 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const to = (x: number) => Math.round(x * 255).toString(16).padStart(2, "0");
+  return `#${to(f(0))}${to(f(8))}${to(f(4))}`;
 }
 function Segmented({
   options,
