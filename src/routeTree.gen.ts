@@ -19,6 +19,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DesignStudioRouteImport } from './routes/design-studio'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SupportRouteImport } from './routes/support'
@@ -87,6 +88,11 @@ const CommunityRoute = CommunityRouteImport.update({
 const DesignStudioRoute = DesignStudioRouteImport.update({
   id: '/design-studio',
   path: '/design-studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/community': typeof CommunityRoute
   '/design-studio': typeof DesignStudioRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRouteWithChildren
   '/support': typeof SupportRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/reset-password'
     | '/search'
     | '/shop'
     | '/support'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/reset-password'
     | '/search'
     | '/shop'
     | '/support'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/community'
     | '/design-studio'
+    | '/reset-password'
     | '/search'
     | '/shop'
     | '/support'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CommunityRoute: typeof CommunityRoute
   DesignStudioRoute: typeof DesignStudioRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRouteWithChildren
   SupportRoute: typeof SupportRoute
@@ -466,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/design-studio'
       fullPath: '/design-studio'
       preLoaderRoute: typeof DesignStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -670,6 +690,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CommunityRoute: CommunityRoute,
   DesignStudioRoute: DesignStudioRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRouteWithChildren,
   SupportRoute: SupportRoute,

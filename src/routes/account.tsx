@@ -1,10 +1,11 @@
 // @ts-nocheck
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2 } from "lucide-react";
+import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2, AlertCircle, Mail } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { useLoyalty, TIERS, type Reward } from "@/hooks/use-loyalty";
 import { toast } from "sonner";
@@ -23,22 +24,20 @@ export const Route = createFileRoute("/account")({
 });
 
 function AccountPage() {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      // Stay on page for sign-in
-    }
-  }, [loading, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
+    setAuthError(null);
+    setNotice(null);
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -47,14 +46,53 @@ function AccountPage() {
           options: { emailRedirectTo: window.location.origin + "/account" },
         });
         if (error) throw error;
-        toast.success("Account created — you're signed in.");
+        toast.success("Account created — check your inbox to confirm.");
+        setNotice("Check your inbox to confirm your email.");
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + "/reset-password",
+        });
+        if (error) throw error;
+        setNotice("If that email exists, a reset link is on its way.");
+        toast.success("Password reset email sent.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back.");
       }
-    } catch (err) {
-      toast.error(sanitizeError(err));
+    } catch (err: any) {
+      console.error("[auth]", err);
+      setAuthError(err?.message || sanitizeError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleOAuth = async (provider: "google" | "discord") => {
+    setAuthError(null);
+    setBusy(true);
+    try {
+      if (provider === "google") {
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        });
+        if (result?.error) throw result.error;
+      } else {
+        // Discord: use Supabase directly (project-level provider config required).
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "discord",
+          options: { redirectTo: window.location.origin + "/account" },
+        });
+        if (error) throw error;
+      }
+    } catch (err: any) {
+      console.error("[oauth]", provider, err);
+      const msg = err?.message || String(err);
+      setAuthError(
+        msg.includes("provider is not enabled") || msg.includes("Unsupported provider")
+          ? `${provider} sign-in isn't enabled yet. Enable it in your backend auth settings.`
+          : msg,
+      );
     } finally {
       setBusy(false);
     }
@@ -76,13 +114,16 @@ function AccountPage() {
         ) : (
           <AuthView
             mode={mode}
-            setMode={setMode}
+            setMode={(m) => { setMode(m); setAuthError(null); setNotice(null); }}
             email={email}
             setEmail={setEmail}
             password={password}
             setPassword={setPassword}
             busy={busy}
+            authError={authError}
+            notice={notice}
             onSubmit={handleSubmit}
+            onOAuth={handleOAuth}
           />
         )}
       </main>
@@ -559,45 +600,101 @@ function AuthView({
   password,
   setPassword,
   busy,
+  authError,
+  notice,
   onSubmit,
+  onOAuth,
 }: {
-  mode: "signin" | "signup";
-  setMode: (m: "signin" | "signup") => void;
+  mode: "signin" | "signup" | "forgot";
+  setMode: (m: "signin" | "signup" | "forgot") => void;
   email: string;
   setEmail: (s: string) => void;
   password: string;
   setPassword: (s: string) => void;
   busy: boolean;
+  authError: string | null;
+  notice: string | null;
   onSubmit: (e: React.FormEvent) => void;
+  onOAuth: (p: "google" | "discord") => void;
 }) {
+  const title =
+    mode === "signin" ? "Welcome back" : mode === "signup" ? "Join the crew" : "Reset password";
   return (
     <div className="max-w-md mx-auto">
-      <div className="text-center mb-10">
+      <div className="text-center mb-8">
         <User className="h-10 w-10 text-primary mx-auto mb-4" />
-        <h1 className="font-display font-black text-3xl md:text-4xl mb-3">
-          {mode === "signin" ? "Welcome back" : "Join the crew"}
-        </h1>
+        <h1 className="font-display font-black text-3xl md:text-4xl mb-3">{title}</h1>
         <p className="text-silver/70 text-sm">
-          Track orders, save your wishlist, earn loyalty rewards.
+          {mode === "forgot"
+            ? "Enter your email and we'll send a reset link."
+            : "Track orders, save your wishlist, earn loyalty rewards."}
         </p>
       </div>
 
       <div className="border border-border/60 bg-card p-6 rounded-lg">
-        <div className="flex gap-2 mb-6">
-          {(["signin", "signup"] as const).map((k) => (
-            <button
-              key={k}
-              onClick={() => setMode(k)}
-              className={`flex-1 font-mono text-[10px] uppercase tracking-widest px-3 py-2.5 border rounded-md transition-colors ${
-                mode === k
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/60 text-silver hover:border-primary"
-              }`}
-            >
-              {k === "signin" ? "Sign in" : "Create account"}
-            </button>
-          ))}
-        </div>
+        {mode !== "forgot" && (
+          <div className="flex gap-2 mb-5">
+            {(["signin", "signup"] as const).map((k) => (
+              <button
+                key={k}
+                onClick={() => setMode(k)}
+                className={`flex-1 font-mono text-[10px] uppercase tracking-widest px-3 py-2.5 border rounded-md transition-colors ${
+                  mode === k
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/60 text-silver hover:border-primary"
+                }`}
+              >
+                {k === "signin" ? "Sign in" : "Create account"}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {mode !== "forgot" && (
+          <>
+            <div className="grid grid-cols-2 gap-2 mb-5">
+              <button
+                type="button"
+                onClick={() => onOAuth("google")}
+                disabled={busy}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-border/60 rounded-md text-xs font-mono uppercase tracking-widest hover:border-primary disabled:opacity-50"
+              >
+                <GoogleIcon /> Google
+              </button>
+              <button
+                type="button"
+                onClick={() => onOAuth("discord")}
+                disabled={busy}
+                className="inline-flex items-center justify-center gap-2 px-3 py-2.5 border border-border/60 rounded-md text-xs font-mono uppercase tracking-widest hover:border-primary disabled:opacity-50"
+              >
+                <DiscordIcon /> Discord
+              </button>
+            </div>
+            <div className="relative my-4 text-center">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/40" /></div>
+              <span className="relative bg-card px-2 text-[10px] font-mono uppercase tracking-widest text-silver/50">or with email</span>
+            </div>
+          </>
+        )}
+
+        {authError && (
+          <div
+            role="alert"
+            className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive"
+          >
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span className="break-words">{authError}</span>
+          </div>
+        )}
+        {notice && (
+          <div
+            role="status"
+            className="mb-3 flex items-start gap-2 rounded-md border border-primary/40 bg-primary/10 p-3 text-xs text-primary"
+          >
+            <Mail className="h-4 w-4 mt-0.5 shrink-0" />
+            <span className="break-words">{notice}</span>
+          </div>
+        )}
 
         <form onSubmit={onSubmit} className="space-y-3">
           <input
@@ -608,15 +705,17 @@ function AuthView({
             placeholder="Email"
             className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
           />
-          <input
-            required
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (min 8 characters)"
-            minLength={8}
-            className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
-          />
+          {mode !== "forgot" && (
+            <input
+              required
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (min 8 characters)"
+              minLength={8}
+              className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver placeholder:text-silver/40 rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
+            />
+          )}
           <button
             type="submit"
             disabled={busy}
@@ -628,13 +727,53 @@ function AuthView({
               </span>
             ) : mode === "signin" ? (
               "Sign in"
-            ) : (
+            ) : mode === "signup" ? (
               "Create account"
+            ) : (
+              "Send reset link"
             )}
           </button>
         </form>
+
+        <div className="mt-4 flex items-center justify-between text-[11px] font-mono">
+          {mode === "signin" ? (
+            <button
+              type="button"
+              onClick={() => setMode("forgot")}
+              className="text-primary hover:underline"
+            >
+              Forgot password?
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMode("signin")}
+              className="text-primary hover:underline"
+            >
+              ← Back to sign in
+            </button>
+          )}
+        </div>
       </div>
     </div>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden>
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.5 13.3l7.8 6.1C12.2 13.5 17.6 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.5 24.5c0-1.6-.2-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.8c4.3-4 6.7-9.8 6.7-17.3z"/>
+      <path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.5 10.7l7.8-6.1z"/>
+      <path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.4-5.8c-2.1 1.4-4.7 2.2-7.9 2.2-6.4 0-11.8-4-13.7-9.9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/>
+    </svg>
+  );
+}
+function DiscordIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden fill="currentColor">
+      <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3l-.191.365a18.29 18.29 0 0 1 3.317 1.093c-4.026-1.94-8.708-1.94-12.784 0A18.32 18.32 0 0 1 10.22 3.365L10.03 3a19.79 19.79 0 0 0-3.76 1.369C2.61 9.75 1.822 15 2.2 20.18c1.68 1.253 3.31 2.017 4.914 2.517.397-.54.75-1.116 1.056-1.719-.579-.219-1.131-.487-1.657-.804.14-.104.276-.212.408-.322 3.216 1.492 6.696 1.492 9.869 0 .133.11.269.218.408.322-.527.318-1.08.587-1.66.807.306.6.66 1.176 1.056 1.716 1.605-.5 3.235-1.264 4.916-2.518.446-6-.907-11.203-3.194-15.81zM8.834 15.62c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.882 2.244-1.996 2.244zm6.332 0c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.881 2.244-1.996 2.244z"/>
+    </svg>
   );
 }
 
