@@ -696,7 +696,9 @@ function DesignStudioPage() {
                   </select>
                 </Field>
 
-                <StudioSpecsExtra onApply={commit} />
+                {product === "skateboard" && (
+                  <>
+                    <Field label="Concave profile">
                       <Segmented
                         options={["mellow", "medium", "steep"]}
                         value={state.concave || "medium"}
