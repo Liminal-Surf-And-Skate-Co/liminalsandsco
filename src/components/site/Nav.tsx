@@ -38,6 +38,39 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/40">
+      {/* Top utility bar — secondary links (Blog, Crew, Support, Join Us) */}
+      <div className="border-b border-border/40 bg-background/85 hidden lg:block">
+        <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-end gap-7 text-[11px] font-mono uppercase tracking-widest text-silver/80">
+          <Link
+            to="/blog"
+            className="hover:text-primary transition-colors inline-flex items-center gap-1.5 min-h-[36px]"
+            activeProps={{ className: "text-primary" }}
+          >
+            <BookOpen className="h-3 w-3" /> Blog
+          </Link>
+          <Link
+            to="/about"
+            className="hover:text-primary transition-colors min-h-[36px] inline-flex items-center"
+            activeProps={{ className: "text-primary" }}
+          >
+            Crew
+          </Link>
+          <Link
+            to="/support"
+            className="hover:text-primary transition-colors min-h-[36px] inline-flex items-center"
+            activeProps={{ className: "text-primary" }}
+          >
+            Support
+          </Link>
+          <Link
+            to="/academy"
+            className="text-primary hover:opacity-80 transition-opacity min-h-[36px] inline-flex items-center gap-1.5 px-2 py-0.5 border border-primary/40 rounded-sm"
+            activeProps={{ className: "opacity-100 bg-primary/10" }}
+          >
+            <Sparkles className="h-3 w-3" /> Join Us
+          </Link>
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Liminal Surf & Skate Co" className="h-10 w-auto" />
@@ -76,32 +109,11 @@ export function Nav() {
           ))}
 
           <Link
-            to="/about"
-            className="hover:text-primary transition-colors"
-            activeProps={{ className: "text-primary" }}
-          >
-            Crew
-          </Link>
-          <Link
             to="/community"
             className="hover:text-primary transition-colors"
             activeProps={{ className: "text-primary" }}
           >
             Community
-          </Link>
-          <Link
-            to="/academy"
-            className="hover:text-primary transition-colors flex items-center gap-1"
-            activeProps={{ className: "text-primary" }}
-          >
-            <BookOpen className="h-3 w-3" /> Academy
-          </Link>
-          <Link
-            to="/blog"
-            className="hover:text-primary transition-colors"
-            activeProps={{ className: "text-primary" }}
-          >
-            Blog
           </Link>
           <Link
             to="/design-studio"
