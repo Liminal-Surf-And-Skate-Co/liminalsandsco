@@ -13,6 +13,16 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 import { STICKER_CATEGORIES, METALLIC_PALETTES, findSticker, ALL_STICKERS } from "@/lib/sticker-library";
+import {
+  STUDIO_THEMES,
+  type StudioTheme,
+} from "@/lib/studio/themes";
+import {
+  SOFT_PALETTES,
+  HOT_PALETTES,
+  type PaletteGroup,
+  type PaletteSwatch,
+} from "@/lib/studio/palettes";
 
 export const Route = createFileRoute("/design-studio")({
   head: () => ({
@@ -686,9 +696,7 @@ function DesignStudioPage() {
                   </select>
                 </Field>
 
-                {product === "skateboard" && (
-                  <>
-                    <Field label="Concave">
+                <StudioSpecsExtra onApply={commit} />
                       <Segmented
                         options={["mellow", "medium", "steep"]}
                         value={state.concave || "medium"}
@@ -1136,6 +1144,93 @@ function Segmented({
 }
 
 // ---------- Helpers ----------
+function StudioSpecsExtra({
+  onApply,
+}: {
+  onApply: (updater: (s: DesignState) => DesignState) => void;
+}) {
+  const applyTheme = (t: StudioTheme) => {
+    onApply((s) => ({ ...s, bg: t.palette.bg, ink: t.palette.ink }));
+  };
+  const applySwatch = (sw: PaletteSwatch) => {
+    onApply((s) => ({ ...s, ink: sw.hex }));
+  };
+  return (
+    <div className="space-y-4 border-t border-border/40 pt-4">
+      <Field label="Studio Theme & Mood — 50 presets">
+        <div className="grid grid-cols-5 gap-1.5 max-h-48 overflow-y-auto pr-1 rounded-sm border border-border/40 bg-background/30 p-1.5">
+          {STUDIO_THEMES.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              title={`${t.label} — ${t.mood}`}
+              onClick={() => applyTheme(t)}
+              className="aspect-square rounded-sm border border-border/60 hover:border-primary relative overflow-hidden group transition-colors"
+              style={{ background: t.palette.bg }}
+            >
+              <span
+                className="absolute inset-x-0 bottom-0 text-[7px] font-mono uppercase tracking-widest truncate text-center px-0.5 py-0.5"
+                style={{ color: t.palette.ink }}
+              >
+                {t.label.slice(0, 8)}
+              </span>
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-1.5">
+          Click a preset to apply scoped palette to the studio canvas. The outer website theme is NOT touched.
+        </p>
+      </Field>
+
+      <Field label="Soft & Hot Color Palettes">
+        <div className="space-y-2.5">
+          {[...SOFT_PALETTES, ...HOT_PALETTES].map((g) => (
+            <div key={g.id} className="border border-border/40 rounded-sm p-2 bg-background/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[9px] font-mono uppercase tracking-widest">
+                  {g.label}
+                  <span
+                    className={`ml-1.5 ${
+                      g.mood === "hot"
+                        ? "text-primary"
+                        : g.mood === "soft"
+                          ? "text-amber-300"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    · {g.mood.toUpperCase()}
+                  </span>
+                </span>
+                <span className="text-[8px] text-muted-foreground font-mono">{g.swatches.length} hues</span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                {g.swatches.map((sw) => (
+                  <button
+                    key={sw.hex}
+                    type="button"
+                    title={`${sw.label} — ${sw.hex}`}
+                    onClick={() => applySwatch(sw)}
+                    className="h-8 rounded-sm border border-border/60 hover:border-primary relative group transition-colors"
+                    style={{ background: sw.hex }}
+                  >
+                    <span className="sr-only">{sw.label}</span>
+                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 text-[8px] font-mono uppercase tracking-widest bg-background/95 border border-border opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10">
+                      {sw.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-1.5">
+          Hover for name. Click to apply ink color to current layer.
+        </p>
+      </Field>
+    </div>
+  );
+}
+
 function initialState(product: ProductKey): DesignState {
   return {
     product,
