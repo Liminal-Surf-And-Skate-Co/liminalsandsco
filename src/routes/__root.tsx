@@ -9,7 +9,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  supabase,
+  isSupabaseConfigured,
+} from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 
@@ -139,6 +142,26 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Dev/ops banner shown at the very top of the app when the Supabase URL or
+ * anon key is missing. It does NOT block the rest of the UI — auth-gated
+ * features still render their "degraded mode" placeholders underneath.
+ */
+function BackendBanner() {
+  if (isSupabaseConfigured) return null;
+  return (
+    <div
+      role="status"
+      className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-xs sm:text-sm font-medium"
+    >
+      Backend configuration missing. Set{" "}
+      <code className="font-mono">VITE_SUPABASE_URL</code> and{" "}
+      <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> in the project’s
+      API Keys tab to enable login, products, and admin.
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -161,6 +184,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary name="Application Root">
         <AuthSync />
+        <BackendBanner />
         <Outlet />
         <LiamChatWidget />
       </ErrorBoundary>

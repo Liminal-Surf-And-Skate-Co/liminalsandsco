@@ -9,6 +9,14 @@ export function useAuth() {
 
   useEffect(() => {
     let mounted = true;
+    let initialSettled = false;
+
+    const settleLoading = () => {
+      if (!initialSettled && mounted) {
+        initialSettled = true;
+        setLoading(false);
+      }
+    };
 
     const checkAdmin = async (uid: string | null, sessionUser: User | null) => {
       if (!uid) {
@@ -16,14 +24,14 @@ export function useAuth() {
         return;
       }
 
-      // Fast path: check JWT app_metadata for admin role (works even if DB is unreachable)
+      // Fast path: JWT app_metadata (works even if DB is unreachable)
       const metaRole = sessionUser?.app_metadata?.role;
       if (metaRole === "admin") {
         if (mounted) setIsAdmin(true);
         return;
       }
 
-      // Also check user_roles table in the database
+      // Fallback: user_roles table
       try {
         const { data } = await supabase
           .from("user_roles")
@@ -33,27 +41,58 @@ export function useAuth() {
           .maybeSingle();
         if (mounted) setIsAdmin(Boolean(data));
       } catch {
-        // If the DB query fails, fall back to metadata check
         if (mounted) setIsAdmin(metaRole === "admin");
       }
     };
 
+    // Primary path: wait for Supabase's INITIAL_SESSION event before flipping
+    // `loading` to false. This prevents the redirect-loop / white-screen flicker
+    // that happens when consumers see `loading=false` with a stale user state.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
-      // Defer Supabase call to avoid deadlock inside the listener
-      setTimeout(() => checkAdmin(session?.user?.id ?? null, session?.user ?? null), 0);
+
+      // Defer Supabase calls to avoid deadlocking inside the listener.
+      setTimeout(() => {
+        if (!mounted) return;
+        checkAdmin(session?.user?.id ?? null, session?.user ?? null);
+      }, 0);
+
+      // Only resolve `loading` after the initial session (or a real change) is known.
+      if (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN" ||
+        event === "SIGNED_OUT" ||
+        event === "USER_UPDATED" ||
+        event === "PASSWORD_RECOVERY"
+      ) {
+        settleLoading();
+      }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      setUser(session?.user ?? null);
-      checkAdmin(session?.user?.id ?? null, session?.user ?? null).finally(() => {
-        if (mounted) setLoading(false);
-      });
-    });
+    // Safety net: if the Supabase proxy stub returns a no-op (env vars missing
+    // → INITIAL_SESSION will *never* fire), we still need loading to settle so
+    // the UI doesn't spin forever. Also catches thrown errors.
+    try {
+      const maybe = supabase.auth.getSession();
+      if (maybe && typeof maybe.then === "function") {
+        maybe
+          .then(() => settleLoading())
+          .catch((err: unknown) => {
+            // eslint-disable-next-line no-console
+            console.error("[useAuth] getSession failed:", err);
+            settleLoading();
+          });
+      } else {
+        settleLoading();
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[useAuth] getSession threw synchronously:", err);
+      settleLoading();
+    }
 
     return () => {
       mounted = false;
