@@ -20,7 +20,7 @@ export function BackendConfigBanner() {
     // Defer the env check to the client to avoid SSR errors when
     // import.meta.env is unavailable at build-time hydration.
     try {
-      setConfigured(isSupabaseConfigured());
+      setConfigured(isSupabaseConfigured);
     } catch {
       setConfigured(true);
     }

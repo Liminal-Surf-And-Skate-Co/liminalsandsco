@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -22,33 +22,6 @@ import {
   Save,
   Upload,
   Palette,
-  Brush,
-  Pipette,
-  Droplet,
-  Sun,
-  Contrast,
-  ZoomIn,
-  ZoomOut,
-  FlipHorizontal2,
-  FlipVertical2,
-  Eye,
-  Group,
-  Square,
-  Circle as CircleIcon,
-  Hexagon,
-  Triangle,
-  Grid3x3,
-  Files,
-  Frame,
-  Shapes,
-  ChevronsLeftRight,
-  ChartPie,
-  ChartBar,
-  Activity,
-  Layers3,
-  Search,
-  Plus,
-  Minus,
 } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -56,21 +29,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
-import { METALLIC_PALETTES, findSticker, ALL_STICKERS } from "@/lib/sticker-library";
 import {
-  DECAL_CATEGORIES,
-  ALL_DECALS,
-  findDecal,
-  searchDecals,
-  type Decal,
-  type DecalCategory,
-} from "@/lib/studio/decals";
+  STICKER_CATEGORIES,
+  METALLIC_PALETTES,
+  findSticker,
+  ALL_STICKERS,
+} from "@/lib/sticker-library";
 import { STUDIO_THEMES, type StudioTheme } from "@/lib/studio/themes";
 import {
   SOFT_PALETTES,
@@ -78,8 +46,6 @@ import {
   type PaletteGroup,
   type PaletteSwatch,
 } from "@/lib/studio/palettes";
-
-const OFFLINE = !isSupabaseConfigured();
 
 export const Route = createFileRoute("/design-studio")({
   head: () => ({
@@ -111,9 +77,6 @@ function DesignStudioPageWithBoundary() {
 type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";
 type FaceKey = string;
 type LayerKind = "text" | "image" | "sticker";
-/** Lightweight optional group container id; layers sharing the same groupId
- *  are treated as a single groupable unit (group / ungroup). */
-type TextEffect = "shadow" | "neon" | "hollow" | "retro-wave" | "arch" | "3d-block";
 interface Layer {
   id: string;
   kind: LayerKind;
@@ -123,29 +86,14 @@ interface Layer {
   scale: number;
   rotation: number;
   locked?: boolean;
-  // visual extras
-  opacity?: number; // 0-100 (defaults to 100)
-  flipX?: boolean;
-  flipY?: boolean;
-  groupId?: string;
-  // text extras
+  // text
   text?: string;
   font?: string;
   color?: string;
   bold?: boolean;
   italic?: boolean;
-  letterSpacing?: number; // multiplier, 0.5 .. 4
-  lineHeight?: number; // multiplier, 0.8 .. 2.5
-  effect?: TextEffect;
-  arched?: boolean;
-  // image / sticker extras
+  // image / sticker
   src?: string;
-  /**
-   * Optional per-decals recolor override. When set, renders this color instead
-   * of `state.ink` for the stroke / fill matching `currentColor`. Lets you mix
-   * colors per layer on a single canvas (multi-path recoloring).
-   */
-  recolor?: string;
 }
 interface DesignState {
   product: ProductKey;
@@ -159,194 +107,7 @@ interface DesignState {
   tail?: "squash" | "swallow" | "pin";
   fins?: "single" | "twin" | "thruster" | "quad";
   layers: Layer[];
-  /** Optional multi-page index — when set, this is the active page slot. */
-  page?: number;
-  /** Canvas dimensions metadata for export pipelines (300 DPI etc.). */
-  canvasWidth?: number;
-  canvasHeight?: number;
-  canvasUnit?: "px" | "in" | "mm";
-  /** CMYK preview mock flag — does not transform color, just sets a visual marker. */
-  cmykPreview?: boolean;
 }
-
-// ---------- Tool: Font definitions ----------
-/** Categorised Google Fonts so the typography panel can filter by mood. */
-const FONT_GROUPS: { id: string; label: string; fonts: string[] }[] = [
-  {
-    id: "display",
-    label: "Display / Retro",
-    fonts: [
-      "'Bungee', sans-serif",
-      "'Monoton', sans-serif",
-      "'Audiowide', cursive",
-      "'Press Start 2P', monospace",
-      "'Bebas Neue', sans-serif",
-      "'Rubik Mono One', monospace",
-      "'Major Mono Display', monospace",
-      "'Russo One', sans-serif",
-    ],
-  },
-  {
-    id: "serif",
-    label: "Serif",
-    fonts: [
-      "'Playfair Display', serif",
-      "'Cormorant Garamond', serif",
-      "'EB Garamond', serif",
-      "'Lora', serif",
-      "'Crimson Pro', serif",
-      "'Merriweather', serif",
-    ],
-  },
-  {
-    id: "sans",
-    label: "Sans Serif",
-    fonts: [
-      "Inter, sans-serif",
-      "'IBM Plex Sans', sans-serif",
-      "'Manrope', sans-serif",
-      "'Outfit', sans-serif",
-      "'Space Grotesk', sans-serif",
-    ],
-  },
-  {
-    id: "script",
-    label: "Script",
-    fonts: [
-      "'Caveat', cursive",
-      "'Permanent Marker', cursive",
-      "'Pacifico', cursive",
-      "'Dancing Script', cursive",
-      "'Sacramento', cursive",
-    ],
-  },
-  {
-    id: "mono",
-    label: "Monospace",
-    fonts: [
-      "'JetBrains Mono', monospace",
-      "'IBM Plex Mono', monospace",
-      "'Fira Code', monospace",
-      "'Space Mono', monospace",
-    ],
-  },
-];
-
-const ALL_FONTS_LIST: string[] = FONT_GROUPS.flatMap((g) => g.fonts);
-
-/** Pre-made pairing templates so users can apply balanced typographic styles in one click. */
-const FONT_PAIRINGS: { id: string; label: string; headline: string; body: string }[] = [
-  {
-    id: "y2k-display",
-    label: "Y2K Display + Mono",
-    headline: "'Bungee', sans-serif",
-    body: "'JetBrains Mono', monospace",
-  },
-  {
-    id: "editorial-serif",
-    label: "Editorial Serif",
-    headline: "'Playfair Display', serif",
-    body: "'Lora', serif",
-  },
-  {
-    id: "swiss-tech",
-    label: "Swiss Tech",
-    headline: "'Space Grotesk', sans-serif",
-    body: "'IBM Plex Mono', monospace",
-  },
-  {
-    id: "surf-script",
-    label: "Sun-bleached Script",
-    headline: "'Permanent Marker', cursive",
-    body: "'Inter', sans-serif",
-  },
-  {
-    id: "hippie-script",
-    label: "Hippie Script",
-    headline: "'Caveat', cursive",
-    body: "'Space Grotesk', sans-serif",
-  },
-];
-
-// ---------- Tool: Photo filters / adjustments ----------
-type FilterName = "none" | "vivid" | "warm" | "cool" | "vintage" | "duotone";
-const PHOTO_FILTERS: Record<FilterName, { label: string; css: string }> = {
-  none: { label: "Original", css: "none" },
-  vivid: { label: "Vivid", css: "saturate(1.4) contrast(1.1)" },
-  warm: { label: "Warm", css: "sepia(0.25) saturate(1.2)" },
-  cool: { label: "Cool", css: "hue-rotate(195deg) saturate(0.9)" },
-  vintage: { label: "Vintage", css: "sepia(0.5) contrast(0.95) brightness(0.95)" },
-  duotone: { label: "Duotone", css: "grayscale(1) contrast(1.5)" },
-};
-
-type AdjustmentKey = "brightness" | "contrast" | "saturation" | "tint" | "vignette" | "blur";
-type Adjustments = Record<AdjustmentKey, number>;
-const DEFAULT_ADJUSTMENTS: Adjustments = {
-  brightness: 100,
-  contrast: 100,
-  saturation: 100,
-  tint: 0,
-  vignette: 0,
-  blur: 0,
-};
-function adjustmentsToCss(a: Adjustments): string {
-  const parts: string[] = [];
-  if (a.brightness !== 100) parts.push(`brightness(${a.brightness}%)`);
-  if (a.contrast !== 100) parts.push(`contrast(${a.contrast}%)`);
-  if (a.saturation !== 100) parts.push(`saturate(${a.saturation}%)`);
-  if (a.tint !== 0) parts.push(`hue-rotate(${a.tint}deg)`);
-  if (a.blur !== 0) parts.push(`blur(${a.blur}px)`);
-  return parts.length ? parts.join(" ") : "none";
-}
-
-// ---------- Tool: Paint brushes ----------
-type BrushKind = "watercolor" | "spray" | "highlighter" | "chalk" | "pencil" | "eraser";
-const BRUSH_LIBRARY: { id: BrushKind; label: string; blurb: string }[] = [
-  { id: "watercolor", label: "Watercolor", blurb: "Soft, low-opacity filled strokes" },
-  { id: "spray", label: "Spray / Graffiti", blurb: "Splatter + density control" },
-  { id: "highlighter", label: "Highlighter", blurb: "Transparent flat pass" },
-  { id: "chalk", label: "Chalk / Crayon", blurb: "Gritty, broken edges" },
-  { id: "pencil", label: "Pencil / Fine Pen", blurb: "1px hairline + smooth" },
-  { id: "eraser", label: "Eraser", blurb: "Non-destructive paint removal" },
-];
-
-// ---------- Tool: Clip frame shapes ----------
-const CLIP_FRAME_SHAPES: { id: string; label: string; clipPath: string }[] = [
-  { id: "none", label: "None", clipPath: "none" },
-  { id: "circle", label: "Circle", clipPath: "circle(50% at 50% 50%)" },
-  {
-    id: "badge",
-    label: "Badge",
-    clipPath: "polygon(50% 0,90% 30%,90% 70%,50% 100%,10% 70%,10% 30%)",
-  },
-  {
-    id: "hex",
-    label: "Hexagon",
-    clipPath: "polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)",
-  },
-  {
-    id: "torn",
-    label: "Torn Paper",
-    clipPath:
-      "polygon(0 8%, 12% 2%, 24% 6%, 36% 1%, 50% 7%, 64% 0, 78% 5%, 90% 0, 100% 6%, 98% 18%, 100% 36%, 96% 56%, 100% 76%, 97% 92%, 88% 98%, 74% 95%, 60% 99%, 46% 96%, 32% 100%, 18% 97%, 6% 100%, 0 90%, 3% 72%, 0 54%, 4% 32%, 0 16%)",
-  },
-];
-
-// ---------- 50-Decal ON-SURFACE Palette & Theme quick states ----------
-const PAGE_SIZES: {
-  id: string;
-  label: string;
-  width: number;
-  height: number;
-  unit: "px" | "in" | "mm";
-}[] = [
-  { id: "std-a4", label: "A4", width: 2480, height: 3508, unit: "px" },
-  { id: "std-square", label: "Square 1080", width: 1080, height: 1080, unit: "px" },
-  { id: "print-deck", label: "Skate Deck 32×8", width: 3200, height: 800, unit: "px" },
-  { id: "tall-story", label: "Story 1080×1920", width: 1080, height: 1920, unit: "px" },
-  { id: "browser-banner", label: "Web Banner 1920×540", width: 1920, height: 540, unit: "px" },
-  { id: "sublimation-tshirt", label: "T-Shirt 12×16", width: 3600, height: 4800, unit: "px" },
-];
 
 // ---------- Constants ----------
 const PRODUCTS: Record<
@@ -391,8 +152,6 @@ const PRODUCTS: Record<
 };
 
 const BRAND_COLORS = ["#0b0b0f", "#f4f1ea", "#ff5b1f", "#1f6feb", "#3ea770", "#e2b23a", "#d43f5b"];
-/** Backwards-compatible legacy fonts array — kept so existing templates keep
- *  rendering correctly. New typography panel reads from FONT_GROUPS. */
 const FONTS = [
   "Inter, sans-serif",
   "Georgia, serif",
@@ -407,18 +166,8 @@ const TEXTURES = [
   { key: "cotton", label: "Heavy Cotton" },
 ];
 
-// Legacy alias — the real library still lives in @/lib/sticker-library for
-// backwards compatibility with any persisted designs that reference sticker ids.
+// Legacy alias — the real library lives in @/lib/sticker-library
 const STICKERS = ALL_STICKERS;
-
-/**
- * Look up a sticker/decals by id from EITHER library. The new decals.ts file
- * is the preferred source for any new placements; stickers remain resolvable so
- * Garage-saved designs still render.
- */
-function resolveDecalSvg(id: string): string | undefined {
-  return findDecal(id)?.svg ?? findSticker(id)?.svg;
-}
 
 // ---------- Templates ----------
 const TEMPLATES: {
@@ -520,63 +269,8 @@ function DesignStudioPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; ox: number; oy: number } | null>(null);
 
-  // ---------- New-tool UI state (does NOT affect undo/redo doc history) ----------
-  const [zoom, setZoom] = useState<number>(1);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [showRulers, setShowRulers] = useState<boolean>(false);
-  const [showCenterLines, setShowCenterLines] = useState<boolean>(true);
-  const [activeFilter, setActiveFilter] = useState<FilterName>("none");
-  const [adjustments, setAdjustments] = useState<Adjustments>(DEFAULT_ADJUSTMENTS);
-  const [brushKind, setBrushKind] = useState<BrushKind>("pencil");
-  const [brushSize, setBrushSize] = useState<number>(6);
-  const [brushOpacity, setBrushOpacity] = useState<number>(80);
-  const [clipFrame, setClipFrame] = useState<string>("none");
-  const [aspectLocked, setAspectLocked] = useState<boolean>(false);
-  const [decalSearch, setDecalSearch] = useState<string>("");
-  const [selectedFontGroup, setSelectedFontGroup] = useState<string>("display");
-
-  // ---------- Read hydrate from autosave on mount / per-product ----------
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(`liminal:studio:save:${product}`);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<DesignState>;
-      if (parsed?.layers && Array.isArray(parsed.layers)) {
-        setState((s) => ({
-          ...s,
-          ...parsed,
-          product,
-          face: parsed?.face ?? s.face,
-          layers: parsed.layers as Layer[],
-        }));
-        toast.success(`Restored autosave for ${PRODUCTS[product].label}`);
-      }
-    } catch {
-      /* ignore parse errors */
-    }
-  }, [product]);
-
-  // ---------- Debounced autosave to localStorage ----------
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const t = window.setTimeout(() => {
-      try {
-        window.localStorage.setItem(`liminal:studio:save:${product}`, JSON.stringify(state));
-      } catch {
-        /* quota / serialization failure — silent */
-      }
-    }, 1200);
-    return () => window.clearTimeout(t);
-  }, [state, product]);
-
   const meta = PRODUCTS[product];
   const activeFace = state.face;
-
-  // ---------- Filter single selector for layer style ----------
-  const layerCssFilter = useMemo(() => {
-    if (activeFilter === "none" && adjustments === DEFAULT_ADJUSTMENTS) return "none";
-    return `${PHOTO_FILTERS[activeFilter].css === "none" ? "" : PHOTO_FILTERS[activeFilter].css} ${adjustmentsToCss(adjustments)}`.trim();
-  }, [activeFilter, adjustments]);
 
   // pushHistory before mutating
   const commit = useCallback((updater: (s: DesignState) => DesignState) => {
@@ -652,147 +346,6 @@ function DesignStudioPage() {
       next.splice(target, 0, item);
       return { ...s, layers: next };
     });
-
-  // Group / Ungroup selected layers (uses optional groupId)
-  const groupSelected = () => {
-    if (facedLayers.length < 2) {
-      toast.info("Select 2+ layers to group");
-      return;
-    }
-    const gid = cryptoId();
-    const ids = new Set(facedLayers.map((l) => l.id));
-    commit((s) => ({
-      ...s,
-      layers: s.layers.map((l) => (ids.has(l.id) ? { ...l, groupId: gid } : l)),
-    }));
-    toast.success(`Grouped ${ids.size} layers`);
-  };
-  const ungroupSelected = () => {
-    if (!selected?.groupId) {
-      toast.info("Pick a grouped layer first");
-      return;
-    }
-    const gid = selected.groupId;
-    commit((s) => ({
-      ...s,
-      layers: s.layers.map((l) => (l.groupId === gid ? { ...l, groupId: undefined } : l)),
-    }));
-    toast.success("Group dissolved");
-  };
-
-  // Equal spacing distribution (horizontal) for selected-faced layers
-  const distributeHorizontally = () => {
-    if (facedLayers.length < 3) {
-      toast.info("Need at least 3 layers to distribute");
-      return;
-    }
-    const sorted = [...facedLayers].sort((a, b) => a.x - b.x);
-    const minX = sorted[0].x;
-    const maxX = sorted[sorted.length - 1].x;
-    const span = maxX - minX;
-    if (span <= 0) {
-      toast.info("Items already aligned");
-      return;
-    }
-    const step = span / (sorted.length - 1);
-    commit((s) => ({
-      ...s,
-      layers: s.layers.map((l) => {
-        const idx = sorted.findIndex((x) => x.id === l.id);
-        if (idx < 0) return l;
-        return { ...l, x: minX + step * idx };
-      }),
-    }));
-    toast.success("Distributed evenly");
-  };
-
-  // Format painter — copy style from selected layer to the next-added layer
-  const formatPainter = useRef<Layer | null>(null);
-  const copyStyle = () => {
-    if (!selected) {
-      toast.info("Select a layer to copy its style from");
-      return;
-    }
-    formatPainter.current = { ...selected };
-    toast.success("Style copied — add a new layer to paste");
-  };
-  const pasteStyle = (l: Layer): Layer => {
-    if (!formatPainter.current) return l;
-    return {
-      ...l,
-      ...formatPainter.current,
-      id: l.id,
-      src: l.src,
-      text: l.text,
-      kind: l.kind,
-      face: l.face,
-    };
-  };
-
-  // Custom font uploader (browser native — no new dep)
-  const onFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!/\.(ttf|otf)$/i.test(file.name)) {
-      toast.error("Only .ttf or .otf uploads are supported");
-      return;
-    }
-    const buffer = await file.arrayBuffer().catch(() => null);
-    if (!buffer) return;
-    const fontName = `custom-${cryptoId()}`;
-    try {
-      // @ts-expect-error — TS lib.dom doesn't know about FontFace across all configs
-      const font: FontFace = new FontFace(fontName, buffer);
-      await font.load();
-      // @ts-expect-error
-      document.fonts.add(font);
-      if (selected?.kind === "text") {
-        patchLayer(selected.id, { font: fontName });
-        toast.success(`Font uploaded — applied to "${selected.text?.slice(0, 10)}"`);
-      } else {
-        toast.success(`Font uploaded — pick a text layer to apply`);
-      }
-    } catch (err) {
-      toast.error("Could not load that font file");
-    }
-  };
-
-  // Duplicate the entire project — clone state into a new localStorage slot
-  const duplicateProject = () => {
-    const key = `liminal:studio:project:${cryptoId()}`;
-    try {
-      window.localStorage.setItem(key, JSON.stringify({ ...state, product }));
-      toast.success(`Project duplicated → ${key.slice(-8)}`);
-    } catch {
-      toast.error("Duplicate failed — storage unavailable");
-    }
-  };
-
-  // Eyedropper — uses browser API when supported, falls back to toast tip
-  const eyedropper = async () => {
-    // @ts-expect-error
-    if (typeof window !== "undefined" && window.EyeDropper) {
-      try {
-        // @ts-expect-error
-        const ed = new window.EyeDropper();
-        const result = await ed.open();
-        commit((s) => ({ ...s, ink: result.sRGBHex }));
-        toast.success(`Picked ${result.sRGBHex}`);
-      } catch {
-        /* user cancelled */
-      }
-    } else {
-      toast.info("Eyedropper not available — use the color row to pick manually");
-    }
-  };
-
-  // Random palette shuffle over the SOFT_PALETTES swatches
-  const shufflePalette = () => {
-    const allSwatches = ALL_PALETTES.flatMap((g) => g.swatches);
-    const pick = allSwatches[Math.floor(Math.random() * allSwatches.length)];
-    commit((s) => ({ ...s, ink: pick.hex }));
-    toast.success(`Shuffled → ${pick.label}`);
-  };
 
   // Drag
   const onPointerDown = (e: React.PointerEvent, id: string) => {
@@ -1034,81 +587,13 @@ function DesignStudioPage() {
               Garage.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={undo}
-                  disabled={!history.length}
-                  aria-label="Undo"
-                >
-                  <Undo2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Undo (Cmd/Ctrl+Z)</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={redo}
-                  disabled={!future.length}
-                  aria-label="Redo"
-                >
-                  <Redo2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Redo (Cmd/Ctrl+Shift+Z)</TooltipContent>
-            </Tooltip>
-            <div className="mx-1 h-6 w-px bg-border" />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setZoom((z) => Math.max(0.25, z - 0.1))}
-                  aria-label="Zoom out"
-                >
-                  <ZoomOut className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Zoom out</TooltipContent>
-            </Tooltip>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {Math.round(zoom * 100)}%
-            </span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setZoom((z) => Math.min(4, z + 0.1))}
-                  aria-label="Zoom in"
-                >
-                  <ZoomIn className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Zoom in</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setZoom(1);
-                    setPan({ x: 0, y: 0 });
-                  }}
-                  aria-label="Fit"
-                >
-                  Fit
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Fit to screen</TooltipContent>
-            </Tooltip>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={undo} disabled={!history.length}>
+              <Undo2 className="mr-1 h-4 w-4" /> Undo
+            </Button>
+            <Button variant="outline" size="sm" onClick={redo} disabled={!future.length}>
+              <Redo2 className="mr-1 h-4 w-4" /> Redo
+            </Button>
           </div>
         </header>
 
@@ -1133,55 +618,19 @@ function DesignStudioPage() {
           {/* LEFT: Tabs */}
           <aside className="rounded-lg border border-border bg-card p-3">
             <Tabs defaultValue="templates">
-              <TabsList className="grid w-full grid-cols-6">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="templates" title="Templates">
-                      <Sparkles className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Templates</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="text" title="Text">
-                      <TypeIcon className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Text &amp; Typography</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="graphics" title="Decals">
-                      <ImageIcon className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Decals ({ALL_DECALS.length})</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="adjust" title="Adjust">
-                      <Contrast className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Photo Adjust</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="layout" title="Layout">
-                      <Grid3x3 className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Layout</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <TabsTrigger value="specs" title="Specs">
-                      <Palette className="h-3.5 w-3.5" />
-                    </TabsTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Specs</TooltipContent>
-                </Tooltip>
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="templates" title="Templates">
+                  <Sparkles className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="text" title="Text">
+                  <TypeIcon className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="graphics" title="Graphics">
+                  <ImageIcon className="h-4 w-4" />
+                </TabsTrigger>
+                <TabsTrigger value="specs" title="Specs">
+                  <Palette className="h-4 w-4" />
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="templates" className="mt-3 space-y-2">
@@ -1263,64 +712,40 @@ function DesignStudioPage() {
                   />
                 </label>
                 <div>
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                      Canvas Decal Library
-                    </span>
-                    <span className="font-mono text-[10px] text-muted-foreground/70">
-                      {ALL_DECALS.length} decals
+                  <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground">
+                    <span>Sticker Book</span>
+                    <span className="font-mono normal-case text-[10px] text-muted-foreground/70">
+                      {ALL_STICKERS.length} decals
                     </span>
                   </div>
-                  <div className="relative mb-2">
-                    <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Search stars, palm, gear…"
-                      className="h-8 pl-7 text-xs"
-                      value={decalSearch}
-                      onChange={(e) => setDecalSearch(e.target.value)}
-                    />
-                  </div>
-                  <Tabs defaultValue={DECAL_CATEGORIES[0].id}>
-                    <TabsList className="grid h-auto w-full grid-cols-5">
-                      {DECAL_CATEGORIES.slice(0, 10).map((cat) => (
-                        <TabsTrigger key={cat.id} value={cat.id} className="px-1 py-1 text-[9px]">
-                          {cat.label.split(" & ")[0].split(" ")[0]}
+                  <Tabs defaultValue={STICKER_CATEGORIES[0].id}>
+                    <TabsList className="grid w-full grid-cols-4 h-auto">
+                      {STICKER_CATEGORIES.map((cat) => (
+                        <TabsTrigger
+                          key={cat.id}
+                          value={cat.id}
+                          className="text-[10px] px-1 py-1.5"
+                        >
+                          {cat.label.split(" ")[0]}
                         </TabsTrigger>
                       ))}
                     </TabsList>
-                    {DECAL_CATEGORIES.map((cat) => {
-                      const list = decalSearch.trim()
-                        ? searchDecals(decalSearch, cat.decals)
-                        : cat.decals;
-                      return (
-                        <TabsContent key={cat.id} value={cat.id} className="mt-2">
-                          {list.length === 0 ? (
-                            <p className="px-1 py-3 text-center text-[11px] text-muted-foreground">
-                              No matches for “{decalSearch}”
-                            </p>
-                          ) : (
-                            <div className="grid grid-cols-3 gap-2">
-                              {list.map((d) => (
-                                <button
-                                  key={d.id}
-                                  title={d.label}
-                                  onClick={() =>
-                                    addLayer(
-                                      formatPainter.current
-                                        ? pasteStyle(stickerLayer(d.id, activeFace, 50, 50, 1))
-                                        : stickerLayer(d.id, activeFace, 50, 50, 1),
-                                    )
-                                  }
-                                  className="aspect-square rounded-md border border-border p-2 transition hover:border-foreground hover:bg-muted/50"
-                                  style={{ color: state.ink }}
-                                  dangerouslySetInnerHTML={{ __html: d.svg }}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </TabsContent>
-                      );
-                    })}
+                    {STICKER_CATEGORIES.map((cat) => (
+                      <TabsContent key={cat.id} value={cat.id} className="mt-2">
+                        <div className="grid grid-cols-3 gap-2">
+                          {cat.stickers.map((s) => (
+                            <button
+                              key={s.id}
+                              title={s.label}
+                              onClick={() => addLayer(stickerLayer(s.id, activeFace, 50, 50, 1))}
+                              className="aspect-square rounded-md border border-border p-2 transition hover:border-foreground hover:bg-muted/50"
+                              style={{ color: state.ink }}
+                              dangerouslySetInnerHTML={{ __html: s.svg }}
+                            />
+                          ))}
+                        </div>
+                      </TabsContent>
+                    ))}
                   </Tabs>
                 </div>
                 {/* Metallic quick presets */}
@@ -1336,258 +761,13 @@ function DesignStudioPage() {
                         onClick={() =>
                           commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))
                         }
-                        className="aspect-video overflow-hidden rounded-md border border-border hover:border-foreground"
+                        className="aspect-video rounded-md border border-border overflow-hidden hover:border-foreground"
                         style={{ background: p.bg }}
                         aria-label={p.label}
                       />
                     ))}
                   </div>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="adjust" className="mt-3 space-y-4">
-                <Field label="Photo Filters">
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {(Object.keys(PHOTO_FILTERS) as FilterName[]).map((id) => (
-                      <button
-                        key={id}
-                        onClick={() => setActiveFilter(id)}
-                        className={`rounded-md border px-2 py-1.5 text-[10px] uppercase tracking-wider transition ${
-                          activeFilter === id
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border hover:border-foreground"
-                        }`}
-                        title={PHOTO_FILTERS[id].css}
-                      >
-                        {PHOTO_FILTERS[id].label}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <Field label={`Brightness · ${adjustments.brightness}%`}>
-                  <Slider
-                    min={50}
-                    max={150}
-                    step={1}
-                    value={[adjustments.brightness]}
-                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, brightness: v }))}
-                  />
-                </Field>
-                <Field label={`Contrast · ${adjustments.contrast}%`}>
-                  <Slider
-                    min={50}
-                    max={150}
-                    step={1}
-                    value={[adjustments.contrast]}
-                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, contrast: v }))}
-                  />
-                </Field>
-                <Field label={`Saturation · ${adjustments.saturation}%`}>
-                  <Slider
-                    min={0}
-                    max={200}
-                    step={1}
-                    value={[adjustments.saturation]}
-                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, saturation: v }))}
-                  />
-                </Field>
-                <Field label={`Tint · ${adjustments.tint}°`}>
-                  <Slider
-                    min={-180}
-                    max={180}
-                    step={1}
-                    value={[adjustments.tint]}
-                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, tint: v }))}
-                  />
-                </Field>{" "}
-                <Field label={`Blur · ${adjustments.blur}px`}>
-                  <Slider
-                    min={0}
-                    max={20}
-                    step={1}
-                    value={[adjustments.blur]}
-                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, blur: v }))}
-                  />
-                </Field>
-                <Field label="Paint Brushes">
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {BRUSH_LIBRARY.map((b) => (
-                      <button
-                        key={b.id}
-                        onClick={() => {
-                          setBrushKind(b.id);
-                          toast.info(`Brush: ${b.label} — preview only in v2`);
-                        }}
-                        className={`rounded-md border px-2 py-1.5 text-left text-[11px] transition ${
-                          brushKind === b.id
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border hover:border-foreground"
-                        }`}
-                      >
-                        <span className="block font-medium">{b.label}</span>
-                        <span className="block text-[9px] opacity-70">{b.blurb}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    <Field label={`Size · ${brushSize}px`}>
-                      <Slider
-                        min={1}
-                        max={64}
-                        step={1}
-                        value={[brushSize]}
-                        onValueChange={([v]) => setBrushSize(v)}
-                      />
-                    </Field>
-                    <Field label={`Opacity · ${brushOpacity}%`}>
-                      <Slider
-                        min={5}
-                        max={100}
-                        step={1}
-                        value={[brushOpacity]}
-                        onValueChange={([v]) => setBrushOpacity(v)}
-                      />
-                    </Field>
-                  </div>
-                </Field>
-                <Field label="Clip Frame (image layers)">
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {CLIP_FRAME_SHAPES.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => setClipFrame(c.id)}
-                        className={`rounded-md border px-2 py-1.5 text-[10px] uppercase tracking-wider transition ${
-                          clipFrame === c.id
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border hover:border-foreground"
-                        }`}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <Field label="Tools">
-                  <div className="grid grid-cols-2 gap-1.5">
-                    <Button variant="outline" size="sm" onClick={eyedropper}>
-                      <Pipette className="mr-1 h-3.5 w-3.5" /> Eyedropper
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={copyStyle}>
-                      <Brush className="mr-1 h-3.5 w-3.5" /> Format Painter
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={shufflePalette}>
-                      <Droplet className="mr-1 h-3.5 w-3.5" /> Shuffle
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={distributeHorizontally}
-                      disabled={facedLayers.length < 3}
-                    >
-                      <ChevronsLeftRight className="mr-1 h-3.5 w-3.5" /> Distribute
-                    </Button>
-                  </div>
-                </Field>
-              </TabsContent>
-
-              <TabsContent value="layout" className="mt-3 space-y-4">
-                <Field label="Canvas Dimensions">
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {PAGE_SIZES.map((p) => (
-                      <button
-                        key={p.id}
-                        onClick={() =>
-                          commit((s) => ({
-                            ...s,
-                            canvasWidth: p.width,
-                            canvasHeight: p.height,
-                            canvasUnit: p.unit,
-                          }))
-                        }
-                        className={`rounded-md border px-2 py-2 text-left text-[11px] transition ${
-                          state.canvasWidth === p.width
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border hover:border-foreground"
-                        }`}
-                      >
-                        <span className="block font-display text-[12px] font-semibold">
-                          {p.label}
-                        </span>
-                        <span className="block font-mono text-[9px] opacity-70">
-                          {p.width}×{p.height} {p.unit}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <Field label="Collage Grids">
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[2, 3, 4, 6, 9].map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => toast.info(`Collage grid ${n}×${n} — preview only in v2`)}
-                        className="flex aspect-video items-center justify-center rounded-md border border-border hover:border-foreground"
-                      >
-                        <span className="font-mono text-[10px] uppercase tracking-widest">
-                          {n}×{n}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-                <Field label="Charts (preview)">
-                  <div className="grid grid-cols-3 gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toast.info("Bar chart — preview only in v2")}
-                    >
-                      <ChartBar className="mr-1 h-3.5 w-3.5" /> Bar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toast.info("Pie chart — preview only in v2")}
-                    >
-                      <ChartPie className="mr-1 h-3.5 w-3.5" /> Pie
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toast.info("Progress ring — preview only in v2")}
-                    >
-                      <Activity className="mr-1 h-3.5 w-3.5" /> Ring
-                    </Button>
-                  </div>
-                </Field>
-                <Field label="Color Mode">
-                  <div className="flex items-center justify-between rounded-md border border-border p-2 text-xs">
-                    <span className="uppercase tracking-wider text-muted-foreground">
-                      CMYK preview
-                    </span>
-                    <Switch
-                      checked={!!state.cmykPreview}
-                      onCheckedChange={(v) => commit((s) => ({ ...s, cmykPreview: v }))}
-                    />
-                  </div>
-                </Field>
-                <Field label="Canvas Guidelines">
-                  <div className="space-y-1.5">
-                    <label className="flex items-center justify-between rounded-md border border-border p-2 text-xs">
-                      <span>Show rulers</span>
-                      <Switch checked={showRulers} onCheckedChange={setShowRulers} />
-                    </label>
-                    <label className="flex items-center justify-between rounded-md border border-border p-2 text-xs">
-                      <span>Snap to center</span>
-                      <Switch checked={showCenterLines} onCheckedChange={setShowCenterLines} />
-                    </label>
-                  </div>
-                </Field>
-                <Field label="Project">
-                  <Button variant="outline" size="sm" className="w-full" onClick={duplicateProject}>
-                    <Files className="mr-1 h-3.5 w-3.5" /> Duplicate project
-                  </Button>
-                </Field>
               </TabsContent>
 
               <TabsContent value="specs" className="mt-3 space-y-4">
@@ -1617,7 +797,7 @@ function DesignStudioPage() {
 
                 {product === "skateboard" && (
                   <>
-                    <Field label="Concave">
+                    <Field label="Concave profile">
                       <Segmented
                         options={["mellow", "medium", "steep"]}
                         value={state.concave || "medium"}
@@ -1759,33 +939,11 @@ function DesignStudioPage() {
                       <div
                         style={{
                           fontFamily: l.font,
-                          color: l.recolor || l.color,
+                          color: l.color,
                           fontWeight: l.bold ? 700 : 400,
                           fontStyle: l.italic ? "italic" : "normal",
                           fontSize: 24,
                           whiteSpace: "nowrap",
-                          opacity: (l.opacity ?? 100) / 100,
-                          letterSpacing: l.letterSpacing ? `${l.letterSpacing}px` : undefined,
-                          lineHeight: l.lineHeight || undefined,
-                          transform: `scale(${l.flipX ? -1 : 1}, ${l.flipY ? -1 : 1})`,
-                          textShadow:
-                            l.effect === "shadow"
-                              ? "2px 2px 4px rgba(0,0,0,0.5)"
-                              : l.effect === "neon"
-                                ? "0 0 6px currentColor, 0 0 12px currentColor"
-                                : l.effect === "hollow"
-                                  ? "0 0 1px #fff, 0 0 1px #fff"
-                                  : l.effect === "3d-block"
-                                    ? "3px 3px 0 rgba(0,0,0,0.4)"
-                                    : "none",
-                          WebkitTextStroke: l.effect === "hollow" ? "1px currentColor" : undefined,
-                          color: l.effect === "retro-wave" ? "transparent" : l.recolor || l.color,
-                          backgroundImage:
-                            l.effect === "retro-wave"
-                              ? "linear-gradient(180deg, currentColor 0%, currentColor 60%, transparent 60%)"
-                              : undefined,
-                          WebkitBackgroundClip: l.effect === "retro-wave" ? "text" : undefined,
-                          display: l.arched ? "inline-block" : undefined,
                         }}
                       >
                         {l.text}
@@ -1796,30 +954,14 @@ function DesignStudioPage() {
                         src={l.src}
                         alt=""
                         draggable={false}
-                        style={{
-                          width: 140,
-                          height: "auto",
-                          pointerEvents: "none",
-                          opacity: (l.opacity ?? 100) / 100,
-                          filter: layerCssFilter !== "none" ? layerCssFilter : undefined,
-                          clipPath:
-                            CLIP_FRAME_SHAPES.find((c) => c.id === clipFrame)?.clipPath ||
-                            undefined,
-                          transform: `scale(${l.flipX ? -1 : 1}, ${l.flipY ? -1 : 1})`,
-                        }}
+                        style={{ width: 140, height: "auto", pointerEvents: "none" }}
                       />
                     )}
                     {l.kind === "sticker" && l.src && (
                       <div
-                        style={{
-                          width: 100,
-                          height: 100,
-                          color: l.recolor || l.color || state.ink,
-                          opacity: (l.opacity ?? 100) / 100,
-                          transform: `scale(${l.flipX ? -1 : 1}, ${l.flipY ? -1 : 1})`,
-                        }}
+                        style={{ width: 100, height: 100, color: l.color || state.ink }}
                         dangerouslySetInnerHTML={{
-                          __html: resolveDecalSvg(l.src) || "",
+                          __html: findSticker(l.src)?.svg || "",
                         }}
                       />
                     )}

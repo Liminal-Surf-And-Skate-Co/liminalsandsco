@@ -3,59 +3,51 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
 /**
- * Returns true when both the Supabase URL and a publishable/anon key are present AND
- * do not look like empty / placeholder values. Used by the BackendConfigBanner to
- * decide whether to render a "Demo / Offline Mode" notice.
+ * Resolve Supabase URL and anon key.
  *
- * Note: this is intentionally re-evaluated per call (cheap env read). It also treats
- * common placeholders like "your-project", "placeholder", "changeme" as unconfigured.
+ * Browser bundle (Vite) reads `VITE_*` env vars. Server runtime reads the
+ * unprefixed names. We support both so the same client module can be imported
+ * from either environment.
+ *
+ * NOTE: this file intentionally never throws and never blocks rendering when
+ * the keys are missing. The proxy at the bottom of the file returns a safe
+ * no-op stub that keeps the React tree mountable while `isSupabaseConfigured`
+ * reports `false`. The `BackendBanner` component in `__root.tsx` is what
+ * surfaces a helpful warning to the developer / user.
  */
-export function isSupabaseConfigured(): boolean {
-  if (typeof import.meta === "undefined") return false;
-  const url =
-    import.meta.env?.VITE_SUPABASE_URL ||
-    (typeof process !== "undefined" ? process.env?.SUPABASE_URL : undefined);
-  const key =
-    import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    import.meta.env?.VITE_SUPABASE_ANON_KEY ||
-    (typeof process !== "undefined"
-      ? process.env?.SUPABASE_PUBLISHABLE_KEY || process.env?.SUPABASE_ANON_KEY
-      : undefined);
-  const looksReal = (v: string | undefined) => {
-    if (!v) return false;
-    const t = v.trim().toLowerCase();
-    if (!t) return false;
-    if (t.includes("your-project") || t.includes("placeholder") || t.includes("changeme")) {
-      return false;
-    }
-    if (url && t === url.toLowerCase()) return false;
-    return t.length >= 8;
-  };
-  return looksReal(url) && looksReal(key);
-}
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
+
+const SUPABASE_ANON_KEY =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  process.env.SUPABASE_ANON_KEY ??
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  "";
+
+/**
+ * Public flag the UI can read to decide whether to:
+ *   - show the "Backend configuration missing" banner, and
+ *   - disable login / signup / data-fetching UI instead of crashing.
+ */
+export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 function createSupabaseClient(): SupabaseClient<Database> | null {
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    import.meta.env.VITE_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY;
-
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     const missing = [
-      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY / SUPABASE_ANON_KEY"] : []),
+      ...(!SUPABASE_URL ? ["VITE_SUPABASE_URL"] : []),
+      ...(!SUPABASE_ANON_KEY ? ["VITE_SUPABASE_ANON_KEY"] : []),
     ];
+    // Helpful developer-facing warning; never throws.
+
     console.warn(
       `[Supabase] Missing environment variable(s): ${missing.join(", ")}. ` +
-        `The site will run in a degraded mode — authentication and database features will be unavailable. ` +
-        `Check your Vercel/Lovable environment variables.`,
+        `Authentication and database features are disabled until set. ` +
+        `Add them via the project's API Keys tab (or .env.local for local dev).`,
     );
     return null;
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       storage: typeof window !== "undefined" ? localStorage : undefined,
       persistSession: true,
@@ -67,28 +59,33 @@ function createSupabaseClient(): SupabaseClient<Database> | null {
 let _supabase: SupabaseClient<Database> | null | undefined;
 
 /**
- * Backwards-compatible convenience constant. Equivalent to `!isSupabaseConfigured()`.
- * `false` here means the live backend (auth, db) is wired up; `true` means we're running
- * in Demo/Offline Mode and the client will return safe no-op stubs.
+ * Proxy Supabase client. When env vars are missing this proxy returns:
+ *   - `.auth.*`         → safe no-op stubs that never throw and surface a
+ *                           "Backend not configured" error message
+ *   - `.from(...)`      → a query-builder stub that resolves to empty data
+ *   - anything else     → a chained no-op
+ *
+ * This guarantees React renders normally while the banner informs the user.
  */
-export const isSupabaseOffline: boolean = !isSupabaseConfigured();
-
 export const supabase: SupabaseClient<Database> = new Proxy({} as SupabaseClient<Database>, {
-  get(_, prop, receiver) {
+  get(_target, prop, receiver) {
     if (_supabase === undefined) _supabase = createSupabaseClient();
     if (_supabase === null) {
-      // Return a no-op stub for any property access when env vars are missing.
-      // This prevents crashes while making it clear the backend is unavailable.
       if (prop === "auth") {
         return {
-          getSession: async () => ({ data: { session: null }, error: null }),
-          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+          getSession: async () => ({
+            data: { session: null },
+            error: null,
+          }),
+          onAuthStateChange: () => ({
+            data: { subscription: { unsubscribe: () => {} } },
+          }),
           signInWithPassword: async () => ({
-            data: { user: null },
+            data: { user: null, session: null },
             error: { message: "Backend not configured" },
           }),
           signUp: async () => ({
-            data: { user: null },
+            data: { user: null, session: null },
             error: { message: "Backend not configured" },
           }),
           signOut: async () => ({ error: null }),
@@ -101,7 +98,8 @@ export const supabase: SupabaseClient<Database> = new Proxy({} as SupabaseClient
           },
         };
       }
-      // For .from() and other query builders, return a proxy that resolves to empty
+      // For .from() and any other PostgREST/query builder, return a proxy that
+      // ultimately resolves to empty data without throwing.
       return new Proxy(
         {},
         {

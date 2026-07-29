@@ -9,10 +9,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
-import { BackendConfigBanner } from "@/components/site/BackendConfigBanner";
 
 import appCss from "../styles.css?url";
 
@@ -140,6 +139,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Dev/ops banner shown at the very top of the app when the Supabase URL or
+ * anon key is missing. It does NOT block the rest of the UI — auth-gated
+ * features still render their "degraded mode" placeholders underneath.
+ */
+function BackendBanner() {
+  if (isSupabaseConfigured) return null;
+  return (
+    <div
+      role="status"
+      className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-xs sm:text-sm font-medium"
+    >
+      Backend configuration missing. Set <code className="font-mono">VITE_SUPABASE_URL</code> and{" "}
+      <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> in the project’s API Keys tab to
+      enable login, products, and admin.
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -162,11 +180,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary name="Application Root">
         <AuthSync />
-        {/* Backend status banner sits above the Nav so it shows across every route
-            when the Supabase env is not configured. The Nav itself remains
-            sticky-native (top:0) and the banner raises to z-60 via its sticky top-0
-            so it never overlaps the navigation. */}
-        <BackendConfigBanner />
+        <BackendBanner />
         <Outlet />
         <LiamChatWidget />
       </ErrorBoundary>
