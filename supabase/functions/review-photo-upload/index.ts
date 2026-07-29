@@ -16,9 +16,7 @@ const BUCKET = "review-photos";
 const MAGIC: Record<string, Uint8Array[]> = {
   "image/jpeg": [new Uint8Array([0xff, 0xd8, 0xff])],
   "image/png": [new Uint8Array([0x89, 0x50, 0x4e, 0x47])],
-  "image/webp": [
-    new Uint8Array([0x52, 0x49, 0x46, 0x46]),
-  ],
+  "image/webp": [new Uint8Array([0x52, 0x49, 0x46, 0x46])],
 };
 
 interface StructuredLog {
@@ -39,7 +37,7 @@ function logStructured(
   level: "info" | "warn" | "error",
   message: string,
   correlationId: string,
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ): void {
   const log: StructuredLog = {
     timestamp: new Date().toISOString(),
@@ -94,52 +92,46 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    logStructured("warn", "Invalid method", correlationId, { method: req.method, request_id: requestId });
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      {
-        status: 405,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    logStructured("warn", "Invalid method", correlationId, {
+      method: req.method,
+      request_id: requestId,
+    });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   }
 
   try {
     const jwt = req.headers.get("Authorization")?.replace("Bearer ", "");
     if (!jwt) {
       logStructured("warn", "Missing auth token", correlationId, { request_id: requestId });
-      return new Response(
-        JSON.stringify({ error: "Missing auth token" }),
-        {
-          status: 401,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Missing auth token" }), {
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     const form = await req.formData();
     const file = form.get("file");
     if (!(file instanceof File)) {
       logStructured("warn", "No file provided", correlationId, { request_id: requestId });
-      return new Response(
-        JSON.stringify({ error: "No file provided" }),
-        {
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "No file provided" }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     const lowerName = file.name.toLowerCase();
@@ -159,17 +151,14 @@ Deno.serve(async (req: Request) => {
         filename: file.name,
         request_id: requestId,
       });
-      return new Response(
-        JSON.stringify({ error: "File type not allowed" }),
-        {
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "File type not allowed" }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     // 2. Validate extension
@@ -188,7 +177,7 @@ Deno.serve(async (req: Request) => {
             "Content-Type": "application/json",
             "X-Correlation-ID": correlationId,
           },
-        }
+        },
       );
     }
 
@@ -200,17 +189,14 @@ Deno.serve(async (req: Request) => {
         max_size: MAX_BYTES,
         request_id: requestId,
       });
-      return new Response(
-        JSON.stringify({ error: "File too large. Max 5 MB." }),
-        {
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "File too large. Max 5 MB." }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     // 4. Read first bytes for magic-number validation
@@ -231,7 +217,7 @@ Deno.serve(async (req: Request) => {
             "Content-Type": "application/json",
             "X-Correlation-ID": correlationId,
           },
-        }
+        },
       );
     }
 
@@ -240,17 +226,14 @@ Deno.serve(async (req: Request) => {
     const { data: userData, error: userErr } = await supabase.auth.getUser(jwt);
     if (userErr || !userData.user) {
       logStructured("warn", "Invalid auth token", correlationId, { request_id: requestId });
-      return new Response(
-        JSON.stringify({ error: "Invalid auth token" }),
-        {
-          status: 401,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Invalid auth token" }), {
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
     const userId = userData.user.id;
 
@@ -279,24 +262,23 @@ Deno.serve(async (req: Request) => {
             "Content-Type": "application/json",
             "X-Correlation-ID": correlationId,
           },
-        }
+        },
       );
     }
 
     // 6. Server-side upload with validated MIME
-    const path = `${userId}/${crypto.randomUUID()}${ext}`;\n    logStructured("info", "Starting file upload", correlationId, {
+    const path = `${userId}/${crypto.randomUUID()}${ext}`;
+    logStructured("info", "Starting file upload", correlationId, {
       user_id: userId,
       path,
       mime_type: inferred,
       request_id: requestId,
     });
 
-    const { error: uploadErr } = await supabase.storage
-      .from(BUCKET)
-      .upload(path, bytes, {
-        contentType: inferred,
-        upsert: false,
-      });
+    const { error: uploadErr } = await supabase.storage.from(BUCKET).upload(path, bytes, {
+      contentType: inferred,
+      upsert: false,
+    });
     if (uploadErr) {
       logStructured("error", "File upload failed", correlationId, {
         user_id: userId,
@@ -304,17 +286,14 @@ Deno.serve(async (req: Request) => {
         error: uploadErr.message,
         request_id: requestId,
       });
-      return new Response(
-        JSON.stringify({ error: uploadErr.message }),
-        {
-          status: 500,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: uploadErr.message }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     logStructured("info", "File uploaded successfully", correlationId, {
@@ -323,32 +302,26 @@ Deno.serve(async (req: Request) => {
       request_id: requestId,
     });
 
-    return new Response(
-      JSON.stringify({ path, request_id: requestId }),
-      {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    return new Response(JSON.stringify({ path, request_id: requestId }), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   } catch (err) {
     logStructured("error", "Unexpected error", correlationId, {
       error: (err as Error).message,
       request_id: requestId,
     });
-    return new Response(
-      JSON.stringify({ error: (err as Error).message }),
-      {
-        status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   }
 });

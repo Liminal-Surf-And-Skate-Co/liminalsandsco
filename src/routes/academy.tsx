@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -422,8 +423,8 @@ export function AcademyPage() {
               <Package className="h-6 w-6 text-silver/50" />
             </div>
             <p className="text-silver/70 max-w-2xl mb-8">
-              Pre-made checklists for different session types. Check items off before you head out so
-              you never forget your wax again.
+              Pre-made checklists for different session types. Check items off before you head out
+              so you never forget your wax again.
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPresets.length > 0 ? (
@@ -472,11 +473,10 @@ export function AcademyPage() {
                     <div className="mt-4 pt-3 border-t border-border/40">
                       <p className="font-mono text-[10px] text-silver/50">
                         {
-                          preset.items.filter(
-                            (_, i) => checkedItems.has(`${preset.id}-${i}`)
-                          ).length
-                        } /
-                        {preset.items.length} packed
+                          preset.items.filter((_, i) => checkedItems.has(`${preset.id}-${i}`))
+                            .length
+                        }{" "}
+                        /{preset.items.length} packed
                       </p>
                     </div>
                   </div>
@@ -514,9 +514,7 @@ export function AcademyPage() {
                       <li>3. Spin dry on a cloth, then blow out any debris</li>
                       <li>4. Apply a few drops of speed cream or light machine oil</li>
                       <li>5. Reattach shields, reinstall in wheels</li>
-                      <li>
-                        6. Break them in — they'll get faster after a few sessions of riding
-                      </li>
+                      <li>6. Break them in — they'll get faster after a few sessions of riding</li>
                     </ol>
                     <p className="font-mono text-[10px] text-amber-500 mt-4">
                       Never use WD-40 — it attracts dirt and gums up bearings.
@@ -530,16 +528,10 @@ export function AcademyPage() {
                     <ol className="space-y-3 text-sm text-silver/80">
                       <li>1. Peel off old grip tape slowly, using a hair dryer if stubborn</li>
                       <li>2. Clean deck surface with isopropyl alcohol, let dry completely</li>
-                      <li>
-                        3. Line up new sheet from nose to tail, pressing down gradually
-                      </li>
+                      <li>3. Line up new sheet from nose to tail, pressing down gradually</li>
                       <li>4. Use a screwdriver or file to score the edge of the deck</li>
-                      <li>
-                        5. Trim excess with a fresh razor blade at a 45° angle
-                      </li>
-                      <li>
-                        6. Poke holes through the grip tape for hardware
-                      </li>
+                      <li>5. Trim excess with a fresh razor blade at a 45° angle</li>
+                      <li>6. Poke holes through the grip tape for hardware</li>
                     </ol>
                     <p className="font-mono text-[10px] text-silver/50 mt-4">
                       Fresh grip = better flicks.
@@ -574,8 +566,13 @@ export function AcademyPage() {
                       <li>1. Rinse with fresh water after every surf — salt degrades neoprene</li>
                       <li>2. Dry inside-out first, in the shade, away from direct sun</li>
                       <li>3. Never use hot water or leave in a hot car to "dry"</li>
-                      <li>4. Hang on a thick hanger or drape over a bar — thin hangers stretch shoulders</li>
-                      <li>5. Use wetsuit shampoo monthly to flush bacteria and restore flexibility</li>
+                      <li>
+                        4. Hang on a thick hanger or drape over a bar — thin hangers stretch
+                        shoulders
+                      </li>
+                      <li>
+                        5. Use wetsuit shampoo monthly to flush bacteria and restore flexibility
+                      </li>
                       <li>6. Patch small tears immediately with neoprene cement</li>
                     </ol>
                     <p className="font-mono text-[10px] text-amber-500 mt-4">

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,9 +48,7 @@ export function useSpotPins() {
 export function useCreateSpotPin() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (
-      input: Omit<SpotPin, "id" | "user_id" | "created_at" | "updated_at">,
-    ) => {
+    mutationFn: async (input: Omit<SpotPin, "id" | "user_id" | "created_at" | "updated_at">) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Please sign in to add a pin.");
       const { error } = await supabase.from("spot_pins").insert({
@@ -120,10 +119,7 @@ export function useVoteVideoClip() {
         .maybeSingle();
       if (fetchErr) throw new Error(sanitizeError(fetchErr));
       const next = (existing?.votes ?? 0) + 1;
-      const { error } = await supabase
-        .from("video_clips")
-        .update({ votes: next })
-        .eq("id", id);
+      const { error } = await supabase.from("video_clips").update({ votes: next }).eq("id", id);
       if (error) throw new Error(sanitizeError(error));
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["video_clips"] }),

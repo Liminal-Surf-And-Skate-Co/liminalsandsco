@@ -6,7 +6,9 @@ import { Footer } from "@/components/site/Footer";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/settings/payouts")({
-  head: () => ({ meta: [{ title: "Payout Settings — Admin — Liminal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Payout Settings — Admin — Liminal" }, { name: "robots", content: "noindex" }],
+  }),
   component: PayoutsSettingsPage,
 });
 
@@ -55,7 +57,10 @@ function PayoutsSettingsPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
-        <Link to="/admin" className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-silver/60 hover:text-primary mb-6">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-silver/60 hover:text-primary mb-6"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Admin
         </Link>
 
@@ -69,7 +74,9 @@ function PayoutsSettingsPage() {
           <ShieldCheck className="h-6 w-6 text-success" />
           <div>
             <p className="font-bold text-sm text-success">Connected via Stripe</p>
-            <p className="text-xs text-silver/60">Active Direct Deposit — payouts process every 2 business days</p>
+            <p className="text-xs text-silver/60">
+              Active Direct Deposit — payouts process every 2 business days
+            </p>
           </div>
         </div>
 
@@ -78,7 +85,9 @@ function PayoutsSettingsPage() {
           <h2 className="font-display font-bold text-lg mb-4">Direct Deposit Details</h2>
           <div className="space-y-4">
             <div>
-              <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">Account Holder Name</label>
+              <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">
+                Account Holder Name
+              </label>
               <input
                 type="text"
                 value={accountName}
@@ -86,11 +95,15 @@ function PayoutsSettingsPage() {
                 placeholder="John Doe"
                 className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver rounded-md focus:outline-none focus:border-primary"
               />
-              {errors.accountName && <p className="text-[10px] text-destructive mt-1">{errors.accountName}</p>}
+              {errors.accountName && (
+                <p className="text-[10px] text-destructive mt-1">{errors.accountName}</p>
+              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">Routing Number</label>
+                <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">
+                  Routing Number
+                </label>
                 <input
                   type="text"
                   value={routing}
@@ -98,10 +111,14 @@ function PayoutsSettingsPage() {
                   placeholder="021000021"
                   className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver rounded-md focus:outline-none focus:border-primary"
                 />
-                {errors.routing && <p className="text-[10px] text-destructive mt-1">{errors.routing}</p>}
+                {errors.routing && (
+                  <p className="text-[10px] text-destructive mt-1">{errors.routing}</p>
+                )}
               </div>
               <div>
-                <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">Account Number</label>
+                <label className="block font-mono text-[10px] uppercase tracking-widest text-silver/60 mb-1.5">
+                  Account Number
+                </label>
                 <input
                   type="text"
                   value={accountNumber}
@@ -109,7 +126,9 @@ function PayoutsSettingsPage() {
                   placeholder="••••••••"
                   className="w-full px-3 py-2.5 bg-background border border-border/60 text-sm font-mono text-silver rounded-md focus:outline-none focus:border-primary"
                 />
-                {errors.accountNumber && <p className="text-[10px] text-destructive mt-1">{errors.accountNumber}</p>}
+                {errors.accountNumber && (
+                  <p className="text-[10px] text-destructive mt-1">{errors.accountNumber}</p>
+                )}
               </div>
             </div>
             <button
@@ -130,17 +149,27 @@ function PayoutsSettingsPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted">
                 <tr>
-                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">Date</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">Amount</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">Method</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">Status</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">
+                    Date
+                  </th>
+                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">
+                    Amount
+                  </th>
+                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">
+                    Method
+                  </th>
+                  <th className="text-left px-4 py-2.5 text-xs font-mono uppercase tracking-widest text-silver/60">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {MOCK_PAYOUTS.map((p) => (
                   <tr key={p.id} className="border-t border-border/30 hover:bg-muted/50">
                     <td className="px-4 py-3 font-mono text-xs text-silver/60">{p.date}</td>
-                    <td className="px-4 py-3 font-mono text-xs font-bold">${p.amount.toFixed(2)}</td>
+                    <td className="px-4 py-3 font-mono text-xs font-bold">
+                      ${p.amount.toFixed(2)}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs text-silver/60">{p.method}</td>
                     <td className="px-4 py-3">
                       {p.status === "completed" ? (

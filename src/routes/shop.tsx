@@ -140,6 +140,7 @@ function ShopPage() {
 
   const filtered = useMemo(
     () => sortProducts(applyFilters(), search.sort),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [products, search, selColours, selGenders, selSizes],
   );
 
@@ -154,6 +155,7 @@ function ShopPage() {
       if (map.has(c)) map.set(c, (map.get(c) ?? 0) + 1);
     }
     return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, search, selGenders, selSizes]);
 
   const genderCounts = useMemo(() => {
@@ -165,6 +167,7 @@ function ShopPage() {
       if (map.has(g)) map.set(g, (map.get(g) ?? 0) + 1);
     }
     return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, search, selColours, selSizes]);
 
   const sizeCounts = useMemo(() => {
@@ -175,6 +178,7 @@ function ShopPage() {
       for (const s of p.sizes) if (map.has(s)) map.set(s, (map.get(s) ?? 0) + 1);
     }
     return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, search, selColours, selGenders]);
 
   const reset = () =>

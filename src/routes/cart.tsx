@@ -145,7 +145,9 @@ function CartPage() {
                       <div className="h-1.5 w-full max-w-xs bg-silver/20 rounded-full overflow-hidden ml-auto">
                         <div
                           className="h-full bg-primary transition-all"
-                          style={{ width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%` }}
+                          style={{
+                            width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%`,
+                          }}
                         />
                       </div>
                     </div>

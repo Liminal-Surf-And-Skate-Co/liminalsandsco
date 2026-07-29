@@ -25,8 +25,8 @@ export function TermsPage() {
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">1. Agreement to Terms</h2>
             <p className="text-silver/80 leading-relaxed">
-              By accessing or using Liminal Surf & Skate Co's website and services, you agree to
-              be bound by these Terms. If you do not agree, please do not use our services.
+              By accessing or using Liminal Surf & Skate Co's website and services, you agree to be
+              bound by these Terms. If you do not agree, please do not use our services.
             </p>
           </section>
 

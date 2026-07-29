@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { Trash2, Pencil, ShoppingCart, ExternalLink, Plus, Loader as Loader2 } from "lucide-react";
@@ -83,9 +84,7 @@ function GaragePage() {
   };
 
   const renameDesign = (id: string, title: string) => {
-    setDesigns((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, title } : d))
-    );
+    setDesigns((prev) => prev.map((d) => (d.id === id ? { ...d, title } : d)));
     if (user) {
       const key = `liminal:garage:${user.id}`;
       const updated = designs.map((d) => (d.id === id ? { ...d, title } : d));
@@ -96,7 +95,11 @@ function GaragePage() {
   };
 
   const loadInStudio = (design: SavedDesign) => {
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify({ product: design.product, state: design.state }))));
+    const encoded = btoa(
+      unescape(
+        encodeURIComponent(JSON.stringify({ product: design.product, state: design.state })),
+      ),
+    );
     navigate({ to: "/design-studio", search: { d: encoded } });
   };
 
@@ -126,7 +129,10 @@ function GaragePage() {
         <main className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-16">
           <div className="border border-border/60 bg-card rounded-lg p-8 text-center">
             <p className="text-silver/60 text-sm mb-4">Sign in to view your saved designs.</p>
-            <Link to="/account" className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-5 py-3 rounded-lg">
+            <Link
+              to="/account"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-5 py-3 rounded-lg"
+            >
               Sign in
             </Link>
           </div>
@@ -155,7 +161,9 @@ function GaragePage() {
 
         {designs.length === 0 ? (
           <div className="border border-dashed border-border/60 bg-card rounded-lg p-12 text-center">
-            <p className="text-silver/60 text-sm mb-4">No saved designs yet. Head to the Design Studio to create one.</p>
+            <p className="text-silver/60 text-sm mb-4">
+              No saved designs yet. Head to the Design Studio to create one.
+            </p>
             <Link
               to="/design-studio"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-mono text-xs uppercase tracking-widest px-5 py-3 rounded-lg"
@@ -208,7 +216,12 @@ function DesignCard({
   setEditTitle: (s: string) => void;
   setEditingId: (id: string | null) => void;
 }) {
-  const state = design.state as { bg?: string; ink?: string; texture?: string; layers?: { kind: string; text?: string; src?: string }[] };
+  const state = design.state as {
+    bg?: string;
+    ink?: string;
+    texture?: string;
+    layers?: { kind: string; text?: string; src?: string }[];
+  };
   const title = design.title || `${design.product} design`;
 
   return (

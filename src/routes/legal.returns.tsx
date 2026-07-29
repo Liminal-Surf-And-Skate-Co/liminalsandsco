@@ -62,7 +62,9 @@ export function ReturnsPage() {
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">2. Non-Returnable Items</h2>
-            <p className="text-silver/80 leading-relaxed mb-4">The following items cannot be returned:</p>
+            <p className="text-silver/80 leading-relaxed mb-4">
+              The following items cannot be returned:
+            </p>
             <ul className="space-y-2">
               {[
                 "Swimwear and bikini bottoms (for hygiene reasons)",
@@ -101,8 +103,8 @@ export function ReturnsPage() {
               </li>
             </ol>
             <p className="text-silver/80 mt-4">
-              Guest orders: email us at contact@liminalsandsco.com with your order number and
-              return request.
+              Guest orders: email us at contact@liminalsandsco.com with your order number and return
+              request.
             </p>
           </section>
 
@@ -141,7 +143,8 @@ export function ReturnsPage() {
                 <strong>Orders over $100 AUD:</strong> Free return shipping
               </li>
               <li>
-                <strong>Orders under $100 AUD:</strong> $9.95 return shipping fee deducted from refund
+                <strong>Orders under $100 AUD:</strong> $9.95 return shipping fee deducted from
+                refund
               </li>
               <li>
                 <strong>Defective/incorrect items:</strong> We cover return shipping in full

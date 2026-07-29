@@ -1,7 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { Package, FileText, Mail, Calendar, Search as SearchIcon, MapPin, ArrowRight } from "lucide-react";
+import {
+  Package,
+  FileText,
+  Mail,
+  Calendar,
+  Search as SearchIcon,
+  MapPin,
+  ArrowRight,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { GlobalSearch } from "@/components/site/GlobalSearch";
@@ -84,27 +92,54 @@ function SearchPage() {
               <p className="font-mono text-sm text-silver/70 mb-1">
                 Nothing matched <span className="text-primary">“{q}”</span>
               </p>
-              <p className="text-xs text-silver/50 mb-6">Try a different keyword or browse these categories.</p>
+              <p className="text-xs text-silver/50 mb-6">
+                Try a different keyword or browse these categories.
+              </p>
               <div className="flex flex-wrap gap-2 justify-center">
-                <Link to="/shop" className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/shop"
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Shop All
                 </Link>
-                <Link to="/shop" search={{ dept: "skate" }} className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/shop"
+                  search={{ dept: "skate" }}
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Skate
                 </Link>
-                <Link to="/shop" search={{ dept: "surf" }} className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/shop"
+                  search={{ dept: "surf" }}
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Surf
                 </Link>
-                <Link to="/shop" search={{ dept: "clothing" }} className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/shop"
+                  search={{ dept: "clothing" }}
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Clothing
                 </Link>
-                <Link to="/shop" search={{ dept: "accessories" }} className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/shop"
+                  search={{ dept: "accessories" }}
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Accessories
                 </Link>
-                <Link to="/blog" className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/blog"
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Blog
                 </Link>
-                <Link to="/community" className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors">
+                <Link
+                  to="/community"
+                  className="px-4 py-2 border border-border/60 text-xs font-mono text-silver hover:border-primary hover:text-primary transition-colors"
+                >
                   Community
                 </Link>
               </div>
@@ -138,9 +173,15 @@ function SearchPage() {
                         <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
                           {DEPARTMENT_LABELS[p.department]}
                         </p>
-                        <h3 className="font-display font-bold text-base" dangerouslySetInnerHTML={safeHtml(highlightText(p.title, q))} />
+                        <h3
+                          className="font-display font-bold text-base"
+                          dangerouslySetInnerHTML={safeHtml(highlightText(p.title, q))}
+                        />
                         {q && matchDescription(p.description, q) && (
-                          <p className="text-xs text-silver/60 mt-1 line-clamp-2" dangerouslySetInnerHTML={safeHtml(highlightText(p.description, q))} />
+                          <p
+                            className="text-xs text-silver/60 mt-1 line-clamp-2"
+                            dangerouslySetInnerHTML={safeHtml(highlightText(p.description, q))}
+                          />
                         )}
                       </div>
                       <span className="text-silver text-sm font-mono">${effectivePrice(p)}</span>
@@ -176,8 +217,14 @@ function SearchPage() {
                         <p className="font-mono text-[10px] uppercase tracking-widest text-primary mb-1">
                           {p.category}
                         </p>
-                        <h3 className="font-display font-bold text-2xl text-silver group-hover:text-primary transition-colors" dangerouslySetInnerHTML={safeHtml(highlightText(p.title, q))} />
-                        <p className="text-silver/70 text-sm mt-1" dangerouslySetInnerHTML={safeHtml(highlightText(p.excerpt, q))} />
+                        <h3
+                          className="font-display font-bold text-2xl text-silver group-hover:text-primary transition-colors"
+                          dangerouslySetInnerHTML={safeHtml(highlightText(p.title, q))}
+                        />
+                        <p
+                          className="text-silver/70 text-sm mt-1"
+                          dangerouslySetInnerHTML={safeHtml(highlightText(p.excerpt, q))}
+                        />
                       </div>
                     </Link>
                   </li>
@@ -208,9 +255,15 @@ function SearchPage() {
                         year: "numeric",
                       })}
                     </p>
-                    <h3 className="font-display font-bold text-lg leading-tight group-hover:text-primary mb-2" dangerouslySetInnerHTML={safeHtml(highlightText(n.subject, q))} />
+                    <h3
+                      className="font-display font-bold text-lg leading-tight group-hover:text-primary mb-2"
+                      dangerouslySetInnerHTML={safeHtml(highlightText(n.subject, q))}
+                    />
                     {n.excerpt && (
-                      <p className="text-xs text-silver/60 line-clamp-3" dangerouslySetInnerHTML={safeHtml(highlightText(n.excerpt, q))} />
+                      <p
+                        className="text-xs text-silver/60 line-clamp-3"
+                        dangerouslySetInnerHTML={safeHtml(highlightText(n.excerpt, q))}
+                      />
                     )}
                   </Link>
                 ))}
@@ -231,8 +284,14 @@ function SearchPage() {
                       {e.date}
                     </div>
                     <div className="md:col-span-7">
-                      <h3 className="font-display font-bold text-xl text-silver mb-1" dangerouslySetInnerHTML={safeHtml(highlightText(e.title, q))} />
-                      <p className="text-silver/70 text-sm" dangerouslySetInnerHTML={safeHtml(highlightText(e.detail, q))} />
+                      <h3
+                        className="font-display font-bold text-xl text-silver mb-1"
+                        dangerouslySetInnerHTML={safeHtml(highlightText(e.title, q))}
+                      />
+                      <p
+                        className="text-silver/70 text-sm"
+                        dangerouslySetInnerHTML={safeHtml(highlightText(e.detail, q))}
+                      />
                     </div>
                     <div className="md:col-span-3 md:text-right">
                       <Link

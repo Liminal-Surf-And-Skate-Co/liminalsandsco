@@ -7,10 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const RECIPIENTS = [
-  "liminalsurfandskateco60467@gmail.com",
-  "contact@liminalsandsco.com",
-];
+const RECIPIENTS = ["liminalsurfandskateco60467@gmail.com", "contact@liminalsandsco.com"];
 
 const SUBJECT = "New Custom Product Inquiry";
 
@@ -33,7 +30,7 @@ function logStructured(
   level: "info" | "warn" | "error",
   message: string,
   correlationId: string,
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ): void {
   const log: StructuredLog = {
     timestamp: new Date().toISOString(),
@@ -76,22 +73,20 @@ Deno.serve(async (req: Request) => {
       method: req.method,
       request_id: requestId,
     });
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      {
-        status: 405,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   }
 
   try {
     const body = await req.json();
-    const { name, email, phone, product_type, dimensions, materials, budget, notes, deadline } = body;
+    const { name, email, phone, product_type, dimensions, materials, budget, notes, deadline } =
+      body;
 
     if (!name || !email || !product_type) {
       logStructured("warn", "Missing required fields", correlationId, {
@@ -107,7 +102,7 @@ Deno.serve(async (req: Request) => {
             "Content-Type": "application/json",
             "X-Correlation-ID": correlationId,
           },
-        }
+        },
       );
     }
 
@@ -145,17 +140,14 @@ Deno.serve(async (req: Request) => {
         error: emailError.message,
         email: email,
       });
-      return new Response(
-        JSON.stringify({ error: "Failed to send email" }),
-        {
-          status: 500,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "X-Correlation-ID": correlationId,
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "X-Correlation-ID": correlationId,
+        },
+      });
     }
 
     logStructured("info", "Email sent successfully", correlationId, {
@@ -164,7 +156,11 @@ Deno.serve(async (req: Request) => {
     });
 
     return new Response(
-      JSON.stringify({ success: true, message: "Inquiry submitted successfully", request_id: requestId }),
+      JSON.stringify({
+        success: true,
+        message: "Inquiry submitted successfully",
+        request_id: requestId,
+      }),
       {
         status: 200,
         headers: {
@@ -172,24 +168,21 @@ Deno.serve(async (req: Request) => {
           "Content-Type": "application/json",
           "X-Correlation-ID": correlationId,
         },
-      }
+      },
     );
   } catch (err) {
     logStructured("error", "Unexpected error", correlationId, {
       request_id: requestId,
       error: (err as Error).message,
     });
-    return new Response(
-      JSON.stringify({ error: (err as Error).message }),
-      {
-        status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   }
 });
 

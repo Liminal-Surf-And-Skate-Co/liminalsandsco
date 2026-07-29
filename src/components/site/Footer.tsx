@@ -12,7 +12,9 @@ export function LiamBadge() {
       <div className="h-6 w-6 rounded-full bg-silver/20 flex items-center justify-center">
         <span className="font-display font-black text-[8px] text-silver">LL</span>
       </div>
-      <span className="font-mono text-[9px] uppercase tracking-widest text-silver/70">Liam SAYS HI</span>
+      <span className="font-mono text-[9px] uppercase tracking-widest text-silver/70">
+        Liam SAYS HI
+      </span>
     </div>
   );
 }

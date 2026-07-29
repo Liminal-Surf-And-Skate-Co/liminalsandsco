@@ -73,41 +73,48 @@ let _supabase: SupabaseClient<Database> | null | undefined;
  */
 export const isSupabaseOffline: boolean = !isSupabaseConfigured();
 
-export const supabase: SupabaseClient<Database> = new Proxy(
-  {} as SupabaseClient<Database>,
-  {
-    get(_, prop, receiver) {
-      if (_supabase === undefined) _supabase = createSupabaseClient();
-      if (_supabase === null) {
-        // Return a no-op stub for any property access when env vars are missing.
-        // This prevents crashes while making it clear the backend is unavailable.
-        if (prop === "auth") {
-          return {
-            getSession: async () => ({ data: { session: null }, error: null }),
-            onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-            signInWithPassword: async () => ({ data: { user: null }, error: { message: "Backend not configured" } }),
-            signUp: async () => ({ data: { user: null }, error: { message: "Backend not configured" } }),
-            signOut: async () => ({ error: null }),
-            getUser: async () => ({ data: { user: null }, error: null }),
-            admin: { updateUserById: async () => ({ data: {}, error: { message: "Backend not configured" } }) },
-          };
-        }
-        // For .from() and other query builders, return a proxy that resolves to empty
-        return new Proxy(
-          {},
-          {
-            get: () => () =>
-              new Proxy(
-                {},
-                {
-                  get: () => () =>
-                    Promise.resolve({ data: null, error: null, count: 0 }),
-                },
-              ),
+export const supabase: SupabaseClient<Database> = new Proxy({} as SupabaseClient<Database>, {
+  get(_, prop, receiver) {
+    if (_supabase === undefined) _supabase = createSupabaseClient();
+    if (_supabase === null) {
+      // Return a no-op stub for any property access when env vars are missing.
+      // This prevents crashes while making it clear the backend is unavailable.
+      if (prop === "auth") {
+        return {
+          getSession: async () => ({ data: { session: null }, error: null }),
+          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+          signInWithPassword: async () => ({
+            data: { user: null },
+            error: { message: "Backend not configured" },
+          }),
+          signUp: async () => ({
+            data: { user: null },
+            error: { message: "Backend not configured" },
+          }),
+          signOut: async () => ({ error: null }),
+          getUser: async () => ({ data: { user: null }, error: null }),
+          admin: {
+            updateUserById: async () => ({
+              data: {},
+              error: { message: "Backend not configured" },
+            }),
           },
-        );
+        };
       }
-      return Reflect.get(_supabase, prop, receiver);
-    },
+      // For .from() and other query builders, return a proxy that resolves to empty
+      return new Proxy(
+        {},
+        {
+          get: () => () =>
+            new Proxy(
+              {},
+              {
+                get: () => () => Promise.resolve({ data: null, error: null, count: 0 }),
+              },
+            ),
+        },
+      );
+    }
+    return Reflect.get(_supabase, prop, receiver);
   },
-);
+});

@@ -1,14 +1,24 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useCallback } from "react";
-import { Activity, Play, ArrowLeft, CircleCheck as CheckCircle2, Circle as XCircle, Terminal } from "lucide-react";
+import {
+  Activity,
+  Play,
+  ArrowLeft,
+  CircleCheck as CheckCircle2,
+  Circle as XCircle,
+  Terminal,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/diagnostics")({
-  head: () => ({ meta: [{ title: "Diagnostics — Admin — Liminal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Diagnostics — Admin — Liminal" }, { name: "robots", content: "noindex" }],
+  }),
   component: DiagnosticsPage,
 });
 
@@ -44,7 +54,9 @@ function DiagnosticsPage() {
     // Ping test
     const pingStart = performance.now();
     try {
-      const { error } = await supabase.from("profiles").select("id", { count: "exact", head: true });
+      const { error } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true });
       const elapsed = Math.round(performance.now() - pingStart);
       setPingMs(elapsed);
       if (error) {
@@ -99,7 +111,10 @@ function DiagnosticsPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
-        <Link to="/admin" className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-silver/60 hover:text-primary mb-6">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-silver/60 hover:text-primary mb-6"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Admin
         </Link>
 
@@ -111,11 +126,21 @@ function DiagnosticsPage() {
         {/* Status badge */}
         <div className="flex items-center gap-4 mb-6">
           <div className="flex items-center gap-2 border border-border/60 bg-card rounded-lg px-4 py-3">
-            <span className={`h-3 w-3 rounded-full ${
-              supabaseStatus === "ok" ? "bg-success" : supabaseStatus === "error" ? "bg-destructive" : "bg-muted-foreground"
-            }`} />
+            <span
+              className={`h-3 w-3 rounded-full ${
+                supabaseStatus === "ok"
+                  ? "bg-success"
+                  : supabaseStatus === "error"
+                    ? "bg-destructive"
+                    : "bg-muted-foreground"
+              }`}
+            />
             <span className="font-mono text-xs uppercase tracking-widest">
-              {supabaseStatus === "ok" ? "Supabase Connected" : supabaseStatus === "error" ? "Connection Error" : "Not Tested"}
+              {supabaseStatus === "ok"
+                ? "Supabase Connected"
+                : supabaseStatus === "error"
+                  ? "Connection Error"
+                  : "Not Tested"}
             </span>
           </div>
           {pingMs !== null && (
@@ -136,19 +161,36 @@ function DiagnosticsPage() {
         <div className="border border-border/60 bg-card rounded-lg overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-muted/50">
             <Terminal className="h-4 w-4 text-silver/60" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver/60">Console Output</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver/60">
+              Console Output
+            </span>
           </div>
-          <div ref={consoleRef} className="p-4 font-mono text-xs space-y-1 max-h-96 overflow-y-auto bg-background">
+          <div
+            ref={consoleRef}
+            className="p-4 font-mono text-xs space-y-1 max-h-96 overflow-y-auto bg-background"
+          >
             {logs.length === 0 ? (
               <p className="text-silver/40">Click "Run Diagnostics" to start…</p>
             ) : (
               logs.map((log, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <span className="text-silver/40 shrink-0">{log.time}</span>
-                  {log.level === "ok" && <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />}
-                  {log.level === "error" && <XCircle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />}
+                  {log.level === "ok" && (
+                    <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
+                  )}
+                  {log.level === "error" && (
+                    <XCircle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />
+                  )}
                   {log.level === "info" && <span className="text-silver/40 shrink-0">›</span>}
-                  <span className={log.level === "error" ? "text-destructive" : log.level === "ok" ? "text-success" : "text-silver/80"}>
+                  <span
+                    className={
+                      log.level === "error"
+                        ? "text-destructive"
+                        : log.level === "ok"
+                          ? "text-success"
+                          : "text-silver/80"
+                    }
+                  >
                     {log.message}
                   </span>
                 </div>

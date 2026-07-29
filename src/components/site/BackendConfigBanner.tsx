@@ -78,10 +78,10 @@ export function BackendConfigBanner() {
             <code className="rounded bg-amber-200/60 px-1 py-0.5 font-mono text-[11px] dark:bg-amber-500/30">
               VITE_SUPABASE_ANON_KEY
             </code>{" "}
-            is missing in this environment. Authentication, account data, blog CMS,
-            loyalty points, orders, and saved Garage designs will simulate local mock
-            behavior — your browser is fully usable for browsing and Design Studio
-            preview, but nothing will sync to a real backend until the keys are added.
+            is missing in this environment. Authentication, account data, blog CMS, loyalty points,
+            orders, and saved Garage designs will simulate local mock behavior — your browser is
+            fully usable for browsing and Design Studio preview, but nothing will sync to a real
+            backend until the keys are added.
           </p>
 
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-amber-800/80 dark:text-amber-100/80">

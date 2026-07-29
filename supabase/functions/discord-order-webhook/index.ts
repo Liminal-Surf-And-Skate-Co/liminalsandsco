@@ -34,7 +34,7 @@ function logStructured(
   level: "info" | "warn" | "error",
   message: string,
   correlationId: string,
-  extra?: Record<string, unknown>
+  extra?: Record<string, unknown>,
 ): void {
   const log: StructuredLog = {
     timestamp: new Date().toISOString(),
@@ -63,7 +63,10 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    logStructured("warn", "Invalid method", correlationId, { method: req.method, request_id: requestId });
+    logStructured("warn", "Invalid method", correlationId, {
+      method: req.method,
+      request_id: requestId,
+    });
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
       headers: {
@@ -80,7 +83,9 @@ Deno.serve(async (req: Request) => {
     const discordWebhookUrl = Deno.env.get("DISCORD_ORDERS_WEBHOOK_URL");
 
     if (!discordWebhookUrl) {
-      logStructured("error", "Discord webhook URL not configured", correlationId, { request_id: requestId });
+      logStructured("error", "Discord webhook URL not configured", correlationId, {
+        request_id: requestId,
+      });
       return new Response(JSON.stringify({ error: "Webhook not configured" }), {
         status: 500,
         headers: {
@@ -198,16 +203,13 @@ Deno.serve(async (req: Request) => {
       error: (error as Error).message,
       request_id: requestId,
     });
-    return new Response(
-      JSON.stringify({ error: "Something went wrong. Please try again." }),
-      {
-        status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "X-Correlation-ID": correlationId,
-        },
-      }
-    );
+    return new Response(JSON.stringify({ error: "Something went wrong. Please try again." }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "X-Correlation-ID": correlationId,
+      },
+    });
   }
 });

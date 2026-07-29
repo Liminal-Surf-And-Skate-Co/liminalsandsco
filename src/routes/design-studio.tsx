@@ -1,12 +1,54 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
 // @ts-nocheck
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Undo2, Redo2, Type as TypeIcon, Image as ImageIcon, Layers, Sparkles, Trash2, Lock, Clock as Unlock,
-  ArrowUp, ArrowDown, Crosshair, Maximize2, RotateCw, Download, Link2, Save, Upload, Palette,
-  Brush, Pipette, Droplet, Sun, Contrast, ZoomIn, ZoomOut, FlipHorizontal2, FlipVertical2,
-  Eye, Group, Square, Circle as CircleIcon, Hexagon, Triangle, Grid3x3, Files, Frame,
-  Shapes, ChevronsLeftRight, ChartPie, ChartBar, Activity, Layers3, Search, Plus, Minus,
+  Undo2,
+  Redo2,
+  Type as TypeIcon,
+  Image as ImageIcon,
+  Layers,
+  Sparkles,
+  Trash2,
+  Lock,
+  Clock as Unlock,
+  ArrowUp,
+  ArrowDown,
+  Crosshair,
+  Maximize2,
+  RotateCw,
+  Download,
+  Link2,
+  Save,
+  Upload,
+  Palette,
+  Brush,
+  Pipette,
+  Droplet,
+  Sun,
+  Contrast,
+  ZoomIn,
+  ZoomOut,
+  FlipHorizontal2,
+  FlipVertical2,
+  Eye,
+  Group,
+  Square,
+  Circle as CircleIcon,
+  Hexagon,
+  Triangle,
+  Grid3x3,
+  Files,
+  Frame,
+  Shapes,
+  ChevronsLeftRight,
+  ChartPie,
+  ChartBar,
+  Activity,
+  Layers3,
+  Search,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
@@ -29,10 +71,7 @@ import {
   type Decal,
   type DecalCategory,
 } from "@/lib/studio/decals";
-import {
-  STUDIO_THEMES,
-  type StudioTheme,
-} from "@/lib/studio/themes";
+import { STUDIO_THEMES, type StudioTheme } from "@/lib/studio/themes";
 import {
   SOFT_PALETTES,
   HOT_PALETTES,
@@ -68,7 +107,6 @@ function DesignStudioPageWithBoundary() {
   );
 }
 
-
 // ---------- Types ----------
 type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";
 type FaceKey = string;
@@ -86,7 +124,7 @@ interface Layer {
   rotation: number;
   locked?: boolean;
   // visual extras
-  opacity?: number;          // 0-100 (defaults to 100)
+  opacity?: number; // 0-100 (defaults to 100)
   flipX?: boolean;
   flipY?: boolean;
   groupId?: string;
@@ -96,8 +134,8 @@ interface Layer {
   color?: string;
   bold?: boolean;
   italic?: boolean;
-  letterSpacing?: number;    // multiplier, 0.5 .. 4
-  lineHeight?: number;       // multiplier, 0.8 .. 2.5
+  letterSpacing?: number; // multiplier, 0.5 .. 4
+  lineHeight?: number; // multiplier, 0.8 .. 2.5
   effect?: TextEffect;
   arched?: boolean;
   // image / sticker extras
@@ -135,7 +173,8 @@ interface DesignState {
 /** Categorised Google Fonts so the typography panel can filter by mood. */
 const FONT_GROUPS: { id: string; label: string; fonts: string[] }[] = [
   {
-    id: "display", label: "Display / Retro",
+    id: "display",
+    label: "Display / Retro",
     fonts: [
       "'Bungee', sans-serif",
       "'Monoton', sans-serif",
@@ -148,7 +187,8 @@ const FONT_GROUPS: { id: string; label: string; fonts: string[] }[] = [
     ],
   },
   {
-    id: "serif", label: "Serif",
+    id: "serif",
+    label: "Serif",
     fonts: [
       "'Playfair Display', serif",
       "'Cormorant Garamond', serif",
@@ -159,16 +199,36 @@ const FONT_GROUPS: { id: string; label: string; fonts: string[] }[] = [
     ],
   },
   {
-    id: "sans", label: "Sans Serif",
-    fonts: ["Inter, sans-serif", "'IBM Plex Sans', sans-serif", "'Manrope', sans-serif", "'Outfit', sans-serif", "'Space Grotesk', sans-serif"],
+    id: "sans",
+    label: "Sans Serif",
+    fonts: [
+      "Inter, sans-serif",
+      "'IBM Plex Sans', sans-serif",
+      "'Manrope', sans-serif",
+      "'Outfit', sans-serif",
+      "'Space Grotesk', sans-serif",
+    ],
   },
   {
-    id: "script", label: "Script",
-    fonts: ["'Caveat', cursive", "'Permanent Marker', cursive", "'Pacifico', cursive", "'Dancing Script', cursive", "'Sacramento', cursive"],
+    id: "script",
+    label: "Script",
+    fonts: [
+      "'Caveat', cursive",
+      "'Permanent Marker', cursive",
+      "'Pacifico', cursive",
+      "'Dancing Script', cursive",
+      "'Sacramento', cursive",
+    ],
   },
   {
-    id: "mono", label: "Monospace",
-    fonts: ["'JetBrains Mono', monospace", "'IBM Plex Mono', monospace", "'Fira Code', monospace", "'Space Mono', monospace"],
+    id: "mono",
+    label: "Monospace",
+    fonts: [
+      "'JetBrains Mono', monospace",
+      "'IBM Plex Mono', monospace",
+      "'Fira Code', monospace",
+      "'Space Mono', monospace",
+    ],
   },
 ];
 
@@ -176,11 +236,36 @@ const ALL_FONTS_LIST: string[] = FONT_GROUPS.flatMap((g) => g.fonts);
 
 /** Pre-made pairing templates so users can apply balanced typographic styles in one click. */
 const FONT_PAIRINGS: { id: string; label: string; headline: string; body: string }[] = [
-  { id: "y2k-display", label: "Y2K Display + Mono", headline: "'Bungee', sans-serif", body: "'JetBrains Mono', monospace" },
-  { id: "editorial-serif", label: "Editorial Serif", headline: "'Playfair Display', serif", body: "'Lora', serif" },
-  { id: "swiss-tech", label: "Swiss Tech", headline: "'Space Grotesk', sans-serif", body: "'IBM Plex Mono', monospace" },
-  { id: "surf-script", label: "Sun-bleached Script", headline: "'Permanent Marker', cursive", body: "'Inter', sans-serif" },
-  { id: "hippie-script", label: "Hippie Script", headline: "'Caveat', cursive", body: "'Space Grotesk', sans-serif" },
+  {
+    id: "y2k-display",
+    label: "Y2K Display + Mono",
+    headline: "'Bungee', sans-serif",
+    body: "'JetBrains Mono', monospace",
+  },
+  {
+    id: "editorial-serif",
+    label: "Editorial Serif",
+    headline: "'Playfair Display', serif",
+    body: "'Lora', serif",
+  },
+  {
+    id: "swiss-tech",
+    label: "Swiss Tech",
+    headline: "'Space Grotesk', sans-serif",
+    body: "'IBM Plex Mono', monospace",
+  },
+  {
+    id: "surf-script",
+    label: "Sun-bleached Script",
+    headline: "'Permanent Marker', cursive",
+    body: "'Inter', sans-serif",
+  },
+  {
+    id: "hippie-script",
+    label: "Hippie Script",
+    headline: "'Caveat', cursive",
+    body: "'Space Grotesk', sans-serif",
+  },
 ];
 
 // ---------- Tool: Photo filters / adjustments ----------
@@ -229,13 +314,32 @@ const BRUSH_LIBRARY: { id: BrushKind; label: string; blurb: string }[] = [
 const CLIP_FRAME_SHAPES: { id: string; label: string; clipPath: string }[] = [
   { id: "none", label: "None", clipPath: "none" },
   { id: "circle", label: "Circle", clipPath: "circle(50% at 50% 50%)" },
-  { id: "badge", label: "Badge", clipPath: "polygon(50% 0,90% 30%,90% 70%,50% 100%,10% 70%,10% 30%)" },
-  { id: "hex", label: "Hexagon", clipPath: "polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)" },
-  { id: "torn", label: "Torn Paper", clipPath: "polygon(0 8%, 12% 2%, 24% 6%, 36% 1%, 50% 7%, 64% 0, 78% 5%, 90% 0, 100% 6%, 98% 18%, 100% 36%, 96% 56%, 100% 76%, 97% 92%, 88% 98%, 74% 95%, 60% 99%, 46% 96%, 32% 100%, 18% 97%, 6% 100%, 0 90%, 3% 72%, 0 54%, 4% 32%, 0 16%)" },
+  {
+    id: "badge",
+    label: "Badge",
+    clipPath: "polygon(50% 0,90% 30%,90% 70%,50% 100%,10% 70%,10% 30%)",
+  },
+  {
+    id: "hex",
+    label: "Hexagon",
+    clipPath: "polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)",
+  },
+  {
+    id: "torn",
+    label: "Torn Paper",
+    clipPath:
+      "polygon(0 8%, 12% 2%, 24% 6%, 36% 1%, 50% 7%, 64% 0, 78% 5%, 90% 0, 100% 6%, 98% 18%, 100% 36%, 96% 56%, 100% 76%, 97% 92%, 88% 98%, 74% 95%, 60% 99%, 46% 96%, 32% 100%, 18% 97%, 6% 100%, 0 90%, 3% 72%, 0 54%, 4% 32%, 0 16%)",
+  },
 ];
 
 // ---------- 50-Decal ON-SURFACE Palette & Theme quick states ----------
-const PAGE_SIZES: { id: string; label: string; width: number; height: number; unit: "px" | "in" | "mm" }[] = [
+const PAGE_SIZES: {
+  id: string;
+  label: string;
+  width: number;
+  height: number;
+  unit: "px" | "in" | "mm";
+}[] = [
   { id: "std-a4", label: "A4", width: 2480, height: 3508, unit: "px" },
   { id: "std-square", label: "Square 1080", width: 1080, height: 1080, unit: "px" },
   { id: "print-deck", label: "Skate Deck 32×8", width: 3200, height: 800, unit: "px" },
@@ -247,19 +351,54 @@ const PAGE_SIZES: { id: string; label: string; width: number; height: number; un
 // ---------- Constants ----------
 const PRODUCTS: Record<
   ProductKey,
-  { label: string; family: "hardware" | "apparel"; faces: FaceKey[]; basePrice: number; ratio: number }
+  {
+    label: string;
+    family: "hardware" | "apparel";
+    faces: FaceKey[];
+    basePrice: number;
+    ratio: number;
+  }
 > = {
-  skateboard: { label: "Skateboard", family: "hardware", faces: ["top", "bottom"], basePrice: 120, ratio: 0.28 },
-  surfboard: { label: "Surfboard", family: "hardware", faces: ["top", "bottom"], basePrice: 780, ratio: 0.22 },
-  tshirt: { label: "T-Shirt", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 55, ratio: 0.85 },
-  hoodie: { label: "Hoodie", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 110, ratio: 0.9 },
+  skateboard: {
+    label: "Skateboard",
+    family: "hardware",
+    faces: ["top", "bottom"],
+    basePrice: 120,
+    ratio: 0.28,
+  },
+  surfboard: {
+    label: "Surfboard",
+    family: "hardware",
+    faces: ["top", "bottom"],
+    basePrice: 780,
+    ratio: 0.22,
+  },
+  tshirt: {
+    label: "T-Shirt",
+    family: "apparel",
+    faces: ["front", "back", "left-sleeve"],
+    basePrice: 55,
+    ratio: 0.85,
+  },
+  hoodie: {
+    label: "Hoodie",
+    family: "apparel",
+    faces: ["front", "back", "left-sleeve"],
+    basePrice: 110,
+    ratio: 0.9,
+  },
   cap: { label: "Cap", family: "apparel", faces: ["front", "back"], basePrice: 40, ratio: 0.75 },
 };
 
 const BRAND_COLORS = ["#0b0b0f", "#f4f1ea", "#ff5b1f", "#1f6feb", "#3ea770", "#e2b23a", "#d43f5b"];
 /** Backwards-compatible legacy fonts array — kept so existing templates keep
  *  rendering correctly. New typography panel reads from FONT_GROUPS. */
-const FONTS = ["Inter, sans-serif", "Georgia, serif", "'Courier New', monospace", "Impact, sans-serif"];
+const FONTS = [
+  "Inter, sans-serif",
+  "Georgia, serif",
+  "'Courier New', monospace",
+  "Impact, sans-serif",
+];
 const TEXTURES = [
   { key: "none", label: "None" },
   { key: "grip", label: "Grip Tape" },
@@ -415,7 +554,6 @@ function DesignStudioPage() {
     } catch {
       /* ignore parse errors */
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
   // ---------- Debounced autosave to localStorage ----------
@@ -423,10 +561,7 @@ function DesignStudioPage() {
     if (typeof window === "undefined") return;
     const t = window.setTimeout(() => {
       try {
-        window.localStorage.setItem(
-          `liminal:studio:save:${product}`,
-          JSON.stringify(state),
-        );
+        window.localStorage.setItem(`liminal:studio:save:${product}`, JSON.stringify(state));
       } catch {
         /* quota / serialization failure — silent */
       }
@@ -444,16 +579,13 @@ function DesignStudioPage() {
   }, [activeFilter, adjustments]);
 
   // pushHistory before mutating
-  const commit = useCallback(
-    (updater: (s: DesignState) => DesignState) => {
-      setState((prev) => {
-        setHistory((h) => [...h.slice(-49), prev]);
-        setFuture([]);
-        return updater(prev);
-      });
-    },
-    [],
-  );
+  const commit = useCallback((updater: (s: DesignState) => DesignState) => {
+    setState((prev) => {
+      setHistory((h) => [...h.slice(-49), prev]);
+      setFuture([]);
+      return updater(prev);
+    });
+  }, []);
   const undo = () => {
     setHistory((h) => {
       if (!h.length) return h;
@@ -478,7 +610,10 @@ function DesignStudioPage() {
       if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         undo();
-      } else if (mod && (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey))) {
+      } else if (
+        mod &&
+        (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey))
+      ) {
         e.preventDefault();
         redo();
       }
@@ -583,7 +718,15 @@ function DesignStudioPage() {
   };
   const pasteStyle = (l: Layer): Layer => {
     if (!formatPainter.current) return l;
-    return { ...l, ...formatPainter.current, id: l.id, src: l.src, text: l.text, kind: l.kind, face: l.face };
+    return {
+      ...l,
+      ...formatPainter.current,
+      id: l.id,
+      src: l.src,
+      text: l.text,
+      kind: l.kind,
+      face: l.face,
+    };
   };
 
   // Custom font uploader (browser native — no new dep)
@@ -598,10 +741,10 @@ function DesignStudioPage() {
     if (!buffer) return;
     const fontName = `custom-${cryptoId()}`;
     try {
-      // @ts-ignore — TS lib.dom doesn't know about FontFace across all configs
+      // @ts-expect-error — TS lib.dom doesn't know about FontFace across all configs
       const font: FontFace = new FontFace(fontName, buffer);
       await font.load();
-      // @ts-ignore
+      // @ts-expect-error
       document.fonts.add(font);
       if (selected?.kind === "text") {
         patchLayer(selected.id, { font: fontName });
@@ -627,10 +770,10 @@ function DesignStudioPage() {
 
   // Eyedropper — uses browser API when supported, falls back to toast tip
   const eyedropper = async () => {
-    // @ts-ignore
+    // @ts-expect-error
     if (typeof window !== "undefined" && window.EyeDropper) {
       try {
-        // @ts-ignore
+        // @ts-expect-error
         const ed = new window.EyeDropper();
         const result = await ed.open();
         commit((s) => ({ ...s, ink: result.sRGBHex }));
@@ -711,7 +854,8 @@ function DesignStudioPage() {
   const centerX = () => selected && patchLayer(selected.id, { x: 50 });
   const centerY = () => selected && patchLayer(selected.id, { y: 50 });
   const fitCanvas = () => selected && patchLayer(selected.id, { scale: 2, x: 50, y: 50 });
-  const rot90 = () => selected && patchLayer(selected.id, { rotation: (selected.rotation + 90) % 360 });
+  const rot90 = () =>
+    selected && patchLayer(selected.id, { rotation: (selected.rotation + 90) % 360 });
 
   // Templates
   const applyTemplate = (id: string) => {
@@ -741,16 +885,44 @@ function DesignStudioPage() {
       total += cost;
       items.push({ label: `Sticker layers (${stickers})`, amount: cost });
     }
-    if (state.texture === "gloss") { total += 25; items.push({ label: "High-Gloss Fiberglass", amount: 25 }); }
-    if (state.texture === "grip") { total += 12; items.push({ label: "Grip Tape", amount: 12 }); }
-    if (state.texture === "wood") { total += 18; items.push({ label: "Stained Wood Grain", amount: 18 }); }
-    if (state.texture === "cotton") { total += 10; items.push({ label: "Heavy Cotton", amount: 10 }); }
-    if (state.concave === "steep") { total += 15; items.push({ label: "Steep Concave", amount: 15 }); }
-    else if (state.concave === "medium") { total += 8; items.push({ label: "Medium Concave", amount: 8 }); }
-    if (state.hardness === "101a") { total += 12; items.push({ label: "101a Wheels", amount: 12 }); }
-    else if (state.hardness === "99a") { total += 8; items.push({ label: "99a Wheels", amount: 8 }); }
-    if (state.tail === "swallow" || state.tail === "pin") { total += 20; items.push({ label: `${state.tail} tail`, amount: 20 }); }
-    if (state.fins === "quad" || state.fins === "thruster") { total += 25; items.push({ label: `${state.fins} fin setup`, amount: 25 }); }
+    if (state.texture === "gloss") {
+      total += 25;
+      items.push({ label: "High-Gloss Fiberglass", amount: 25 });
+    }
+    if (state.texture === "grip") {
+      total += 12;
+      items.push({ label: "Grip Tape", amount: 12 });
+    }
+    if (state.texture === "wood") {
+      total += 18;
+      items.push({ label: "Stained Wood Grain", amount: 18 });
+    }
+    if (state.texture === "cotton") {
+      total += 10;
+      items.push({ label: "Heavy Cotton", amount: 10 });
+    }
+    if (state.concave === "steep") {
+      total += 15;
+      items.push({ label: "Steep Concave", amount: 15 });
+    } else if (state.concave === "medium") {
+      total += 8;
+      items.push({ label: "Medium Concave", amount: 8 });
+    }
+    if (state.hardness === "101a") {
+      total += 12;
+      items.push({ label: "101a Wheels", amount: 12 });
+    } else if (state.hardness === "99a") {
+      total += 8;
+      items.push({ label: "99a Wheels", amount: 8 });
+    }
+    if (state.tail === "swallow" || state.tail === "pin") {
+      total += 20;
+      items.push({ label: `${state.tail} tail`, amount: 20 });
+    }
+    if (state.fins === "quad" || state.fins === "thruster") {
+      total += 25;
+      items.push({ label: `${state.fins} fin setup`, amount: 25 });
+    }
     return { items, total };
   }, [state, meta]);
 
@@ -858,13 +1030,20 @@ function DesignStudioPage() {
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Studio</p>
             <h1 className="text-3xl font-semibold md:text-4xl">Design Studio</h1>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              Load a template, drop your own graphics, dial in the specs — then save it to your Garage.
+              Load a template, drop your own graphics, dial in the specs — then save it to your
+              Garage.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={undo} disabled={!history.length} aria-label="Undo">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={undo}
+                  disabled={!history.length}
+                  aria-label="Undo"
+                >
                   <Undo2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -872,7 +1051,13 @@ function DesignStudioPage() {
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={redo} disabled={!future.length} aria-label="Redo">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={redo}
+                  disabled={!future.length}
+                  aria-label="Redo"
+                >
                   <Redo2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -881,7 +1066,12 @@ function DesignStudioPage() {
             <div className="mx-1 h-6 w-px bg-border" />
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={() => setZoom((z) => Math.max(0.25, z - 0.1))} aria-label="Zoom out">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setZoom((z) => Math.max(0.25, z - 0.1))}
+                  aria-label="Zoom out"
+                >
                   <ZoomOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -892,7 +1082,12 @@ function DesignStudioPage() {
             </span>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={() => setZoom((z) => Math.min(4, z + 0.1))} aria-label="Zoom in">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setZoom((z) => Math.min(4, z + 0.1))}
+                  aria-label="Zoom in"
+                >
                   <ZoomIn className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -900,7 +1095,15 @@ function DesignStudioPage() {
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} aria-label="Fit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setZoom(1);
+                    setPan({ x: 0, y: 0 });
+                  }}
+                  aria-label="Fit"
+                >
                   Fit
                 </Button>
               </TooltipTrigger>
@@ -931,36 +1134,54 @@ function DesignStudioPage() {
           <aside className="rounded-lg border border-border bg-card p-3">
             <Tabs defaultValue="templates">
               <TabsList className="grid w-full grid-cols-6">
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="templates" title="Templates">
-                    <Sparkles className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Templates</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="text" title="Text">
-                    <TypeIcon className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Text &amp; Typography</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="graphics" title="Decals">
-                    <ImageIcon className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Decals ({ALL_DECALS.length})</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="adjust" title="Adjust">
-                    <Contrast className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Photo Adjust</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="layout" title="Layout">
-                    <Grid3x3 className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Layout</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild>
-                  <TabsTrigger value="specs" title="Specs">
-                    <Palette className="h-3.5 w-3.5" />
-                  </TabsTrigger>
-                </TooltipTrigger><TooltipContent>Specs</TooltipContent></Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="templates" title="Templates">
+                      <Sparkles className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Templates</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="text" title="Text">
+                      <TypeIcon className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Text &amp; Typography</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="graphics" title="Decals">
+                      <ImageIcon className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Decals ({ALL_DECALS.length})</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="adjust" title="Adjust">
+                      <Contrast className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Photo Adjust</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="layout" title="Layout">
+                      <Grid3x3 className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Layout</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="specs" title="Specs">
+                      <Palette className="h-3.5 w-3.5" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Specs</TooltipContent>
+                </Tooltip>
               </TabsList>
 
               <TabsContent value="templates" className="mt-3 space-y-2">
@@ -981,9 +1202,7 @@ function DesignStudioPage() {
                   size="sm"
                   className="w-full"
                   onClick={() =>
-                    addLayer(
-                      textLayer("YOUR TEXT", activeFace, 50, 50, FONTS[0], state.ink, 1),
-                    )
+                    addLayer(textLayer("YOUR TEXT", activeFace, 50, 50, FONTS[0], state.ink, 1))
                   }
                 >
                   <TypeIcon className="mr-1 h-4 w-4" /> Add text
@@ -1114,7 +1333,9 @@ function DesignStudioPage() {
                       <button
                         key={p.id}
                         title={p.label}
-                        onClick={() => commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))}
+                        onClick={() =>
+                          commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))
+                        }
                         className="aspect-video overflow-hidden rounded-md border border-border hover:border-foreground"
                         style={{ background: p.bg }}
                         aria-label={p.label}
@@ -1144,27 +1365,63 @@ function DesignStudioPage() {
                   </div>
                 </Field>
                 <Field label={`Brightness · ${adjustments.brightness}%`}>
-                  <Slider min={50} max={150} step={1} value={[adjustments.brightness]} onValueChange={([v]) => setAdjustments((a) => ({ ...a, brightness: v }))} />
+                  <Slider
+                    min={50}
+                    max={150}
+                    step={1}
+                    value={[adjustments.brightness]}
+                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, brightness: v }))}
+                  />
                 </Field>
                 <Field label={`Contrast · ${adjustments.contrast}%`}>
-                  <Slider min={50} max={150} step={1} value={[adjustments.contrast]} onValueChange={([v]) => setAdjustments((a) => ({ ...a, contrast: v }))} />
+                  <Slider
+                    min={50}
+                    max={150}
+                    step={1}
+                    value={[adjustments.contrast]}
+                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, contrast: v }))}
+                  />
                 </Field>
                 <Field label={`Saturation · ${adjustments.saturation}%`}>
-                  <Slider min={0} max={200} step={1} value={[adjustments.saturation]} onValueChange={([v]) => setAdjustments((a) => ({ ...a, saturation: v }))} />
+                  <Slider
+                    min={0}
+                    max={200}
+                    step={1}
+                    value={[adjustments.saturation]}
+                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, saturation: v }))}
+                  />
                 </Field>
                 <Field label={`Tint · ${adjustments.tint}°`}>
-                  <Slider min={-180} max={180} step={1} value={[adjustments.tint]} onValueChange={([v]) => setAdjustments((a) => ({ ...a, tint: v }))} />
-                </Field>                <Field label={`Blur · ${adjustments.blur}px`}>
-                  <Slider min={0} max={20} step={1} value={[adjustments.blur]} onValueChange={([v]) => setAdjustments((a) => ({ ...a, blur: v }))} />
+                  <Slider
+                    min={-180}
+                    max={180}
+                    step={1}
+                    value={[adjustments.tint]}
+                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, tint: v }))}
+                  />
+                </Field>{" "}
+                <Field label={`Blur · ${adjustments.blur}px`}>
+                  <Slider
+                    min={0}
+                    max={20}
+                    step={1}
+                    value={[adjustments.blur]}
+                    onValueChange={([v]) => setAdjustments((a) => ({ ...a, blur: v }))}
+                  />
                 </Field>
                 <Field label="Paint Brushes">
                   <div className="grid grid-cols-2 gap-1.5">
                     {BRUSH_LIBRARY.map((b) => (
                       <button
                         key={b.id}
-                        onClick={() => { setBrushKind(b.id); toast.info(`Brush: ${b.label} — preview only in v2`); }}
+                        onClick={() => {
+                          setBrushKind(b.id);
+                          toast.info(`Brush: ${b.label} — preview only in v2`);
+                        }}
                         className={`rounded-md border px-2 py-1.5 text-left text-[11px] transition ${
-                          brushKind === b.id ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"
+                          brushKind === b.id
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border hover:border-foreground"
                         }`}
                       >
                         <span className="block font-medium">{b.label}</span>
@@ -1174,10 +1431,22 @@ function DesignStudioPage() {
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <Field label={`Size · ${brushSize}px`}>
-                      <Slider min={1} max={64} step={1} value={[brushSize]} onValueChange={([v]) => setBrushSize(v)} />
+                      <Slider
+                        min={1}
+                        max={64}
+                        step={1}
+                        value={[brushSize]}
+                        onValueChange={([v]) => setBrushSize(v)}
+                      />
                     </Field>
                     <Field label={`Opacity · ${brushOpacity}%`}>
-                      <Slider min={5} max={100} step={1} value={[brushOpacity]} onValueChange={([v]) => setBrushOpacity(v)} />
+                      <Slider
+                        min={5}
+                        max={100}
+                        step={1}
+                        value={[brushOpacity]}
+                        onValueChange={([v]) => setBrushOpacity(v)}
+                      />
                     </Field>
                   </div>
                 </Field>
@@ -1188,7 +1457,9 @@ function DesignStudioPage() {
                         key={c.id}
                         onClick={() => setClipFrame(c.id)}
                         className={`rounded-md border px-2 py-1.5 text-[10px] uppercase tracking-wider transition ${
-                          clipFrame === c.id ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"
+                          clipFrame === c.id
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border hover:border-foreground"
                         }`}
                       >
                         {c.label}
@@ -1207,7 +1478,12 @@ function DesignStudioPage() {
                     <Button variant="outline" size="sm" onClick={shufflePalette}>
                       <Droplet className="mr-1 h-3.5 w-3.5" /> Shuffle
                     </Button>
-                    <Button variant="outline" size="sm" onClick={distributeHorizontally} disabled={facedLayers.length < 3}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={distributeHorizontally}
+                      disabled={facedLayers.length < 3}
+                    >
                       <ChevronsLeftRight className="mr-1 h-3.5 w-3.5" /> Distribute
                     </Button>
                   </div>
@@ -1229,10 +1505,14 @@ function DesignStudioPage() {
                           }))
                         }
                         className={`rounded-md border px-2 py-2 text-left text-[11px] transition ${
-                          state.canvasWidth === p.width ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"
+                          state.canvasWidth === p.width
+                            ? "border-foreground bg-foreground text-background"
+                            : "border-border hover:border-foreground"
                         }`}
                       >
-                        <span className="block font-display text-[12px] font-semibold">{p.label}</span>
+                        <span className="block font-display text-[12px] font-semibold">
+                          {p.label}
+                        </span>
                         <span className="block font-mono text-[9px] opacity-70">
                           {p.width}×{p.height} {p.unit}
                         </span>
@@ -1257,20 +1537,34 @@ function DesignStudioPage() {
                 </Field>
                 <Field label="Charts (preview)">
                   <div className="grid grid-cols-3 gap-1.5">
-                    <Button variant="outline" size="sm" onClick={() => toast.info("Bar chart — preview only in v2")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toast.info("Bar chart — preview only in v2")}
+                    >
                       <ChartBar className="mr-1 h-3.5 w-3.5" /> Bar
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => toast.info("Pie chart — preview only in v2")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toast.info("Pie chart — preview only in v2")}
+                    >
                       <ChartPie className="mr-1 h-3.5 w-3.5" /> Pie
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => toast.info("Progress ring — preview only in v2")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toast.info("Progress ring — preview only in v2")}
+                    >
                       <Activity className="mr-1 h-3.5 w-3.5" /> Ring
                     </Button>
                   </div>
                 </Field>
                 <Field label="Color Mode">
                   <div className="flex items-center justify-between rounded-md border border-border p-2 text-xs">
-                    <span className="uppercase tracking-wider text-muted-foreground">CMYK preview</span>
+                    <span className="uppercase tracking-wider text-muted-foreground">
+                      CMYK preview
+                    </span>
                     <Switch
                       checked={!!state.cmykPreview}
                       onCheckedChange={(v) => commit((s) => ({ ...s, cmykPreview: v }))}
@@ -1297,8 +1591,16 @@ function DesignStudioPage() {
               </TabsContent>
 
               <TabsContent value="specs" className="mt-3 space-y-4">
-                <ColorRow label="Background" value={state.bg} onChange={(bg) => commit((s) => ({ ...s, bg }))} />
-                <ColorRow label="Ink" value={state.ink} onChange={(ink) => commit((s) => ({ ...s, ink }))} />
+                <ColorRow
+                  label="Background"
+                  value={state.bg}
+                  onChange={(bg) => commit((s) => ({ ...s, bg }))}
+                />
+                <ColorRow
+                  label="Ink"
+                  value={state.ink}
+                  onChange={(ink) => commit((s) => ({ ...s, ink }))}
+                />
                 <Field label="Texture">
                   <select
                     className="w-full rounded-md border border-border bg-background p-2 text-sm"
@@ -1313,7 +1615,9 @@ function DesignStudioPage() {
                   </select>
                 </Field>
 
-                <StudioSpecsExtra onApply={commit} />
+                {product === "skateboard" && (
+                  <>
+                    <Field label="Concave">
                       <Segmented
                         options={["mellow", "medium", "steep"]}
                         value={state.concave || "medium"}
@@ -1475,10 +1779,7 @@ function DesignStudioPage() {
                                     ? "3px 3px 0 rgba(0,0,0,0.4)"
                                     : "none",
                           WebkitTextStroke: l.effect === "hollow" ? "1px currentColor" : undefined,
-                          color:
-                            l.effect === "retro-wave"
-                              ? "transparent"
-                              : l.recolor || l.color,
+                          color: l.effect === "retro-wave" ? "transparent" : l.recolor || l.color,
                           backgroundImage:
                             l.effect === "retro-wave"
                               ? "linear-gradient(180deg, currentColor 0%, currentColor 60%, transparent 60%)"
@@ -1501,7 +1802,9 @@ function DesignStudioPage() {
                           pointerEvents: "none",
                           opacity: (l.opacity ?? 100) / 100,
                           filter: layerCssFilter !== "none" ? layerCssFilter : undefined,
-                          clipPath: CLIP_FRAME_SHAPES.find((c) => c.id === clipFrame)?.clipPath || undefined,
+                          clipPath:
+                            CLIP_FRAME_SHAPES.find((c) => c.id === clipFrame)?.clipPath ||
+                            undefined,
                           transform: `scale(${l.flipX ? -1 : 1}, ${l.flipY ? -1 : 1})`,
                         }}
                       />
@@ -1528,7 +1831,9 @@ function DesignStudioPage() {
             {/* Price breakdown + actions */}
             <div className="mt-4 rounded-lg border border-border bg-card p-4">
               <div className="mb-3">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Price Breakdown</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                  Price Breakdown
+                </div>
                 <div className="space-y-1.5">
                   {priceBreakdown.items.map((item, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
@@ -1539,7 +1844,9 @@ function DesignStudioPage() {
                 </div>
                 <div className="mt-2 pt-2 border-t border-border flex items-center justify-between">
                   <span className="text-sm font-bold uppercase tracking-wider">Subtotal</span>
-                  <span className="text-2xl font-bold font-display">${priceBreakdown.total.toFixed(0)} AUD</span>
+                  <span className="text-2xl font-bold font-display">
+                    ${priceBreakdown.total.toFixed(0)} AUD
+                  </span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -1596,7 +1903,11 @@ function DesignStudioPage() {
                         title={l.locked ? "Unlock" : "Lock"}
                         onClick={() => patchLayer(l.id, { locked: !l.locked })}
                       >
-                        {l.locked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                        {l.locked ? (
+                          <Lock className="h-3.5 w-3.5" />
+                        ) : (
+                          <Unlock className="h-3.5 w-3.5" />
+                        )}
                       </button>
                       <button title="Delete" onClick={() => deleteLayer(l.id)}>
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1746,31 +2057,46 @@ function hexToHsl(hex: string): [number, number, number] {
   const m = /^#?([a-f0-9]{6}|[a-f0-9]{3})$/i.exec(hex || "");
   if (!m) return [0, 0, 50];
   let raw = m[1];
-  if (raw.length === 3) raw = raw.split("").map((c) => c + c).join("");
+  if (raw.length === 3)
+    raw = raw
+      .split("")
+      .map((c) => c + c)
+      .join("");
   const r = parseInt(raw.slice(0, 2), 16) / 255;
   const g = parseInt(raw.slice(2, 4), 16) / 255;
   const b = parseInt(raw.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
   const l = (max + min) / 2;
-  let h = 0, s = 0;
+  let h = 0,
+    s = 0;
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      default: h = (r - g) / d + 4;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      default:
+        h = (r - g) / d + 4;
     }
     h *= 60;
   }
   return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
 }
 function hslToHex(h: number, s: number, l: number): string {
-  s /= 100; l /= 100;
+  s /= 100;
+  l /= 100;
   const k = (n: number) => (n + h / 30) % 12;
   const a = s * Math.min(l, 1 - l);
   const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  const to = (x: number) => Math.round(x * 255).toString(16).padStart(2, "0");
+  const to = (x: number) =>
+    Math.round(x * 255)
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(f(0))}${to(f(8))}${to(f(4))}`;
 }
 function Segmented({
@@ -1834,7 +2160,8 @@ function StudioSpecsExtra({
           ))}
         </div>
         <p className="text-[10px] text-muted-foreground mt-1.5">
-          Click a preset to apply scoped palette to the studio canvas. The outer website theme is NOT touched.
+          Click a preset to apply scoped palette to the studio canvas. The outer website theme is
+          NOT touched.
         </p>
       </Field>
 
@@ -1857,7 +2184,9 @@ function StudioSpecsExtra({
                     · {g.mood.toUpperCase()}
                   </span>
                 </span>
-                <span className="text-[8px] text-muted-foreground font-mono">{g.swatches.length} hues</span>
+                <span className="text-[8px] text-muted-foreground font-mono">
+                  {g.swatches.length} hues
+                </span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {g.swatches.map((sw) => (
@@ -1925,8 +2254,7 @@ function shapeRadius(product: ProductKey) {
 function shapeClip(product: ProductKey, s: DesignState) {
   if (product === "surfboard") {
     if (s.tail === "pin") return "polygon(50% 0, 100% 20%, 50% 100%, 0 20%)";
-    if (s.tail === "swallow")
-      return "polygon(50% 0, 100% 20%, 85% 100%, 50% 90%, 15% 100%, 0 20%)";
+    if (s.tail === "swallow") return "polygon(50% 0, 100% 20%, 85% 100%, 50% 90%, 15% 100%, 0 20%)";
     return "polygon(50% 0, 100% 20%, 90% 100%, 10% 100%, 0 20%)";
   }
   return "none";
