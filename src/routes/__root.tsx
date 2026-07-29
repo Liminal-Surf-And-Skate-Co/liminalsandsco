@@ -12,6 +12,7 @@ import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
+import { BackendConfigBanner } from "@/components/site/BackendConfigBanner";
 
 import appCss from "../styles.css?url";
 
@@ -161,6 +162,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary name="Application Root">
         <AuthSync />
+        {/* Backend status banner sits above the Nav so it shows across every route
+            when the Supabase env is not configured. The Nav itself remains
+            sticky-native (top:0) and the banner raises to z-60 via its sticky top-0
+            so it never overlaps the navigation. */}
+        <BackendConfigBanner />
         <Outlet />
         <LiamChatWidget />
       </ErrorBoundary>

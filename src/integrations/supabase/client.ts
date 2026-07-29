@@ -2,6 +2,38 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
+/**
+ * Returns true when both the Supabase URL and a publishable/anon key are present AND
+ * do not look like empty / placeholder values. Used by the BackendConfigBanner to
+ * decide whether to render a "Demo / Offline Mode" notice.
+ *
+ * Note: this is intentionally re-evaluated per call (cheap env read). It also treats
+ * common placeholders like "your-project", "placeholder", "changeme" as unconfigured.
+ */
+export function isSupabaseConfigured(): boolean {
+  if (typeof import.meta === "undefined") return false;
+  const url =
+    import.meta.env?.VITE_SUPABASE_URL ||
+    (typeof process !== "undefined" ? process.env?.SUPABASE_URL : undefined);
+  const key =
+    import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    import.meta.env?.VITE_SUPABASE_ANON_KEY ||
+    (typeof process !== "undefined"
+      ? process.env?.SUPABASE_PUBLISHABLE_KEY || process.env?.SUPABASE_ANON_KEY
+      : undefined);
+  const looksReal = (v: string | undefined) => {
+    if (!v) return false;
+    const t = v.trim().toLowerCase();
+    if (!t) return false;
+    if (t.includes("your-project") || t.includes("placeholder") || t.includes("changeme")) {
+      return false;
+    }
+    if (url && t === url.toLowerCase()) return false;
+    return t.length >= 8;
+  };
+  return looksReal(url) && looksReal(key);
+}
+
 function createSupabaseClient(): SupabaseClient<Database> | null {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY =
@@ -33,6 +65,13 @@ function createSupabaseClient(): SupabaseClient<Database> | null {
 }
 
 let _supabase: SupabaseClient<Database> | null | undefined;
+
+/**
+ * Backwards-compatible convenience constant. Equivalent to `!isSupabaseConfigured()`.
+ * `false` here means the live backend (auth, db) is wired up; `true` means we're running
+ * in Demo/Offline Mode and the client will return safe no-op stubs.
+ */
+export const isSupabaseOffline: boolean = !isSupabaseConfigured();
 
 export const supabase: SupabaseClient<Database> = new Proxy(
   {} as SupabaseClient<Database>,
