@@ -35,7 +35,9 @@ export function PrivacyPage() {
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">2. How We Use Your Information</h2>
-            <p className="text-silver/80 leading-relaxed mb-4">We use the information we collect to:</p>
+            <p className="text-silver/80 leading-relaxed mb-4">
+              We use the information we collect to:
+            </p>
             <ul className="list-disc pl-6 space-y-2 text-silver/80">
               <li>Process and fulfill your orders</li>
               <li>Communicate with you about your orders, account, and promotional offers</li>
@@ -77,8 +79,8 @@ export function PrivacyPage() {
             <h2 className="font-display font-bold text-xl mb-4">6. Third-Party Services</h2>
             <p className="text-silver/80 leading-relaxed">
               We may use third-party services for payments (Stripe), analytics, and email
-              communications. These services have their own privacy policies and are responsible
-              for the data they collect.
+              communications. These services have their own privacy policies and are responsible for
+              the data they collect.
             </p>
           </section>
 

@@ -77,7 +77,7 @@ function normalize(row: Record<string, unknown>): Product {
     slug: row.slug as string,
     title: row.title as string,
     department: (row.department || "other") as Department,
-    product_type: row.product_type as string | null ?? null,
+    product_type: (row.product_type as string | null) ?? null,
     target_group: (row.target_group as string | null) ?? "unisex",
     description: (row.description as string | null) ?? "",
     details: Array.isArray(row.details) ? (row.details as string[]) : [],
@@ -89,7 +89,10 @@ function normalize(row: Record<string, unknown>): Product {
     stock_count: Number(row.stock_count ?? 0),
     images: Array.isArray(row.images) ? (row.images as string[]) : [],
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    specs: row.specs && typeof row.specs === "object" && !Array.isArray(row.specs) ? (row.specs as Record<string, string>) : {},
+    specs:
+      row.specs && typeof row.specs === "object" && !Array.isArray(row.specs)
+        ? (row.specs as Record<string, string>)
+        : {},
     featured: Boolean(row.featured),
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,

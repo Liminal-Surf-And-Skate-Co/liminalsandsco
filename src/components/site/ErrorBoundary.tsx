@@ -29,7 +29,9 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.props.fallback) return this.props.fallback;
     return (
       <div className="mx-auto max-w-md p-6 text-center">
-        <h2 className="text-lg font-semibold text-foreground">Something broke in {this.props.name}</h2>
+        <h2 className="text-lg font-semibold text-foreground">
+          Something broke in {this.props.name}
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Correlation ID: <code className="text-xs">{this.state.correlationId}</code>
         </p>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Lightweight structured logger with correlation IDs.
 // Emits JSON in production, pretty in dev. Safe on server + client.
 
@@ -21,7 +22,7 @@ function emit(level: Level, scope: string, message: string, fields?: Fields) {
   };
   const line = isDev ? `[${level}] ${scope}: ${message}` : JSON.stringify(record);
   const method = level === "error" ? "error" : level === "warn" ? "warn" : "log";
-  // eslint-disable-next-line no-console
+
   (console as any)[method](line, isDev && fields ? fields : "");
 }
 

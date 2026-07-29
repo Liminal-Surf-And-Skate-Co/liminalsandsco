@@ -1,7 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Undo2, Redo2, Type as TypeIcon, Image as ImageIcon, Layers, Sparkles, Trash2, Lock, Clock as Unlock, ArrowUp, ArrowDown, Crosshair, Maximize2, RotateCw, Download, Link2, Save, Upload, Palette } from "lucide-react";
+import {
+  Undo2,
+  Redo2,
+  Type as TypeIcon,
+  Image as ImageIcon,
+  Layers,
+  Sparkles,
+  Trash2,
+  Lock,
+  Clock as Unlock,
+  ArrowUp,
+  ArrowDown,
+  Crosshair,
+  Maximize2,
+  RotateCw,
+  Download,
+  Link2,
+  Save,
+  Upload,
+  Palette,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
@@ -12,11 +33,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
-import { STICKER_CATEGORIES, METALLIC_PALETTES, findSticker, ALL_STICKERS } from "@/lib/sticker-library";
 import {
-  STUDIO_THEMES,
-  type StudioTheme,
-} from "@/lib/studio/themes";
+  STICKER_CATEGORIES,
+  METALLIC_PALETTES,
+  findSticker,
+  ALL_STICKERS,
+} from "@/lib/sticker-library";
+import { STUDIO_THEMES, type StudioTheme } from "@/lib/studio/themes";
 import {
   SOFT_PALETTES,
   HOT_PALETTES,
@@ -49,7 +72,6 @@ function DesignStudioPageWithBoundary() {
     </ErrorBoundary>
   );
 }
-
 
 // ---------- Types ----------
 type ProductKey = "skateboard" | "surfboard" | "tshirt" | "hoodie" | "cap";
@@ -90,17 +112,52 @@ interface DesignState {
 // ---------- Constants ----------
 const PRODUCTS: Record<
   ProductKey,
-  { label: string; family: "hardware" | "apparel"; faces: FaceKey[]; basePrice: number; ratio: number }
+  {
+    label: string;
+    family: "hardware" | "apparel";
+    faces: FaceKey[];
+    basePrice: number;
+    ratio: number;
+  }
 > = {
-  skateboard: { label: "Skateboard", family: "hardware", faces: ["top", "bottom"], basePrice: 120, ratio: 0.28 },
-  surfboard: { label: "Surfboard", family: "hardware", faces: ["top", "bottom"], basePrice: 780, ratio: 0.22 },
-  tshirt: { label: "T-Shirt", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 55, ratio: 0.85 },
-  hoodie: { label: "Hoodie", family: "apparel", faces: ["front", "back", "left-sleeve"], basePrice: 110, ratio: 0.9 },
+  skateboard: {
+    label: "Skateboard",
+    family: "hardware",
+    faces: ["top", "bottom"],
+    basePrice: 120,
+    ratio: 0.28,
+  },
+  surfboard: {
+    label: "Surfboard",
+    family: "hardware",
+    faces: ["top", "bottom"],
+    basePrice: 780,
+    ratio: 0.22,
+  },
+  tshirt: {
+    label: "T-Shirt",
+    family: "apparel",
+    faces: ["front", "back", "left-sleeve"],
+    basePrice: 55,
+    ratio: 0.85,
+  },
+  hoodie: {
+    label: "Hoodie",
+    family: "apparel",
+    faces: ["front", "back", "left-sleeve"],
+    basePrice: 110,
+    ratio: 0.9,
+  },
   cap: { label: "Cap", family: "apparel", faces: ["front", "back"], basePrice: 40, ratio: 0.75 },
 };
 
 const BRAND_COLORS = ["#0b0b0f", "#f4f1ea", "#ff5b1f", "#1f6feb", "#3ea770", "#e2b23a", "#d43f5b"];
-const FONTS = ["Inter, sans-serif", "Georgia, serif", "'Courier New', monospace", "Impact, sans-serif"];
+const FONTS = [
+  "Inter, sans-serif",
+  "Georgia, serif",
+  "'Courier New', monospace",
+  "Impact, sans-serif",
+];
 const TEXTURES = [
   { key: "none", label: "None" },
   { key: "grip", label: "Grip Tape" },
@@ -216,16 +273,13 @@ function DesignStudioPage() {
   const activeFace = state.face;
 
   // pushHistory before mutating
-  const commit = useCallback(
-    (updater: (s: DesignState) => DesignState) => {
-      setState((prev) => {
-        setHistory((h) => [...h.slice(-49), prev]);
-        setFuture([]);
-        return updater(prev);
-      });
-    },
-    [],
-  );
+  const commit = useCallback((updater: (s: DesignState) => DesignState) => {
+    setState((prev) => {
+      setHistory((h) => [...h.slice(-49), prev]);
+      setFuture([]);
+      return updater(prev);
+    });
+  }, []);
   const undo = () => {
     setHistory((h) => {
       if (!h.length) return h;
@@ -250,7 +304,10 @@ function DesignStudioPage() {
       if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         undo();
-      } else if (mod && (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey))) {
+      } else if (
+        mod &&
+        (e.key.toLowerCase() === "y" || (e.key.toLowerCase() === "z" && e.shiftKey))
+      ) {
         e.preventDefault();
         redo();
       }
@@ -350,7 +407,8 @@ function DesignStudioPage() {
   const centerX = () => selected && patchLayer(selected.id, { x: 50 });
   const centerY = () => selected && patchLayer(selected.id, { y: 50 });
   const fitCanvas = () => selected && patchLayer(selected.id, { scale: 2, x: 50, y: 50 });
-  const rot90 = () => selected && patchLayer(selected.id, { rotation: (selected.rotation + 90) % 360 });
+  const rot90 = () =>
+    selected && patchLayer(selected.id, { rotation: (selected.rotation + 90) % 360 });
 
   // Templates
   const applyTemplate = (id: string) => {
@@ -380,16 +438,44 @@ function DesignStudioPage() {
       total += cost;
       items.push({ label: `Sticker layers (${stickers})`, amount: cost });
     }
-    if (state.texture === "gloss") { total += 25; items.push({ label: "High-Gloss Fiberglass", amount: 25 }); }
-    if (state.texture === "grip") { total += 12; items.push({ label: "Grip Tape", amount: 12 }); }
-    if (state.texture === "wood") { total += 18; items.push({ label: "Stained Wood Grain", amount: 18 }); }
-    if (state.texture === "cotton") { total += 10; items.push({ label: "Heavy Cotton", amount: 10 }); }
-    if (state.concave === "steep") { total += 15; items.push({ label: "Steep Concave", amount: 15 }); }
-    else if (state.concave === "medium") { total += 8; items.push({ label: "Medium Concave", amount: 8 }); }
-    if (state.hardness === "101a") { total += 12; items.push({ label: "101a Wheels", amount: 12 }); }
-    else if (state.hardness === "99a") { total += 8; items.push({ label: "99a Wheels", amount: 8 }); }
-    if (state.tail === "swallow" || state.tail === "pin") { total += 20; items.push({ label: `${state.tail} tail`, amount: 20 }); }
-    if (state.fins === "quad" || state.fins === "thruster") { total += 25; items.push({ label: `${state.fins} fin setup`, amount: 25 }); }
+    if (state.texture === "gloss") {
+      total += 25;
+      items.push({ label: "High-Gloss Fiberglass", amount: 25 });
+    }
+    if (state.texture === "grip") {
+      total += 12;
+      items.push({ label: "Grip Tape", amount: 12 });
+    }
+    if (state.texture === "wood") {
+      total += 18;
+      items.push({ label: "Stained Wood Grain", amount: 18 });
+    }
+    if (state.texture === "cotton") {
+      total += 10;
+      items.push({ label: "Heavy Cotton", amount: 10 });
+    }
+    if (state.concave === "steep") {
+      total += 15;
+      items.push({ label: "Steep Concave", amount: 15 });
+    } else if (state.concave === "medium") {
+      total += 8;
+      items.push({ label: "Medium Concave", amount: 8 });
+    }
+    if (state.hardness === "101a") {
+      total += 12;
+      items.push({ label: "101a Wheels", amount: 12 });
+    } else if (state.hardness === "99a") {
+      total += 8;
+      items.push({ label: "99a Wheels", amount: 8 });
+    }
+    if (state.tail === "swallow" || state.tail === "pin") {
+      total += 20;
+      items.push({ label: `${state.tail} tail`, amount: 20 });
+    }
+    if (state.fins === "quad" || state.fins === "thruster") {
+      total += 25;
+      items.push({ label: `${state.fins} fin setup`, amount: 25 });
+    }
     return { items, total };
   }, [state, meta]);
 
@@ -497,7 +583,8 @@ function DesignStudioPage() {
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Studio</p>
             <h1 className="text-3xl font-semibold md:text-4xl">Design Studio</h1>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              Load a template, drop your own graphics, dial in the specs — then save it to your Garage.
+              Load a template, drop your own graphics, dial in the specs — then save it to your
+              Garage.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -564,9 +651,7 @@ function DesignStudioPage() {
                   size="sm"
                   className="w-full"
                   onClick={() =>
-                    addLayer(
-                      textLayer("YOUR TEXT", activeFace, 50, 50, FONTS[0], state.ink, 1),
-                    )
+                    addLayer(textLayer("YOUR TEXT", activeFace, 50, 50, FONTS[0], state.ink, 1))
                   }
                 >
                   <TypeIcon className="mr-1 h-4 w-4" /> Add text
@@ -636,7 +721,11 @@ function DesignStudioPage() {
                   <Tabs defaultValue={STICKER_CATEGORIES[0].id}>
                     <TabsList className="grid w-full grid-cols-4 h-auto">
                       {STICKER_CATEGORIES.map((cat) => (
-                        <TabsTrigger key={cat.id} value={cat.id} className="text-[10px] px-1 py-1.5">
+                        <TabsTrigger
+                          key={cat.id}
+                          value={cat.id}
+                          className="text-[10px] px-1 py-1.5"
+                        >
                           {cat.label.split(" ")[0]}
                         </TabsTrigger>
                       ))}
@@ -669,7 +758,9 @@ function DesignStudioPage() {
                       <button
                         key={p.id}
                         title={p.label}
-                        onClick={() => commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))}
+                        onClick={() =>
+                          commit((s) => ({ ...s, bg: p.bg, ink: p.ink, texture: "gloss" }))
+                        }
                         className="aspect-video rounded-md border border-border overflow-hidden hover:border-foreground"
                         style={{ background: p.bg }}
                         aria-label={p.label}
@@ -680,8 +771,16 @@ function DesignStudioPage() {
               </TabsContent>
 
               <TabsContent value="specs" className="mt-3 space-y-4">
-                <ColorRow label="Background" value={state.bg} onChange={(bg) => commit((s) => ({ ...s, bg }))} />
-                <ColorRow label="Ink" value={state.ink} onChange={(ink) => commit((s) => ({ ...s, ink }))} />
+                <ColorRow
+                  label="Background"
+                  value={state.bg}
+                  onChange={(bg) => commit((s) => ({ ...s, bg }))}
+                />
+                <ColorRow
+                  label="Ink"
+                  value={state.ink}
+                  onChange={(ink) => commit((s) => ({ ...s, ink }))}
+                />
                 <Field label="Texture">
                   <select
                     className="w-full rounded-md border border-border bg-background p-2 text-sm"
@@ -874,7 +973,9 @@ function DesignStudioPage() {
             {/* Price breakdown + actions */}
             <div className="mt-4 rounded-lg border border-border bg-card p-4">
               <div className="mb-3">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Price Breakdown</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                  Price Breakdown
+                </div>
                 <div className="space-y-1.5">
                   {priceBreakdown.items.map((item, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
@@ -885,7 +986,9 @@ function DesignStudioPage() {
                 </div>
                 <div className="mt-2 pt-2 border-t border-border flex items-center justify-between">
                   <span className="text-sm font-bold uppercase tracking-wider">Subtotal</span>
-                  <span className="text-2xl font-bold font-display">${priceBreakdown.total.toFixed(0)} AUD</span>
+                  <span className="text-2xl font-bold font-display">
+                    ${priceBreakdown.total.toFixed(0)} AUD
+                  </span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -942,7 +1045,11 @@ function DesignStudioPage() {
                         title={l.locked ? "Unlock" : "Lock"}
                         onClick={() => patchLayer(l.id, { locked: !l.locked })}
                       >
-                        {l.locked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                        {l.locked ? (
+                          <Lock className="h-3.5 w-3.5" />
+                        ) : (
+                          <Unlock className="h-3.5 w-3.5" />
+                        )}
                       </button>
                       <button title="Delete" onClick={() => deleteLayer(l.id)}>
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1092,31 +1199,46 @@ function hexToHsl(hex: string): [number, number, number] {
   const m = /^#?([a-f0-9]{6}|[a-f0-9]{3})$/i.exec(hex || "");
   if (!m) return [0, 0, 50];
   let raw = m[1];
-  if (raw.length === 3) raw = raw.split("").map((c) => c + c).join("");
+  if (raw.length === 3)
+    raw = raw
+      .split("")
+      .map((c) => c + c)
+      .join("");
   const r = parseInt(raw.slice(0, 2), 16) / 255;
   const g = parseInt(raw.slice(2, 4), 16) / 255;
   const b = parseInt(raw.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
   const l = (max + min) / 2;
-  let h = 0, s = 0;
+  let h = 0,
+    s = 0;
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      default: h = (r - g) / d + 4;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      default:
+        h = (r - g) / d + 4;
     }
     h *= 60;
   }
   return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
 }
 function hslToHex(h: number, s: number, l: number): string {
-  s /= 100; l /= 100;
+  s /= 100;
+  l /= 100;
   const k = (n: number) => (n + h / 30) % 12;
   const a = s * Math.min(l, 1 - l);
   const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  const to = (x: number) => Math.round(x * 255).toString(16).padStart(2, "0");
+  const to = (x: number) =>
+    Math.round(x * 255)
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(f(0))}${to(f(8))}${to(f(4))}`;
 }
 function Segmented({
@@ -1180,7 +1302,8 @@ function StudioSpecsExtra({
           ))}
         </div>
         <p className="text-[10px] text-muted-foreground mt-1.5">
-          Click a preset to apply scoped palette to the studio canvas. The outer website theme is NOT touched.
+          Click a preset to apply scoped palette to the studio canvas. The outer website theme is
+          NOT touched.
         </p>
       </Field>
 
@@ -1203,7 +1326,9 @@ function StudioSpecsExtra({
                     · {g.mood.toUpperCase()}
                   </span>
                 </span>
-                <span className="text-[8px] text-muted-foreground font-mono">{g.swatches.length} hues</span>
+                <span className="text-[8px] text-muted-foreground font-mono">
+                  {g.swatches.length} hues
+                </span>
               </div>
               <div className="grid grid-cols-4 gap-1.5">
                 {g.swatches.map((sw) => (
@@ -1271,8 +1396,7 @@ function shapeRadius(product: ProductKey) {
 function shapeClip(product: ProductKey, s: DesignState) {
   if (product === "surfboard") {
     if (s.tail === "pin") return "polygon(50% 0, 100% 20%, 50% 100%, 0 20%)";
-    if (s.tail === "swallow")
-      return "polygon(50% 0, 100% 20%, 85% 100%, 50% 90%, 15% 100%, 0 20%)";
+    if (s.tail === "swallow") return "polygon(50% 0, 100% 20%, 85% 100%, 50% 90%, 15% 100%, 0 20%)";
     return "polygon(50% 0, 100% 20%, 90% 100%, 10% 100%, 0 20%)";
   }
   return "none";

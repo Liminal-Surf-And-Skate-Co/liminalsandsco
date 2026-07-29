@@ -81,7 +81,6 @@ export function useAuth() {
         maybe
           .then(() => settleLoading())
           .catch((err: unknown) => {
-            // eslint-disable-next-line no-console
             console.error("[useAuth] getSession failed:", err);
             settleLoading();
           });
@@ -89,7 +88,6 @@ export function useAuth() {
         settleLoading();
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("[useAuth] getSession threw synchronously:", err);
       settleLoading();
     }

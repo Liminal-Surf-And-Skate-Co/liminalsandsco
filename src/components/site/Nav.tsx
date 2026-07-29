@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingCart, User, Menu, X, ChevronDown, Sparkles, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -63,7 +64,7 @@ export function Nav() {
             Support
           </Link>
           <Link
-            to="/academy"
+            to="/membership"
             className="text-primary hover:opacity-80 transition-opacity min-h-[36px] inline-flex items-center gap-1.5 px-2 py-0.5 border border-primary/40 rounded-sm"
             activeProps={{ className: "opacity-100 bg-primary/10" }}
           >

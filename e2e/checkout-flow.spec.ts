@@ -69,18 +69,18 @@ test.describe("E2E Checkout — Cart to Order Confirmation", () => {
     const emptyMsg = page.locator("text=Your cart is empty");
     const orderHeading = page.locator("text=Order confirmed");
     // One of the two states should be present
-    await expect(emptyMsg.or(orderHeading).or(page.locator('text=Checkout'))).toBeVisible();
+    await expect(emptyMsg.or(orderHeading).or(page.locator("text=Checkout"))).toBeVisible();
   });
 
   test("simulate payment failure shows error banner", async ({ page }) => {
     await page.goto("http://localhost:8080/checkout");
 
     // Check if cart has items by looking for the form
-    const form = page.locator('form');
-    if (await form.count() > 0) {
+    const form = page.locator("form");
+    if ((await form.count()) > 0) {
       // Enable simulate failure toggle
       const failToggle = page.locator('input[type="checkbox"]');
-      if (await failToggle.count() > 0) {
+      if ((await failToggle.count()) > 0) {
         await failToggle.check();
       }
 
@@ -97,7 +97,9 @@ test.describe("E2E Checkout — Cart to Order Confirmation", () => {
       await page.locator('button[type="submit"]').click();
 
       // Error banner should appear
-      await expect(page.locator("text=Payment couldn't be completed")).toBeVisible({ timeout: 10000 });
+      await expect(page.locator("text=Payment couldn't be completed")).toBeVisible({
+        timeout: 10000,
+      });
     }
   });
 });

@@ -1,20 +1,61 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
 // @ts-nocheck
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Shield, Package, Mail, Calendar, Settings, Users, Trophy, TrendingUp, ChartBar as BarChart3, Loader as Loader2, CircleAlert as AlertCircle, ChevronDown, Search, Award, Gift, Zap, ArrowLeft, DollarSign, Palette, Database, Store, Banknote, Activity, Stethoscope, KeyRound, MoveVertical as MoreVertical, RefreshCw, Copy } from "lucide-react";
+import {
+  Shield,
+  Package,
+  Mail,
+  Calendar,
+  Settings,
+  Users,
+  Trophy,
+  TrendingUp,
+  ChartBar as BarChart3,
+  Loader as Loader2,
+  CircleAlert as AlertCircle,
+  ChevronDown,
+  Search,
+  Award,
+  Gift,
+  Zap,
+  ArrowLeft,
+  DollarSign,
+  Palette,
+  Database,
+  Store,
+  Banknote,
+  Activity,
+  Stethoscope,
+  KeyRound,
+  MoveVertical as MoreVertical,
+  RefreshCw,
+  Copy,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useSiteSettings, useUpdateSetting, SETTING_KEYS, SETTING_LABELS } from "@/lib/site-settings";
+import {
+  useSiteSettings,
+  useUpdateSetting,
+  SETTING_KEYS,
+  SETTING_LABELS,
+} from "@/lib/site-settings";
 import { adminExists, claimFirstAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { sanitizeError } from "@/lib/error-sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TIERS } from "@/hooks/use-loyalty";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
 // Close action menu when clicking outside
@@ -35,7 +76,9 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "loyalty" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "loyalty" | "settings">(
+    "overview",
+  );
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/account" });
@@ -69,7 +112,9 @@ function AdminPage() {
           </div>
           <div className="flex-1">
             <h1 className="font-display font-black text-2xl md:text-3xl">Admin Dashboard</h1>
-            <p className="text-sm text-silver/60 font-mono">Manage users, rewards, and site settings</p>
+            <p className="text-sm text-silver/60 font-mono">
+              Manage users, rewards, and site settings
+            </p>
           </div>
           <Link
             to="/account"
@@ -81,12 +126,14 @@ function AdminPage() {
 
         {/* Tabs */}
         <div className="flex items-center gap-1 border-b border-border/40 mb-6 overflow-x-auto">
-          {([
-            { key: "overview" as const, label: "Overview", icon: BarChart3 },
-            { key: "users" as const, label: "Users", icon: Users },
-            { key: "loyalty" as const, label: "Loyalty", icon: Trophy },
-            { key: "settings" as const, label: "Settings", icon: Settings },
-          ] as const).map(({ key, label, icon: Icon }) => (
+          {(
+            [
+              { key: "overview" as const, label: "Overview", icon: BarChart3 },
+              { key: "users" as const, label: "Users", icon: Users },
+              { key: "loyalty" as const, label: "Loyalty", icon: Trophy },
+              { key: "settings" as const, label: "Settings", icon: Settings },
+            ] as const
+          ).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
@@ -154,7 +201,8 @@ function AdminModuleError({ name }: { name: string }) {
       <AlertCircle className="h-8 w-8 mx-auto mb-3 text-destructive/60" />
       <p className="font-display font-bold text-lg mb-1">{name} module unavailable</p>
       <p className="font-mono text-xs text-silver/60 mb-4">
-        An error occurred while loading this section. This may be due to a network issue or database permissions.
+        An error occurred while loading this section. This may be due to a network issue or database
+        permissions.
       </p>
       <button
         onClick={() => window.location.reload()}
@@ -203,25 +251,55 @@ function AdminOverview() {
     <div className="space-y-6">
       {/* Interactive metric cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <MetricCard label="Total Sales" value={`${((metrics?.totalOrders ?? 0) * 85).toFixed(0)}`} icon={DollarSign} loading={isLoading} />
-        <MetricCard label="Active Custom Designs" value={metrics?.totalOrders ?? 0} icon={Palette} loading={isLoading} />
+        <MetricCard
+          label="Total Sales"
+          value={`${((metrics?.totalOrders ?? 0) * 85).toFixed(0)}`}
+          icon={DollarSign}
+          loading={isLoading}
+        />
+        <MetricCard
+          label="Active Custom Designs"
+          value={metrics?.totalOrders ?? 0}
+          icon={Palette}
+          loading={isLoading}
+        />
         <MetricCard label="Shopify Sync" value="Idle" icon={Store} loading={false} status="ok" />
-        <MetricCard label="Database Health" value="Healthy" icon={Database} loading={false} status="ok" />
+        <MetricCard
+          label="Database Health"
+          value="Healthy"
+          icon={Database}
+          loading={false}
+          status="ok"
+        />
       </div>
 
       {/* Quick Actions bar */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mr-2">Quick Actions:</span>
-        <Link to="/admin/products" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-silver/50 mr-2">
+          Quick Actions:
+        </span>
+        <Link
+          to="/admin/products"
+          className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors"
+        >
           <Package className="h-3.5 w-3.5" /> Add Product
         </Link>
-        <Link to="/admin/orders" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+        <Link
+          to="/admin/orders"
+          className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors"
+        >
           <Package className="h-3.5 w-3.5" /> View Orders
         </Link>
-        <Link to="/admin/diagnostics" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+        <Link
+          to="/admin/diagnostics"
+          className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors"
+        >
           <Activity className="h-3.5 w-3.5" /> Test Database
         </Link>
-        <Link to="/admin/settings/shopify" className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors">
+        <Link
+          to="/admin/settings/shopify"
+          className="inline-flex items-center gap-1.5 px-3 py-2 border border-border/60 bg-card rounded-md font-mono text-[10px] uppercase tracking-widest text-silver hover:border-primary hover:text-primary transition-colors"
+        >
           <Store className="h-3.5 w-3.5" /> Sync Shopify
         </Link>
       </div>
@@ -229,16 +307,43 @@ function AdminOverview() {
       {/* Original metrics grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
-          { label: "Total Users", value: metrics?.totalUsers ?? 0, icon: Users, loading: isLoading },
-          { label: "Customers", value: metrics?.totalCustomers ?? 0, icon: Users, loading: isLoading },
-          { label: "Orders", value: metrics?.totalOrders ?? 0, icon: DollarSign, loading: isLoading },
-          { label: "Products", value: metrics?.totalProducts ?? 0, icon: Package, loading: isLoading },
-          { label: "Active Rewards", value: metrics?.totalLoyalty ?? 0, icon: Trophy, loading: isLoading },
+          {
+            label: "Total Users",
+            value: metrics?.totalUsers ?? 0,
+            icon: Users,
+            loading: isLoading,
+          },
+          {
+            label: "Customers",
+            value: metrics?.totalCustomers ?? 0,
+            icon: Users,
+            loading: isLoading,
+          },
+          {
+            label: "Orders",
+            value: metrics?.totalOrders ?? 0,
+            icon: DollarSign,
+            loading: isLoading,
+          },
+          {
+            label: "Products",
+            value: metrics?.totalProducts ?? 0,
+            icon: Package,
+            loading: isLoading,
+          },
+          {
+            label: "Active Rewards",
+            value: metrics?.totalLoyalty ?? 0,
+            icon: Trophy,
+            loading: isLoading,
+          },
         ].map(({ label, value, icon: Icon, loading }) => (
           <div key={label} className="border border-border/60 bg-card rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Icon className="h-4 w-4 text-primary" />
-              <span className="text-xs font-mono uppercase tracking-widest text-silver/60">{label}</span>
+              <span className="text-xs font-mono uppercase tracking-widest text-silver/60">
+                {label}
+              </span>
             </div>
             <p className="text-2xl font-display font-bold">
               {loading ? <Skeleton className="h-8 w-16" /> : value}
@@ -282,7 +387,10 @@ function AdminUsers() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin", "users"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("*, user_id").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("*, user_id")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -297,11 +405,17 @@ function AdminUsers() {
     },
   });
 
-  const filtered = users?.filter((u: any) =>
-    search === "" || u.user_id?.toLowerCase().includes(search.toLowerCase()) || u.role?.toLowerCase().includes(search.toLowerCase())
+  const filtered = users?.filter(
+    (u: any) =>
+      search === "" ||
+      u.user_id?.toLowerCase().includes(search.toLowerCase()) ||
+      u.role?.toLowerCase().includes(search.toLowerCase()),
   );
 
-  async function callPasswordApi(action: "reset-email" | "force-update", payload: Record<string, unknown>) {
+  async function callPasswordApi(
+    action: "reset-email" | "force-update",
+    payload: Record<string, unknown>,
+  ) {
     const url = `${import.meta.env.VITE_SUPABASE_URL || ""}/functions/v1/admin-password-management`;
     const res = await fetch(url, {
       method: "POST",
@@ -377,12 +491,24 @@ function AdminUsers() {
           <table className="w-full text-sm">
             <thead className="bg-muted">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">User ID</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Points</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Tier</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Joined</th>
-                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">Actions</th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  User ID
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  Role
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  Points
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  Tier
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  Joined
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-mono uppercase tracking-widest text-silver/60">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -397,17 +523,28 @@ function AdminUsers() {
                   const lp = loyaltyData?.find((l: any) => l.user_id === u.user_id);
                   return (
                     <tr key={u.id} className="border-t border-border/30 hover:bg-muted/50">
-                      <td className="px-4 py-3 font-mono text-xs truncate max-w-[150px] sm:max-w-[200px]">{u.user_id}</td>
+                      <td className="px-4 py-3 font-mono text-xs truncate max-w-[150px] sm:max-w-[200px]">
+                        {u.user_id}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 text-[10px] font-mono uppercase rounded-full ${
-                          u.role === "admin" ? "bg-primary/20 text-primary" : "bg-muted text-silver/60"
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-0.5 text-[10px] font-mono uppercase rounded-full ${
+                            u.role === "admin"
+                              ? "bg-primary/20 text-primary"
+                              : "bg-muted text-silver/60"
+                          }`}
+                        >
                           {u.role}
                         </span>
                       </td>
                       <td className="px-4 py-3 font-mono text-xs">{lp?.points ?? 0}</td>
                       <td className="px-4 py-3">
-                        <span className="text-[10px] font-bold uppercase" style={{ color: TIERS.find((t) => t.key === (lp?.tier ?? "bronze"))?.color }}>
+                        <span
+                          className="text-[10px] font-bold uppercase"
+                          style={{
+                            color: TIERS.find((t) => t.key === (lp?.tier ?? "bronze"))?.color,
+                          }}
+                        >
                           {lp?.tier ?? "bronze"}
                         </span>
                       </td>
@@ -461,7 +598,12 @@ function AdminUsers() {
       </div>
 
       {/* Force Password Update Modal */}
-      <Dialog open={!!resetTarget} onOpenChange={(open) => { if (!open) closeResetModal(); }}>
+      <Dialog
+        open={!!resetTarget}
+        onOpenChange={(open) => {
+          if (!open) closeResetModal();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -472,11 +614,17 @@ function AdminUsers() {
           {resetTarget && (
             <div className="space-y-4">
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">Target User</label>
-                <p className="font-mono text-xs text-silver mt-1 break-all">{resetTarget.email || resetTarget.userId}</p>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">
+                  Target User
+                </label>
+                <p className="font-mono text-xs text-silver mt-1 break-all">
+                  {resetTarget.email || resetTarget.userId}
+                </p>
               </div>
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">New Temporary Password</label>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60">
+                  New Temporary Password
+                </label>
                 <div className="flex gap-2 mt-1">
                   <input
                     type="text"
@@ -495,7 +643,9 @@ function AdminUsers() {
               </div>
               <div className="flex items-center gap-3">
                 <Switch checked={forceChange} onCheckedChange={setForceChange} />
-                <span className="text-xs font-mono text-silver/70">Force user to change password on next login</span>
+                <span className="text-xs font-mono text-silver/70">
+                  Force user to change password on next login
+                </span>
               </div>
               {resetSuccess && (
                 <div className="flex items-center gap-2">
@@ -542,7 +692,10 @@ function AdminLoyalty() {
   const { data: loyaltyData, isLoading } = useQuery({
     queryKey: ["admin", "loyalty"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("loyalty_points").select("*").order("points", { ascending: false });
+      const { data, error } = await supabase
+        .from("loyalty_points")
+        .select("*")
+        .order("points", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -551,7 +704,10 @@ function AdminLoyalty() {
   const { data: allRewards } = useQuery({
     queryKey: ["rewards"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("rewards").select("*").order("points_required", { ascending: true });
+      const { data, error } = await supabase
+        .from("rewards")
+        .select("*")
+        .order("points_required", { ascending: true });
       if (error) throw error;
       return data ?? [];
     },
@@ -559,7 +715,11 @@ function AdminLoyalty() {
 
   const adjustPoints = useMutation({
     mutationFn: async ({ userId, delta }: { userId: string; delta: number }) => {
-      const { data: existing } = await supabase.from("loyalty_points").select("*").eq("user_id", userId).maybeSingle();
+      const { data: existing } = await supabase
+        .from("loyalty_points")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
       if (existing) {
         const newPoints = Math.max(0, existing.points + delta);
         const { error } = await supabase
@@ -594,8 +754,9 @@ function AdminLoyalty() {
     onError: (e) => toast.error(sanitizeError(e)),
   });
 
-  const filtered = loyaltyData?.filter((l: any) =>
-    searchUserId === "" || l.user_id?.toLowerCase().includes(searchUserId.toLowerCase())
+  const filtered = loyaltyData?.filter(
+    (l: any) =>
+      searchUserId === "" || l.user_id?.toLowerCase().includes(searchUserId.toLowerCase()),
   );
 
   return (
@@ -650,7 +811,9 @@ function AdminLoyalty() {
                   </span>
                 </div>
                 <p className="text-xs text-silver/60 mt-1">{reward.description}</p>
-                <span className="text-[10px] font-mono text-silver/40 mt-2 block">{reward.tier_unlocked} tier</span>
+                <span className="text-[10px] font-mono text-silver/40 mt-2 block">
+                  {reward.tier_unlocked} tier
+                </span>
               </div>
             ))}
           </div>
@@ -672,12 +835,24 @@ function AdminLoyalty() {
           <table className="w-full text-sm">
             <thead className="bg-muted">
               <tr>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">Rank</th>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">User</th>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">Points</th>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">Tier</th>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">Earned</th>
-                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">Redeemed</th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  Rank
+                </th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  User
+                </th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  Points
+                </th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  Tier
+                </th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  Earned
+                </th>
+                <th className="text-left px-3 py-2 text-xs font-mono uppercase text-silver/60">
+                  Redeemed
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -691,10 +866,15 @@ function AdminLoyalty() {
                 filtered.slice(0, 20).map((l: any, i: number) => (
                   <tr key={l.id} className="border-t border-border/30 hover:bg-muted/50">
                     <td className="px-3 py-2 font-bold text-primary">{i + 1}</td>
-                    <td className="px-3 py-2 font-mono text-xs truncate max-w-[150px] sm:max-w-[200px]">{l.user_id}</td>
+                    <td className="px-3 py-2 font-mono text-xs truncate max-w-[150px] sm:max-w-[200px]">
+                      {l.user_id}
+                    </td>
                     <td className="px-3 py-2 font-bold">{l.points}</td>
                     <td className="px-3 py-2">
-                      <span className="text-[10px] font-bold uppercase" style={{ color: TIERS.find((t) => t.key === l.tier)?.color }}>
+                      <span
+                        className="text-[10px] font-bold uppercase"
+                        style={{ color: TIERS.find((t) => t.key === l.tier)?.color }}
+                      >
                         {l.tier}
                       </span>
                     </td>
@@ -811,7 +991,9 @@ function NonAdminGate({ userId }: { userId: string }) {
           </>
         ) : (
           <>
-            <p className="text-silver/70 text-sm mb-6">No admins exist yet. Claim the first admin slot.</p>
+            <p className="text-silver/70 text-sm mb-6">
+              No admins exist yet. Claim the first admin slot.
+            </p>
             <button
               onClick={() => claim.mutate()}
               disabled={claim.isPending}
@@ -840,7 +1022,13 @@ function getTierFromPoints(points: number): string {
   return "bronze";
 }
 
-function MetricCard({ label, value, icon: Icon, loading, status }: {
+function MetricCard({
+  label,
+  value,
+  icon: Icon,
+  loading,
+  status,
+}: {
   label: string;
   value: string | number;
   icon: React.ComponentType<{ className?: string }>;
@@ -852,7 +1040,9 @@ function MetricCard({ label, value, icon: Icon, loading, status }: {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Icon className="h-4 w-4 text-primary" />
-          <span className="text-xs font-mono uppercase tracking-widest text-silver/60">{label}</span>
+          <span className="text-xs font-mono uppercase tracking-widest text-silver/60">
+            {label}
+          </span>
         </div>
         {status === "ok" && <span className="h-2.5 w-2.5 rounded-full bg-success" />}
         {status === "error" && <span className="h-2.5 w-2.5 rounded-full bg-destructive" />}

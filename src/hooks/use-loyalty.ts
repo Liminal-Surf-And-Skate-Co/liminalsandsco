@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,7 +6,13 @@ import { useAuth } from "./use-auth";
 
 export type LoyaltyTier = "bronze" | "silver" | "gold" | "platinum";
 
-export const TIERS: { key: LoyaltyTier; label: string; min: number; color: string; next: number }[] = [
+export const TIERS: {
+  key: LoyaltyTier;
+  label: string;
+  min: number;
+  color: string;
+  next: number;
+}[] = [
   { key: "bronze", label: "Bronze", min: 0, color: "#cd7f32", next: 100 },
   { key: "silver", label: "Silver", min: 100, color: "#c0c0c0", next: 500 },
   { key: "gold", label: "Gold", min: 500, color: "#ffd700", next: 1500 },

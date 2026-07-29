@@ -18,10 +18,7 @@ const NOT_CONFIGURED = {
  * Caller (a Login form) should display `result.error.message` in a banner
  * rather than failing silently.
  */
-export async function safeSignInWithPassword(
-  email: string,
-  password: string,
-) {
+export async function safeSignInWithPassword(email: string, password: string) {
   if (!isSupabaseConfigured) {
     return { data: { user: null, session: null }, error: NOT_CONFIGURED.error };
   }

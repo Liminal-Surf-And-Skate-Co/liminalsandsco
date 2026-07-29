@@ -1,7 +1,19 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Package, Truck, Check, Clock, CircleAlert as AlertCircle, RotateCcw, FileText, ExternalLink, ChevronDown, X } from "lucide-react";
+import {
+  Package,
+  Truck,
+  Check,
+  Clock,
+  CircleAlert as AlertCircle,
+  RotateCcw,
+  FileText,
+  ExternalLink,
+  ChevronDown,
+  X,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/use-auth";
@@ -132,10 +144,7 @@ export function OrdersPage() {
 
         {/* Return modal */}
         {returnOrderId && (
-          <ReturnModal
-            orderId={returnOrderId}
-            onClose={() => setReturnOrderId(null)}
-          />
+          <ReturnModal orderId={returnOrderId} onClose={() => setReturnOrderId(null)} />
         )}
       </main>
       <Footer />
@@ -166,10 +175,7 @@ function OrderCard({
 
   return (
     <div className="border border-border/60 bg-card">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 text-left"
-      >
+      <button onClick={onToggle} className="w-full flex items-center justify-between p-4 text-left">
         <div className="flex items-center gap-4">
           <div className="h-10 w-10 rounded-full bg-silver/10 flex items-center justify-center">
             <span className="font-mono text-xs text-silver">
@@ -186,11 +192,15 @@ function OrderCard({
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
             <p className="font-mono text-xs text-silver/50">${order.total_amount} AUD</p>
-            <p className={`font-mono text-xs uppercase tracking-widest ${STATUS_COLORS[order.status] || "text-silver"}`}>
+            <p
+              className={`font-mono text-xs uppercase tracking-widest ${STATUS_COLORS[order.status] || "text-silver"}`}
+            >
               {order.status}
             </p>
           </div>
-          <ChevronDown className={`h-4 w-4 text-silver/50 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          <ChevronDown
+            className={`h-4 w-4 text-silver/50 transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
         </div>
       </button>
 
@@ -209,7 +219,9 @@ function OrderCard({
                   <div key={step.key} className="flex flex-col items-center gap-2 flex-1">
                     <div
                       className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                        isActive ? "bg-primary text-primary-foreground" : "bg-silver/10 text-silver/40"
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-silver/10 text-silver/40"
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -247,7 +259,8 @@ function OrderCard({
                     <span className="text-silver/80">
                       {item.product_title}
                       {item.variant && <span className="text-silver/50"> ({item.variant})</span>}
-                      {" x"}{item.quantity}
+                      {" x"}
+                      {item.quantity}
                     </span>
                     <span className="font-mono text-silver/60">
                       ${(item.unit_price * item.quantity).toFixed(2)}
@@ -360,9 +373,7 @@ function ReturnModal({ orderId, onClose }: { orderId: string; onClose: () => voi
           <X className="h-5 w-5" />
         </button>
         <h2 className="font-display font-bold text-xl mb-4">Start a Return / Exchange</h2>
-        <p className="text-sm text-silver/70 mb-4">
-          Order #{orderId.slice(0, 8)}
-        </p>
+        <p className="text-sm text-silver/70 mb-4">Order #{orderId.slice(0, 8)}</p>
         <div className="mb-4">
           <label className="font-mono text-[10px] uppercase tracking-widest text-silver/60 block mb-2">
             Reason for return

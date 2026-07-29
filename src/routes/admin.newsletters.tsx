@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -88,7 +89,10 @@ function AdminNewslettersPage() {
       <main>
         <section className="py-16 border-b border-border/40">
           <div className="max-w-7xl mx-auto px-6">
-            <Link to="/admin" className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-primary mb-4">
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-primary mb-4"
+            >
               <ArrowLeft className="h-3 w-3" /> Back to admin
             </Link>
             <h1 className="font-display font-black text-4xl">Newsletters</h1>
@@ -98,43 +102,109 @@ function AdminNewslettersPage() {
           <div className="lg:col-span-8 space-y-6">
             {editing === "new" && (
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(upsert.mutate)} className="bg-card border border-border/60 p-6 space-y-4">
-                  <FormField control={form.control} name="subject" render={({ field }) => (
-                    <FormItem><FormLabel>Subject</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                  )} />
-                  <FormField control={form.control} name="excerpt" render={({ field }) => (
-                    <FormItem><FormLabel>Excerpt</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                  )} />
-                  <FormField control={form.control} name="body" render={({ field }) => (
-                    <FormItem><FormLabel>Body</FormLabel><FormControl><Textarea {...field} rows={8} /></FormControl></FormItem>
-                  )} />
-                  <FormField control={form.control} name="scheduled_for" render={({ field }) => (
-                    <FormItem><FormLabel>Scheduled for</FormLabel><FormControl><Input type="datetime-local" {...field} /></FormControl></FormItem>
-                  )} />
+                <form
+                  onSubmit={form.handleSubmit(upsert.mutate)}
+                  className="bg-card border border-border/60 p-6 space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="excerpt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Excerpt</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="body"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Body</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} rows={8} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="scheduled_for"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Scheduled for</FormLabel>
+                        <FormControl>
+                          <Input type="datetime-local" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                   <div className="flex gap-3">
                     <Button type="submit">Save</Button>
-                    <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+                    <Button type="button" variant="outline" onClick={() => setEditing(null)}>
+                      Cancel
+                    </Button>
                   </div>
                 </form>
               </Form>
             )}
             <div className="space-y-3">
               {(newsletters ?? []).map((n: Record<string, unknown>) => (
-                <div key={n.id as string} className="border border-border/60 bg-card p-4 flex items-center justify-between">
+                <div
+                  key={n.id as string}
+                  className="border border-border/60 bg-card p-4 flex items-center justify-between"
+                >
                   <div>
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{(n.subject as string) ?? "Untitled"}</p>
-                    <p className="text-xs text-silver/60">{(n.scheduled_for as string) ? new Date(n.scheduled_for as string).toLocaleString() : "Draft"}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                      {(n.subject as string) ?? "Untitled"}
+                    </p>
+                    <p className="text-xs text-silver/60">
+                      {(n.scheduled_for as string)
+                        ? new Date(n.scheduled_for as string).toLocaleString()
+                        : "Draft"}
+                    </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => setEditing(n.id as string)}>Edit</Button>
-                    <Button size="sm" variant="destructive" onClick={() => deleteN.mutate(n.id as string)}>Delete</Button>
+                    <Button size="sm" onClick={() => setEditing(n.id as string)}>
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteN.mutate(n.id as string)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
           <div className="lg:col-span-4">
-            <Button className="w-full" onClick={() => { setEditing("new"); form.reset(); }}>+ New Newsletter</Button>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setEditing("new");
+                form.reset();
+              }}
+            >
+              + New Newsletter
+            </Button>
           </div>
         </div>
       </main>

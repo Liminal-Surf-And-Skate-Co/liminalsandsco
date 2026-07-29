@@ -33,8 +33,8 @@ export function LiabilityPage() {
               </h2>
               <p className="text-sm text-silver/80">
                 Skateboarding, surfing, and other action sports carry inherent risks. By purchasing
-                equipment from Liminal Surf & Skate Co, you acknowledge and accept these risks
-                and agree to this waiver.
+                equipment from Liminal Surf & Skate Co, you acknowledge and accept these risks and
+                agree to this waiver.
               </p>
             </div>
           </div>
@@ -69,35 +69,34 @@ export function LiabilityPage() {
               1. Acknowledgment of Inherent Risks
             </h2>
             <p className="text-silver/80 leading-relaxed">
-              I understand that action sports including skateboarding, surfing, inline skating,
-              BMX, and related activities involve inherent risks that cannot be eliminated
-              regardless of the care taken to avoid injuries. These risks include, but are not
-              limited to: slips, falls, collisions, equipment failure, impact injuries, head
-              injuries, paralysis, and death.
+              I understand that action sports including skateboarding, surfing, inline skating, BMX,
+              and related activities involve inherent risks that cannot be eliminated regardless of
+              the care taken to avoid injuries. These risks include, but are not limited to: slips,
+              falls, collisions, equipment failure, impact injuries, head injuries, paralysis, and
+              death.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">2. Assumption of Risk</h2>
             <p className="text-silver/80 leading-relaxed">
-              I hereby voluntarily assume all risks associated with action sports activities,
-              both known and unknown, even if arising from the negligence of Liminal Surf &
-              Skate Co, its employees, agents, or representatives. I understand that these
-              activities involve risks both on and off the water, at skateparks, on public
-              roads, and in private facilities.
+              I hereby voluntarily assume all risks associated with action sports activities, both
+              known and unknown, even if arising from the negligence of Liminal Surf & Skate Co, its
+              employees, agents, or representatives. I understand that these activities involve
+              risks both on and off the water, at skateparks, on public roads, and in private
+              facilities.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">3. Waiver and Release</h2>
             <p className="text-silver/80 leading-relaxed">
-              In consideration of being permitted to purchase and use equipment from Liminal
-              Surf & Skate Co, I hereby release, waive, discharge, and covenant not to sue the
-              company, its officers, employees, agents, and representatives from any and all
-              liability, claims, demands, actions, and causes of action whatsoever arising out
-              of or related to any loss, damage, or injury, including death, that may be
-              sustained by me or any property belonging to me while engaged in action sports
-              activities.
+              In consideration of being permitted to purchase and use equipment from Liminal Surf &
+              Skate Co, I hereby release, waive, discharge, and covenant not to sue the company, its
+              officers, employees, agents, and representatives from any and all liability, claims,
+              demands, actions, and causes of action whatsoever arising out of or related to any
+              loss, damage, or injury, including death, that may be sustained by me or any property
+              belonging to me while engaged in action sports activities.
             </p>
           </section>
 
@@ -105,20 +104,20 @@ export function LiabilityPage() {
             <h2 className="font-display font-bold text-xl mb-4">4. Equipment Disclaimer</h2>
             <p className="text-silver/80 leading-relaxed">
               I understand that skateboards, surfboards, and related equipment can fail under
-              stress, impact, or improper use. Liminal Surf & Skate Co makes no warranties,
-              express or implied, regarding the safety or fitness of any product for any
-              particular purpose. I accept responsibility for proper inspection, maintenance,
-              and appropriate use of all equipment purchased.
+              stress, impact, or improper use. Liminal Surf & Skate Co makes no warranties, express
+              or implied, regarding the safety or fitness of any product for any particular purpose.
+              I accept responsibility for proper inspection, maintenance, and appropriate use of all
+              equipment purchased.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">5. Protective Equipment</h2>
             <p className="text-silver/80 leading-relaxed">
-              I acknowledge the importance of wearing appropriate protective equipment
-              including helmets, wrist guards, knee pads, and elbow pads while engaged in
-              action sports. Liminal Surf & Skate Co strongly recommends the use of certified
-              protective equipment at all times.
+              I acknowledge the importance of wearing appropriate protective equipment including
+              helmets, wrist guards, knee pads, and elbow pads while engaged in action sports.
+              Liminal Surf & Skate Co strongly recommends the use of certified protective equipment
+              at all times.
             </p>
           </section>
 
@@ -126,9 +125,9 @@ export function LiabilityPage() {
             <h2 className="font-display font-bold text-xl mb-4">6. Indemnification</h2>
             <p className="text-silver/80 leading-relaxed">
               I agree to indemnify and hold harmless Liminal Surf & Skate Co from any and all
-              claims, actions, suits, costs, and expenses, including attorney's fees, arising
-              from my participation in action sports activities or use of products purchased
-              from Liminal Surf & Skate Co.
+              claims, actions, suits, costs, and expenses, including attorney's fees, arising from
+              my participation in action sports activities or use of products purchased from Liminal
+              Surf & Skate Co.
             </p>
           </section>
 
@@ -136,18 +135,18 @@ export function LiabilityPage() {
             <h2 className="font-display font-bold text-xl mb-4">7. Governing Law</h2>
             <p className="text-silver/80 leading-relaxed">
               This waiver shall be governed by and construed in accordance with the laws of New
-              South Wales, Australia. Any disputes arising under this waiver shall be resolved
-              in the courts of New South Wales.
+              South Wales, Australia. Any disputes arising under this waiver shall be resolved in
+              the courts of New South Wales.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="font-display font-bold text-xl mb-4">8. Acknowledgment</h2>
             <p className="text-silver/80 leading-relaxed">
-              By purchasing products from Liminal Surf & Skate Co, either online or in-store,
-              I acknowledge that I have read and understood this waiver, and I agree to be
-              bound by its terms. I certify that I am at least 18 years of age, or if under 18,
-              my parent or legal guardian has reviewed and agreed to these terms on my behalf.
+              By purchasing products from Liminal Surf & Skate Co, either online or in-store, I
+              acknowledge that I have read and understood this waiver, and I agree to be bound by
+              its terms. I certify that I am at least 18 years of age, or if under 18, my parent or
+              legal guardian has reviewed and agreed to these terms on my behalf.
             </p>
           </section>
 

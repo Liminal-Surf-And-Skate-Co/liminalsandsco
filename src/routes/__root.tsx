@@ -9,10 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { sanitizeError } from "@/lib/error-sanitize";
-import {
-  supabase,
-  isSupabaseConfigured,
-} from "@/integrations/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { LiamChatWidget } from "@/components/site/LiamChatWidget";
 import { ErrorBoundary } from "@/components/site/ErrorBoundary";
 
@@ -154,10 +151,9 @@ function BackendBanner() {
       role="status"
       className="bg-destructive text-destructive-foreground px-4 py-2 text-center text-xs sm:text-sm font-medium"
     >
-      Backend configuration missing. Set{" "}
-      <code className="font-mono">VITE_SUPABASE_URL</code> and{" "}
-      <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> in the project’s
-      API Keys tab to enable login, products, and admin.
+      Backend configuration missing. Set <code className="font-mono">VITE_SUPABASE_URL</code> and{" "}
+      <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> in the project’s API Keys tab to
+      enable login, products, and admin.
     </div>
   );
 }

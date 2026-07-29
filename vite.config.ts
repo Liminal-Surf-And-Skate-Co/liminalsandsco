@@ -6,13 +6,7 @@ import tsConfigPaths from "vite-tsconfig-paths";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [
-    tanstackStart(),
-    react(),
-    nitro(),
-    tailwindcss(),
-    tsConfigPaths()
-  ],
+  plugins: [tanstackStart(), react(), nitro(), tailwindcss(), tsConfigPaths()],
   ssr: {
     noExternal: ["react-leaflet", "leaflet"],
   },

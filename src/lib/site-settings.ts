@@ -31,7 +31,6 @@ export const SETTING_LABELS: Record<SettingKey, string> = {
   contact_email_secondary: "Secondary contact email",
 };
 
-
 export type SettingsMap = Record<SettingKey, string>;
 
 export function useSiteSettings() {

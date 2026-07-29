@@ -8,7 +8,14 @@ export type SearchResults = {
   products: Product[];
   posts: Post[];
   newsletters: Newsletter[];
-  events: { id: string; title: string; date: string; detail: string; start_at: string; category: string }[];
+  events: {
+    id: string;
+    title: string;
+    date: string;
+    detail: string;
+    start_at: string;
+    category: string;
+  }[];
   total: number;
   loading: boolean;
 };
@@ -48,7 +55,14 @@ export function useGlobalSearch(query: string, limitPerGroup = 20): SearchResult
   return useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) {
-      return { products: [], posts: [], newsletters: [], events: [], total: 0, loading: lp || ln || le };
+      return {
+        products: [],
+        posts: [],
+        newsletters: [],
+        events: [],
+        total: 0,
+        loading: lp || ln || le,
+      };
     }
 
     const prod = (products ?? [])

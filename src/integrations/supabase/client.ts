@@ -15,8 +15,7 @@ import type { Database } from "./types";
  * reports `false`. The `BackendBanner` component in `__root.tsx` is what
  * surfaces a helpful warning to the developer / user.
  */
-const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
 
 const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_ANON_KEY ??
@@ -39,7 +38,7 @@ function createSupabaseClient(): SupabaseClient<Database> | null {
       ...(!SUPABASE_ANON_KEY ? ["VITE_SUPABASE_ANON_KEY"] : []),
     ];
     // Helpful developer-facing warning; never throws.
-    // eslint-disable-next-line no-console
+
     console.warn(
       `[Supabase] Missing environment variable(s): ${missing.join(", ")}. ` +
         `Authentication and database features are disabled until set. ` +
@@ -68,56 +67,52 @@ let _supabase: SupabaseClient<Database> | null | undefined;
  *
  * This guarantees React renders normally while the banner informs the user.
  */
-export const supabase: SupabaseClient<Database> = new Proxy(
-  {} as SupabaseClient<Database>,
-  {
-    get(_target, prop, receiver) {
-      if (_supabase === undefined) _supabase = createSupabaseClient();
-      if (_supabase === null) {
-        if (prop === "auth") {
-          return {
-            getSession: async () => ({
-              data: { session: null },
-              error: null,
-            }),
-            onAuthStateChange: () => ({
-              data: { subscription: { unsubscribe: () => {} } },
-            }),
-            signInWithPassword: async () => ({
-              data: { user: null, session: null },
+export const supabase: SupabaseClient<Database> = new Proxy({} as SupabaseClient<Database>, {
+  get(_target, prop, receiver) {
+    if (_supabase === undefined) _supabase = createSupabaseClient();
+    if (_supabase === null) {
+      if (prop === "auth") {
+        return {
+          getSession: async () => ({
+            data: { session: null },
+            error: null,
+          }),
+          onAuthStateChange: () => ({
+            data: { subscription: { unsubscribe: () => {} } },
+          }),
+          signInWithPassword: async () => ({
+            data: { user: null, session: null },
+            error: { message: "Backend not configured" },
+          }),
+          signUp: async () => ({
+            data: { user: null, session: null },
+            error: { message: "Backend not configured" },
+          }),
+          signOut: async () => ({ error: null }),
+          getUser: async () => ({ data: { user: null }, error: null }),
+          admin: {
+            updateUserById: async () => ({
+              data: {},
               error: { message: "Backend not configured" },
             }),
-            signUp: async () => ({
-              data: { user: null, session: null },
-              error: { message: "Backend not configured" },
-            }),
-            signOut: async () => ({ error: null }),
-            getUser: async () => ({ data: { user: null }, error: null }),
-            admin: {
-              updateUserById: async () => ({
-                data: {},
-                error: { message: "Backend not configured" },
-              }),
-            },
-          };
-        }
-        // For .from() and any other PostgREST/query builder, return a proxy that
-        // ultimately resolves to empty data without throwing.
-        return new Proxy(
-          {},
-          {
-            get: () => () =>
-              new Proxy(
-                {},
-                {
-                  get: () => () =>
-                    Promise.resolve({ data: null, error: null, count: 0 }),
-                },
-              ),
           },
-        );
+        };
       }
-      return Reflect.get(_supabase, prop, receiver);
-    },
+      // For .from() and any other PostgREST/query builder, return a proxy that
+      // ultimately resolves to empty data without throwing.
+      return new Proxy(
+        {},
+        {
+          get: () => () =>
+            new Proxy(
+              {},
+              {
+                get: () => () => Promise.resolve({ data: null, error: null, count: 0 }),
+              },
+            ),
+        },
+      );
+    }
+    return Reflect.get(_supabase, prop, receiver);
   },
-);
+});

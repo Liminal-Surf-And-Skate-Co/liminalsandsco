@@ -1,7 +1,23 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
 // @ts-nocheck
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { User, LogOut, Shield, Gift, Clock, Settings, Circle as HelpCircle, Award, ChevronRight, Sparkles, Zap, Loader as Loader2, AlertCircle, Mail } from "lucide-react";
+import {
+  User,
+  LogOut,
+  Shield,
+  Gift,
+  Clock,
+  Settings,
+  Circle as HelpCircle,
+  Award,
+  ChevronRight,
+  Sparkles,
+  Zap,
+  Loader as Loader2,
+  AlertCircle,
+  Mail,
+} from "lucide-react";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,7 +130,11 @@ function AccountPage() {
         ) : (
           <AuthView
             mode={mode}
-            setMode={(m) => { setMode(m); setAuthError(null); setNotice(null); }}
+            setMode={(m) => {
+              setMode(m);
+              setAuthError(null);
+              setNotice(null);
+            }}
             email={email}
             setEmail={setEmail}
             password={password}
@@ -180,7 +200,10 @@ function DashboardView({
             {tierInfo && (
               <span
                 className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: tierInfo.tierDef.color + "20", color: tierInfo.tierDef.color }}
+                style={{
+                  backgroundColor: tierInfo.tierDef.color + "20",
+                  color: tierInfo.tierDef.color,
+                }}
               >
                 <Award className="h-3 w-3" />
                 {tierInfo.tierDef.label}
@@ -232,7 +255,13 @@ function DashboardView({
 
       {/* Tab Content */}
       {activeTab === "overview" && (
-        <OverviewTab user={user} record={record} tierInfo={tierInfo} loading={loading} addPoints={addPoints} />
+        <OverviewTab
+          user={user}
+          record={record}
+          tierInfo={tierInfo}
+          loading={loading}
+          addPoints={addPoints}
+        />
       )}
       {activeTab === "rewards" && (
         <RewardsTab
@@ -268,28 +297,32 @@ function OverviewTab({
         <div className="border border-border/60 bg-card rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Gift className="h-4 w-4 text-primary" />
-            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">Points</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">
+              Points
+            </span>
           </div>
-          <p className="text-2xl font-display font-bold">
-            {loading ? "—" : record?.points ?? 0}
-          </p>
+          <p className="text-2xl font-display font-bold">{loading ? "—" : (record?.points ?? 0)}</p>
         </div>
         <div className="border border-border/60 bg-card rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">Earned</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">
+              Earned
+            </span>
           </div>
           <p className="text-2xl font-display font-bold">
-            {loading ? "—" : record?.total_earned ?? 0}
+            {loading ? "—" : (record?.total_earned ?? 0)}
           </p>
         </div>
         <div className="border border-border/60 bg-card rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="h-4 w-4 text-primary" />
-            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">Redeemed</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-silver/60">
+              Redeemed
+            </span>
           </div>
           <p className="text-2xl font-display font-bold">
-            {loading ? "—" : record?.total_redeemed ?? 0}
+            {loading ? "—" : (record?.total_redeemed ?? 0)}
           </p>
         </div>
       </div>
@@ -311,7 +344,10 @@ function OverviewTab({
               <div className="flex items-center gap-2">
                 <span
                   className="inline-flex items-center gap-1 text-sm font-bold px-3 py-1 rounded-full"
-                  style={{ backgroundColor: tierInfo.tierDef.color + "20", color: tierInfo.tierDef.color }}
+                  style={{
+                    backgroundColor: tierInfo.tierDef.color + "20",
+                    color: tierInfo.tierDef.color,
+                  }}
                 >
                   <Award className="h-3.5 w-3.5" />
                   {tierInfo.tierDef.label}
@@ -335,7 +371,10 @@ function OverviewTab({
             </div>
             <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-silver/40">
               {TIERS.map((t) => (
-                <span key={t.key} className={t.key === tierInfo.tier ? "text-primary font-bold" : ""}>
+                <span
+                  key={t.key}
+                  className={t.key === tierInfo.tier ? "text-primary font-bold" : ""}
+                >
                   {t.label}
                 </span>
               ))}
@@ -353,7 +392,9 @@ function OverviewTab({
           </div>
         ) : (
           <div className="text-center py-6">
-            <p className="text-sm text-silver/60 mb-2">Start earning points with your first purchase!</p>
+            <p className="text-sm text-silver/60 mb-2">
+              Start earning points with your first purchase!
+            </p>
             <button
               onClick={() => addPoints.mutate({ points: 50 })}
               disabled={addPoints.isPending}
@@ -389,12 +430,16 @@ function OverviewTab({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">Current tier: {getTierLabel(record.points)}</p>
-                  <p className="text-xs text-silver/60 font-mono">Total earned: {record.total_earned} pts</p>
+                  <p className="text-xs text-silver/60 font-mono">
+                    Total earned: {record.total_earned} pts
+                  </p>
                 </div>
               </div>
             </>
           ) : (
-            <p className="text-sm text-silver/60 text-center py-4">No activity yet. Make a purchase to get started!</p>
+            <p className="text-sm text-silver/60 text-center py-4">
+              No activity yet. Make a purchase to get started!
+            </p>
           )}
         </div>
       </div>
@@ -509,7 +554,8 @@ function RewardsTab({
                     <span
                       className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded-full"
                       style={{
-                        backgroundColor: TIERS.find((t) => t.key === reward.tier_unlocked)?.color + "20",
+                        backgroundColor:
+                          TIERS.find((t) => t.key === reward.tier_unlocked)?.color + "20",
                         color: TIERS.find((t) => t.key === reward.tier_unlocked)?.color,
                       }}
                     >
@@ -518,7 +564,9 @@ function RewardsTab({
                   </div>
                   <p className="text-xs text-silver/60 mb-3">{reward.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-silver/60">{reward.points_required} pts</span>
+                    <span className="text-xs font-mono text-silver/60">
+                      {reward.points_required} pts
+                    </span>
                     <button
                       onClick={() => canAfford && unlocked && redeem.mutate({ reward })}
                       disabled={!canAfford || !unlocked || redeem.isPending}
@@ -531,10 +579,10 @@ function RewardsTab({
                       {!unlocked
                         ? "Locked"
                         : !canAfford
-                        ? "Need pts"
-                        : redeem.isPending
-                        ? "Redeeming..."
-                        : "Redeem"}
+                          ? "Need pts"
+                          : redeem.isPending
+                            ? "Redeeming..."
+                            : "Redeem"}
                     </button>
                   </div>
                 </div>
@@ -568,7 +616,9 @@ function SettingsTab({ user }: { user: { email: string | null; id: string } }) {
             <label className="block text-xs font-mono uppercase tracking-widest text-silver/60 mb-1">
               User ID
             </label>
-            <code className="text-xs font-mono bg-muted px-2 py-1 rounded break-all">{user.id}</code>
+            <code className="text-xs font-mono bg-muted px-2 py-1 rounded break-all">
+              {user.id}
+            </code>
           </div>
         </div>
       </div>
@@ -671,8 +721,12 @@ function AuthView({
               </button>
             </div>
             <div className="relative my-4 text-center">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/40" /></div>
-              <span className="relative bg-card px-2 text-[10px] font-mono uppercase tracking-widest text-silver/50">or with email</span>
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/40" />
+              </div>
+              <span className="relative bg-card px-2 text-[10px] font-mono uppercase tracking-widest text-silver/50">
+                or with email
+              </span>
             </div>
           </>
         )}
@@ -762,17 +816,29 @@ function AuthView({
 function GoogleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden>
-      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.5 13.3l7.8 6.1C12.2 13.5 17.6 9.5 24 9.5z"/>
-      <path fill="#4285F4" d="M46.5 24.5c0-1.6-.2-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.8c4.3-4 6.7-9.8 6.7-17.3z"/>
-      <path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.5 10.7l7.8-6.1z"/>
-      <path fill="#34A853" d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.4-5.8c-2.1 1.4-4.7 2.2-7.9 2.2-6.4 0-11.8-4-13.7-9.9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/>
+      <path
+        fill="#EA4335"
+        d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.5 13.3l7.8 6.1C12.2 13.5 17.6 9.5 24 9.5z"
+      />
+      <path
+        fill="#4285F4"
+        d="M46.5 24.5c0-1.6-.2-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.8c4.3-4 6.7-9.8 6.7-17.3z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.5 10.7l7.8-6.1z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 48c6.2 0 11.5-2 15.3-5.5l-7.4-5.8c-2.1 1.4-4.7 2.2-7.9 2.2-6.4 0-11.8-4-13.7-9.9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"
+      />
     </svg>
   );
 }
 function DiscordIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden fill="currentColor">
-      <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3l-.191.365a18.29 18.29 0 0 1 3.317 1.093c-4.026-1.94-8.708-1.94-12.784 0A18.32 18.32 0 0 1 10.22 3.365L10.03 3a19.79 19.79 0 0 0-3.76 1.369C2.61 9.75 1.822 15 2.2 20.18c1.68 1.253 3.31 2.017 4.914 2.517.397-.54.75-1.116 1.056-1.719-.579-.219-1.131-.487-1.657-.804.14-.104.276-.212.408-.322 3.216 1.492 6.696 1.492 9.869 0 .133.11.269.218.408.322-.527.318-1.08.587-1.66.807.306.6.66 1.176 1.056 1.716 1.605-.5 3.235-1.264 4.916-2.518.446-6-.907-11.203-3.194-15.81zM8.834 15.62c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.882 2.244-1.996 2.244zm6.332 0c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.881 2.244-1.996 2.244z"/>
+      <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3l-.191.365a18.29 18.29 0 0 1 3.317 1.093c-4.026-1.94-8.708-1.94-12.784 0A18.32 18.32 0 0 1 10.22 3.365L10.03 3a19.79 19.79 0 0 0-3.76 1.369C2.61 9.75 1.822 15 2.2 20.18c1.68 1.253 3.31 2.017 4.914 2.517.397-.54.75-1.116 1.056-1.719-.579-.219-1.131-.487-1.657-.804.14-.104.276-.212.408-.322 3.216 1.492 6.696 1.492 9.869 0 .133.11.269.218.408.322-.527.318-1.08.587-1.66.807.306.6.66 1.176 1.056 1.716 1.605-.5 3.235-1.264 4.916-2.518.446-6-.907-11.203-3.194-15.81zM8.834 15.62c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.882 2.244-1.996 2.244zm6.332 0c-1.096 0-1.996-1.007-1.996-2.244s.882-2.243 1.996-2.243c1.115 0 2.014 1.006 1.996 2.243 0 1.237-.881 2.244-1.996 2.244z" />
     </svg>
   );
 }

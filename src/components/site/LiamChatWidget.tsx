@@ -43,8 +43,8 @@ export function LiamChatWidget() {
           </div>
           <div className="p-4 space-y-3">
             <p className="text-sm text-silver/80">
-              Hey, I'm Liam. Need gear advice, a stoke check, or just want to chat about last
-              swell? Hit me up on Discord.
+              Hey, I'm Liam. Need gear advice, a stoke check, or just want to chat about last swell?
+              Hit me up on Discord.
             </p>
             <p className="text-xs text-silver/50 italic">
               "The waves wait for no one. But I'll answer your DMs within 24 hours."

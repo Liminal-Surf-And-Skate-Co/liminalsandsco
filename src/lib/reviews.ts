@@ -111,9 +111,7 @@ function validateReviewPhoto(file: File): void {
   }
 
   // Validate extension against allowlist
-  const hasAllowedExt = ALLOWED_REVIEW_PHOTO_EXTS.some((ext) =>
-    lowerName.endsWith(ext)
-  );
+  const hasAllowedExt = ALLOWED_REVIEW_PHOTO_EXTS.some((ext) => lowerName.endsWith(ext));
   if (!hasAllowedExt) {
     throw new Error("Only .jpg, .jpeg, .png, and .webp files are allowed.");
   }
@@ -121,9 +119,7 @@ function validateReviewPhoto(file: File): void {
   // Validate MIME type against allowlist (do not rely solely on file.type)
   const declaredType = file.type.toLowerCase().trim();
   if (!ALLOWED_REVIEW_PHOTO_TYPES.includes(declaredType)) {
-    throw new Error(
-      "Invalid file type. Only JPEG, PNG, and WebP images are allowed."
-    );
+    throw new Error("Invalid file type. Only JPEG, PNG, and WebP images are allowed.");
   }
 
   // Validate file size
